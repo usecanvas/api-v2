@@ -4,6 +4,7 @@ defmodule CanvasAPI.Account do
   schema "accounts" do
     field :email, :string
     field :slack_id, :string
+    many_to_many :teams, CanvasAPI.Team, join_through: "memberships"
 
     timestamps
   end

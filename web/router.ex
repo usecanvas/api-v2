@@ -5,7 +5,11 @@ defmodule CanvasAPI.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", CanvasAPI do
+  scope "/", CanvasAPI do
     pipe_through :api
+
+    scope "/oauth", OAuth do
+      get "/slack/callback", Slack.CallbackController, :callback
+    end
   end
 end
