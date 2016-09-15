@@ -13,7 +13,6 @@ config :canvas_api, CanvasAPI.Endpoint,
   check_origin: false,
   watchers: []
 
-
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
@@ -24,8 +23,6 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :canvas_api, CanvasAPI.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "canvas_api_dev",
+  database: "canvas_pro_api_dev",
   hostname: "localhost",
   pool_size: 10

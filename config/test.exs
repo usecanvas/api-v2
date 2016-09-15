@@ -12,8 +12,6 @@ config :logger, level: :warn
 # Configure your database
 config :canvas_api, CanvasAPI.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "canvas_api_test",
+  database: "canvas_pro_api_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox

@@ -13,11 +13,19 @@ use Mix.Config
 # which you typically run after static files are built.
 config :canvas_api, CanvasAPI.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/manifest.json"
+  url: [host: System.get_env("HOST"), port: 80],
+  cache_static_manifest: "priv/static/manifest.json",
+  force_ssl: [hsts: true],
+  secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+# Configure your database
+config :canvas_api, CanvasAPI.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  url: {:system, "DATABASE_URL"},
+  pool_size: 20
 
 # ## SSL Support
 #
@@ -55,7 +63,3 @@ config :logger, level: :info
 #
 #     config :canvas_api, CanvasAPI.Endpoint, server: true
 #
-
-# Finally import the config/prod.secret.exs
-# which should be versioned separately.
-import_config "prod.secret.exs"
