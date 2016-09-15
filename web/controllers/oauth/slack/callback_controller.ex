@@ -9,7 +9,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
   @spec callback(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def callback(conn, %{"code" => code, "state" => "identity"}) do
     with {:ok, %{team: team_info, user: user_info, token: token}} <- exchange_code(code),
-         {:ok, {team, account}} <- ensure_team_and_account(team_info, user_info, token) do
+         {:ok, {_, account}} <- ensure_team_and_account(team_info, user_info, token) do
       conn
       |> fetch_session
       |> put_session(:account_id, account.id)
