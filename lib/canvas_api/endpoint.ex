@@ -33,7 +33,7 @@ defmodule CanvasAPI.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
     store: :cookie,
-    key: "_canvas_api_key",
+    key: "_canvas_pro_api_key",
     signing_salt: "vMKcfdD0"
 
   plug CanvasAPI.Router
