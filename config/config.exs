@@ -13,7 +13,7 @@ config :canvas_api,
 # Configures the endpoint
 config :canvas_api, CanvasAPI.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "eyMP8YyGD807bnsEuTkibf+l5lU85vN5rMMF6OEqWb8olvVloVoRk1GYrZ8MEtyd",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: CanvasAPI.ErrorView, accepts: ~w(json)],
   pubsub: [name: CanvasAPI.PubSub,
            adapter: Phoenix.PubSub.PG2]

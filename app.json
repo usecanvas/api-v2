@@ -1,0 +1,22 @@
+{
+  "env": {
+    "REDIRECT_ON_LOGIN_URL": {
+      "description": "The URL to redirect to on successful login",
+      "development_value": "http://localhost:4200"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "A secret key for encrypting and signing data",
+      "development_value": "Bah0Bijei9epheeshuod4eBaB3aeThaeshet6vaevighieMai9maeti1aeb4Oa7ko9ohfoX2Quah0riec"
+    },
+    "SLACK_ACCESS_TOKEN_ENCRYPTION_KEY": {
+      "description": "A key used to encrypt and decrypt Slack access tokens",
+      "development_value": "thaen6kiuNaoka4aengighoh5coo7soo"
+    },
+    "SLACK_CLIENT_ID": {
+      "description": "A key for a Slack app"
+    },
+    "SLACK_CLIENT_SECRET": {
+      "description": "A secret for a Slack app"
+    }
+  }
+}
