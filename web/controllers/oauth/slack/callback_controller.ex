@@ -1,7 +1,7 @@
 defmodule CanvasAPI.OAuth.Slack.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Account, Membership, Team}
+  alias CanvasAPI.{Account, User, Team}
 
   plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
@@ -30,7 +30,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     Repo.transaction(fn ->
       with {:ok, team} <- find_or_insert_team(team_info),
            {:ok, account} <- find_or_insert_account(current_account || user_info),
-           {:ok, _} <- find_or_insert_membership(team, account, user_info, token) do
+           {:ok, _} <- find_or_insert_user(team, account, user_info, token) do
        {team, account}
       else
         error -> Repo.rollback(error)
@@ -54,29 +54,29 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     end
   end
 
-  # Find or insert a membership for a team/user pair.
-  @spec find_or_insert_membership(Team.t, Account.t, map, String.t) :: {:ok, Membershipo.t} | {:error, any}
-  defp find_or_insert_membership(team, account, user_info, slack_token) do
-    membership_info =
+  # Find or insert a user for a team/user pair.
+  @spec find_or_insert_user(Team.t, Account.t, map, String.t) :: {:ok, User.t} | {:error, any}
+  defp find_or_insert_user(team, account, user_info, slack_token) do
+    user_info =
       user_info
       |> Map.put("slack_id", user_info["id"])
       |> Map.put("image_url", user_info["image_72"])
       |> Map.delete("id")
       |> Map.put("identity_token", slack_token)
 
-    query = from(m in Membership,
-                 where: m.slack_id == ^membership_info["slack_id"],
+    query = from(m in User,
+                 where: m.slack_id == ^user_info["slack_id"],
                  where: m.team_id == ^team.id)
 
     with nil <- Repo.one(query),
-         changeset = %Membership{}
-                     |> Membership.changeset(membership_info)
+         changeset = %User{}
+                     |> User.changeset(user_info)
                      |> Ecto.Changeset.put_assoc(:account, account)
                      |> Ecto.Changeset.put_assoc(:team, team),
-         {:ok, membership} <- Repo.insert(changeset) do
-      {:ok, membership}
+         {:ok, user} <- Repo.insert(changeset) do
+      {:ok, user}
     else
-      membership = %Membership{} -> {:ok, membership}
+      user = %User{} -> {:ok, user}
       error -> error
     end
   end
@@ -108,7 +108,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
 
   defp find_or_insert_account(user_info) do
     query =
-      from(m in Membership, where: m.slack_id == ^user_info["id"])
+      from(m in User, where: m.slack_id == ^user_info["id"])
       |> preload(:account)
 
     with nil <- Repo.one(query),
@@ -116,7 +116,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
          {:ok, account} <- Repo.insert(changeset) do
       {:ok, account}
     else
-      membership = %Membership{} -> {:ok, membership.account}
+      user = %User{} -> {:ok, user.account}
       account = %Account{} -> {:ok, account}
       error -> error
     end

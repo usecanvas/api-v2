@@ -3,10 +3,12 @@ defmodule CanvasAPI.Team do
 
   schema "teams" do
     field :domain, :string
+    field :images, :map, default: %{}
     field :name, :string
-    field :image_url, :string
     field :slack_id, :string
-    many_to_many :members, CanvasAPI.Account, join_through: "memberships"
+
+    many_to_many :accounts, CanvasAPI.Account, join_through: "users", join_keys: [team_id: :slack_id, account_id: :id]
+    has_many :users, CanvasAPI.User, references: :slack_id
 
     timestamps()
   end
@@ -16,7 +18,7 @@ defmodule CanvasAPI.Team do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:domain, :image_url, :name, :slack_id])
-    |> validate_required([:domain, :image_url, :name, :slack_id])
+    |> cast(params, [:domain, :images, :name, :slack_id])
+    |> validate_required([:domain, :images, :name, :slack_id])
   end
 end

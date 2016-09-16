@@ -1,8 +1,6 @@
 defmodule CanvasAPI.TeamController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.Team
-
   plug CanvasAPI.CurrentAccountPlug
 
   def index(conn, _params) do

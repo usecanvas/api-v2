@@ -5,6 +5,8 @@ defmodule CanvasAPI.CurrentAccountPlug do
 
   def init(opts), do: opts
 
+  def call(conn = %{private: %{current_account: %Account{}}}, _), do: conn
+
   def call(conn, opts) do
     with conn <- fetch_session(conn),
          account_id when not is_nil(account_id) <- get_session(conn, :account_id),
@@ -18,7 +20,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
           conn
           |> halt
           |> put_status(:unauthorized)
-          |> render(CanvasAPI.ErrorView, "unauthorized.json")
+          |> render(CanvasAPI.ErrorView, "401.json")
         end
     end
   end

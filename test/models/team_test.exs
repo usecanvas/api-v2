@@ -3,7 +3,7 @@ defmodule CanvasAPI.TeamTest do
 
   alias CanvasAPI.Team
 
-  @valid_attrs %{domain: "some content", name: "some content"}
+  @valid_attrs %{domain: "usecanvas.com", name: "Canvas", slack_id: "FOOBAR"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do

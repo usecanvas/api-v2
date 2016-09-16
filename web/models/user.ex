@@ -1,14 +1,15 @@
-defmodule CanvasAPI.Membership do
+defmodule CanvasAPI.User do
   use CanvasAPI.Web, :model
 
-  schema "memberships" do
+  schema "users" do
     field :email, :string
     field :identity_token, CanvasAPI.EncryptedField
-    field :image_url, :string
+    field :images, :map, default: %{}
     field :name, :string
     field :slack_id, :string
-    belongs_to :team, CanvasAPI.Team
+
     belongs_to :account, CanvasAPI.Account
+    belongs_to :team, CanvasAPI.Team, references: :slack_id
 
     timestamps
   end
@@ -18,7 +19,7 @@ defmodule CanvasAPI.Membership do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:email, :identity_token, :image_url, :name, :slack_id])
-    |> validate_required([:email, :identity_token, :image_url, :name, :slack_id])
+    |> cast(params, [:email, :identity_token, :images, :name, :slack_id])
+    |> validate_required([:email, :identity_token, :images, :name, :slack_id])
   end
 end
