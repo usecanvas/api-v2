@@ -12,10 +12,14 @@ defmodule CanvasAPI.CurrentAccountPlug do
       put_private(conn, :current_account, account)
     else
       _ ->
-        conn
-        |> halt
-        |> put_status(:unauthorized)
-        |> render(CanvasAPI.ErrorView, "unauthorized.json")
+        if opts[:permit_none] do
+          conn
+        else
+          conn
+          |> halt
+          |> put_status(:unauthorized)
+          |> render(CanvasAPI.ErrorView, "unauthorized.json")
+        end
     end
   end
 end
