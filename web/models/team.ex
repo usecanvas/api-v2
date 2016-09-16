@@ -10,6 +10,7 @@ defmodule CanvasAPI.Team do
     field :slack_id, :string
 
     many_to_many :accounts, CanvasAPI.Account, join_through: "users", join_keys: [team_id: :slack_id, account_id: :id]
+    has_many :canvases, CanvasAPI.Canvas
     has_many :users, CanvasAPI.User, references: :slack_id
 
     timestamps()

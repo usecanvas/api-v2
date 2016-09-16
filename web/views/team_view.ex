@@ -16,6 +16,13 @@ defmodule CanvasAPI.TeamView do
         inserted_at: team.inserted_at,
         updated_at: team.updated_at
       },
+      relationships: %{
+        canvases: %{
+          links: %{
+            related: team_canvas_path(CanvasAPI.Endpoint, :index, team.id)
+          }
+        }
+      },
       type: "teams"
     }
   end
