@@ -76,6 +76,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     team_info =
       team_info
       |> Map.put("slack_id", team_info["id"])
+      |> Map.put("image_url", team_info["image_original"])
       |> Map.delete("id")
 
     query = from(t in Team, where: t.slack_id == ^team_info["slack_id"])
@@ -96,6 +97,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     user_info =
       user_info
       |> Map.put("slack_id", user_info["id"])
+      |> Map.put("image_url", user_image_url(user_info))
       |> Map.delete("id")
 
     query = from(a in Account, where: a.slack_id == ^user_info["slack_id"])
@@ -108,5 +110,11 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
       account = %Account{} -> {:ok, account}
       error -> error
     end
+  end
+
+  # Get the image URL from user info.
+  @spec user_image_url(map) :: String.t
+  defp user_image_url(user_info) do
+    String.replace(user_info["image_24"], ~r/_24\.png\z/, "_original.png")
   end
 end

@@ -4,6 +4,7 @@ defmodule CanvasAPI.Team do
   schema "teams" do
     field :domain, :string
     field :name, :string
+    field :image_url, :string
     field :slack_id, :string
     many_to_many :members, CanvasAPI.Account, join_through: "memberships"
 
@@ -15,7 +16,7 @@ defmodule CanvasAPI.Team do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:domain, :name, :slack_id])
-    |> validate_required([:domain, :name, :slack_id])
+    |> cast(params, [:domain, :image_url, :name, :slack_id])
+    |> validate_required([:domain, :image_url, :name, :slack_id])
   end
 end

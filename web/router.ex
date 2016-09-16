@@ -10,6 +10,7 @@ defmodule CanvasAPI.Router do
 
     get "/account", AccountController, :show
     delete "/session", SessionController, :delete
+    resources "/teams", TeamController, only: [:index]
 
     scope "/oauth", OAuth do
       get "/slack/callback", Slack.CallbackController, :callback

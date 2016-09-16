@@ -10,6 +10,7 @@ defmodule CanvasAPI.AccountView do
       id: account.id,
       attributes: %{
         email: account.email,
+        iamge_url: account.image_url,
         slack_id: account.slack_id,
         inserted_at: account.inserted_at,
         updated_at: account.updated_at
