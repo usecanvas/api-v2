@@ -11,7 +11,7 @@ defmodule CanvasAPI.Canvas do
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
 
-    belongs_to :creator, CanvasAPI.Account
+    belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
 
     timestamps()

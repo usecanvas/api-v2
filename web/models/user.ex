@@ -12,6 +12,7 @@ defmodule CanvasAPI.User do
 
     belongs_to :account, CanvasAPI.Account
     belongs_to :team, CanvasAPI.Team, references: :slack_id, type: :string
+    has_many :canvases, CanvasAPI.Canvas
 
     timestamps
   end
