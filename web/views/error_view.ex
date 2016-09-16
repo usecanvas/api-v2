@@ -1,16 +1,24 @@
 defmodule CanvasAPI.ErrorView do
   use CanvasAPI.Web, :view
 
+  def render("400.json", _assigns) do
+    render("error.json", detail: "Bad request")
+  end
+
   def render("401.json", _assigns) do
-    %{errors: %{detail: "Unauthorized"}}
+    render("error.json", detail: "Unauthorized")
   end
 
   def render("404.json", _assigns) do
-    %{errors: %{detail: "Page not found"}}
+    render("error.json", detail: "Page not found")
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{detail: "Internal server error"}}
+    render("error.json", detail: "Internal server error")
+  end
+
+  def render("error.json", %{detail: detail}) do
+    %{errors: %{detail: detail}}
   end
 
   # In case no render clause matches or no

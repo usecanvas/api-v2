@@ -1,5 +1,5 @@
 defmodule CanvasAPI.CurrentAccountPlug do
-  alias CanvasAPI.{Account, Repo}
+  alias CanvasAPI.{Account, ErrorView, Repo}
   import Phoenix.Controller
   import Plug.Conn
 
@@ -20,7 +20,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
           conn
           |> halt
           |> put_status(:unauthorized)
-          |> render(CanvasAPI.ErrorView, "401.json")
+          |> render(ErrorView, "401.json")
         end
     end
   end

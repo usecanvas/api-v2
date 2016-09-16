@@ -18,7 +18,21 @@ defmodule CanvasAPI.Team do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:domain, :images, :name, :slack_id])
-    |> validate_required([:domain, :images, :name, :slack_id])
+    |> cast(params, [:domain, :name, :slack_id])
+    |> validate_required([:domain, :name, :slack_id])
+    |> put_images(params)
+  end
+
+  # Put images into the changeset.
+  @spec put_images(Ecto.Changeset.t, map) :: Ecto.Changeset.t
+  defp put_images(changeset, params) do
+    changeset
+    |> put_change(:images, Enum.reduce(params, %{}, fn ({key, value}, images) ->
+      if String.starts_with?(key, "image_") do
+        Map.put(images, key, value)
+      else
+        images
+      end
+    end))
   end
 end

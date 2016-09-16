@@ -10,8 +10,9 @@ defmodule CanvasAPI.TeamView do
       id: team.id,
       attributes: %{
         domain: team.domain,
+        images: team.images,
         name: team.name,
-        image_url: team.image_url,
+        slack_id: team.slack_id,
         inserted_at: team.inserted_at,
         updated_at: team.updated_at
       },
