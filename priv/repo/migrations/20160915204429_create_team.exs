@@ -14,6 +14,7 @@ defmodule CanvasAPI.Repo.Migrations.CreateTeam do
       add :updated_at, :timestamptz, null: false
     end
 
+    create index(:teams, [:domain], unique: true)
     create index(:teams, [:slack_id], unique: true)
   end
 end
