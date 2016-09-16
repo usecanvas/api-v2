@@ -12,7 +12,7 @@ defmodule CanvasAPI.Router do
     delete "/session", SessionController, :delete
 
     resources "/teams", TeamController, only: [:index] do
-      resources "/canvases", CanvasController, only: [:index]
+      resources "/canvases", CanvasController, only: [:create, :index]
     end
 
     scope "/oauth", OAuth do

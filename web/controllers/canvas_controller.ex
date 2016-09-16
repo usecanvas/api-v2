@@ -1,11 +1,30 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{ErrorView, Repo}
+  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo}
 
   plug CanvasAPI.CurrentAccountPlug
   plug :ensure_team
   plug :ensure_user
+
+  def create(conn, _params) do
+    changeset =
+      %Canvas{}
+      |> Canvas.changeset
+      |> Ecto.Changeset.put_assoc(:creator, conn.private.current_user)
+      |> Ecto.Changeset.put_assoc(:team, conn.private.current_team)
+
+    case Repo.insert(changeset) do
+      {:ok, canvas} ->
+        conn
+        |> put_status(:created)
+        |> render("show.json", canvas: canvas)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 
   def index(conn, _params) do
     canvases = conn.private.current_user.canvases

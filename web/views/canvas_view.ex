@@ -19,7 +19,8 @@ defmodule CanvasAPI.CanvasView do
         version: canvas.version,
         inserted_at: canvas.inserted_at,
         updated_at: canvas.updated_at
-      }
+      },
+      type: "canvases"
     }
   end
 end
