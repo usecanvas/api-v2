@@ -5,6 +5,10 @@ defmodule CanvasAPI.TeamView do
     %{data: render_many(teams, CanvasAPI.TeamView, "team.json")}
   end
 
+  def render("show.json", %{team: team}) do
+    %{data: render_one(team, __MODULE__, "team.json")}
+  end
+
   def render("team.json", %{team: team}) do
     %{
       id: team.id,

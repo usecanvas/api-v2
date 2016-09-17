@@ -27,8 +27,27 @@ defmodule CanvasAPI.CanvasController do
   end
 
   def index(conn, _params) do
-    canvases = conn.private.current_user.canvases
+    canvases =
+      Ecto.assoc(conn.private.current_user, :canvases)
+      |> Repo.all
+
     render(conn, "index.json", canvases: canvases)
+  end
+
+  def show(conn, %{"id" => id}) do
+    canvas =
+      Ecto.assoc(conn.private.current_team, :canvases)
+      |> Repo.get(id)
+
+    case canvas do
+      canvas = %Canvas{} ->
+        conn
+        |> render("show.json", canvas: canvas)
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> render(ErrorView, "404.json")
+    end
   end
 
   defp ensure_team(conn, _opts) do
@@ -51,8 +70,7 @@ defmodule CanvasAPI.CanvasController do
     user =
       from(u in Ecto.assoc(conn.private.current_account, :users),
            where: u.team_id == ^conn.private.current_team.slack_id,
-           limit: 1,
-           preload: [:canvases])
+           limit: 1)
       |> Repo.all
       |> Enum.at(0)
 

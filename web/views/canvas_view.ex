@@ -20,6 +20,11 @@ defmodule CanvasAPI.CanvasView do
         inserted_at: canvas.inserted_at,
         updated_at: canvas.updated_at
       },
+      relationships: %{
+        team: %{
+          related: team_path(CanvasAPI.Endpoint, :show, canvas.team_id)
+        }
+      },
       type: "canvases"
     }
   end
