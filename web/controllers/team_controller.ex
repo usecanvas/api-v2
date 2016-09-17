@@ -14,7 +14,7 @@ defmodule CanvasAPI.TeamController do
     render(conn, "index.json", teams: teams)
   end
 
-  def index(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id}) do
     team =
       Ecto.assoc(conn.private.current_account, :teams)
       |> Repo.get(id)

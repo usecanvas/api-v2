@@ -1,6 +1,6 @@
 defmodule CanvasAPI.Gettext do
   @moduledoc """
-  A module providing Internationalization with a gettext-based API.
+  A module providing Internationalization with a gettext-basedCanvasAPI.
 
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:

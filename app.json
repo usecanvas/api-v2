@@ -1,5 +1,8 @@
 {
   "env": {
+    "WEB_HOST": {
+      "description": "Hostname on which the web app runs"
+    },
     "REDIRECT_ON_LOGIN_URL": {
       "description": "The URL to redirect to on successful login",
       "development_value": "http://localhost:4200"

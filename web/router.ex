@@ -15,6 +15,8 @@ defmodule CanvasAPI.Router do
       resources "/canvases", CanvasController, only: [:create, :index, :show]
     end
 
+    get "/unfurls/:url", UnfurlController, :show
+
     scope "/oauth", OAuth do
       get "/slack/callback", Slack.CallbackController, :callback
     end

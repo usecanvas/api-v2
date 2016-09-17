@@ -53,6 +53,7 @@ defmodule CanvasAPI.Web do
       import CanvasAPI.Router.Helpers
       import CanvasAPI.ErrorHelpers
       import CanvasAPI.Gettext
+      import CanvasAPI.JSONAPIView
     end
   end
 

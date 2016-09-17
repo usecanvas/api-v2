@@ -19,7 +19,8 @@ defmodule CanvasAPI.Mixfile do
   def application do
     [mod: {CanvasAPI, []},
      applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :calecto, :slack, :base62]]
+                    :phoenix_ecto, :postgrex, :calecto, :slack, :base62,
+                    :httpoison, :timex, :floki]]
   end
 
   # Specifies which paths to compile per environment.
@@ -38,7 +39,10 @@ defmodule CanvasAPI.Mixfile do
      {:cowboy, "~> 1.0"},
      {:calecto, "~> 0.16.0"},
      {:slack_ex, "~> 0.0.14", app: false},
-     {:base62, "~> 1.2.0"}]
+     {:base62, "~> 1.2.0"},
+     {:httpoison, "~> 0.9.1"},
+     {:timex, "~> 3.0"},
+     {:floki, "~> 0.10.1"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
