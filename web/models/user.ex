@@ -11,7 +11,7 @@ defmodule CanvasAPI.User do
     field :slack_id, :string
 
     belongs_to :account, CanvasAPI.Account
-    belongs_to :team, CanvasAPI.Team, references: :slack_id, type: :string
+    belongs_to :team, CanvasAPI.Team
     has_many :canvases, through: [:team, :canvases]
     has_many :created_canvases, CanvasAPI.Canvas
 

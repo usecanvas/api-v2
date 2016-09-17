@@ -84,7 +84,7 @@ defmodule CanvasAPI.SignInMediator do
     find_user =
       from(u in User,
            where: u.slack_id == ^user_info["id"],
-           where: u.team_id == ^team.slack_id)
+           where: u.team_id == ^team.id)
 
     user_params =
       user_info

@@ -69,7 +69,7 @@ defmodule CanvasAPI.CanvasController do
   defp ensure_user(conn, _opts) do
     user =
       from(u in Ecto.assoc(conn.private.current_account, :users),
-           where: u.team_id == ^conn.private.current_team.slack_id,
+           where: u.team_id == ^conn.private.current_team.id,
            limit: 1)
       |> Repo.all
       |> Enum.at(0)

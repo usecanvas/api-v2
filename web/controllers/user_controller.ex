@@ -8,7 +8,7 @@ defmodule CanvasAPI.UserController do
   def show(conn, %{"team_id" => team_id}) do
     user =
       from(u in Ecto.assoc(conn.private.current_account, :users),
-           join: t in Team, on: t.slack_id == u.team_id,
+           join: t in Team, on: t.id == u.team_id,
            where: t.id == ^team_id,
            preload: [:team])
       |> Repo.one!

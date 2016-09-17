@@ -12,12 +12,13 @@ defmodule CanvasAPI.Repo.Migrations.CreateUser do
       add :slack_id, :text, null: false
 
       add :account_id, references(:accounts, on_delete: :delete_all, type: :binary_id), null: false
-      add :team_id, references(:teams, on_delete: :delete_all, type: :text, column: :slack_id), null: false
+      add :team_id, references(:teams, on_delete: :delete_all, type: :binary_id,), null: false
 
       add :inserted_at, :timestamptz, null: false
       add :updated_at, :timestamptz, null: false
     end
 
+    create index(:users, [:account_id, :team_id], unique: true)
     create index(:users, [:slack_id, :team_id], unique: true)
   end
 end
