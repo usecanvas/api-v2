@@ -12,6 +12,13 @@ defmodule CanvasAPI.AccountView do
         inserted_at: account.inserted_at,
         updated_at: account.updated_at
       },
+      relationships: %{
+        teams: %{
+          links: %{
+            related: team_path(CanvasAPI.Endpoint, :index)
+          }
+        }
+      },
       type: "account"
     }
   end

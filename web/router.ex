@@ -13,6 +13,7 @@ defmodule CanvasAPI.Router do
 
     resources "/teams", TeamController, only: [:index, :show] do
       resources "/canvases", CanvasController, only: [:create, :index, :show]
+      get "/user", UserController, :show
     end
 
     get "/unfurls/:url", UnfurlController, :show

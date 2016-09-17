@@ -42,7 +42,8 @@ defmodule CanvasAPI.Mixfile do
      {:base62, "~> 1.2.0"},
      {:httpoison, "~> 0.9.1"},
      {:timex, "~> 3.0"},
-     {:floki, "~> 0.10.1"}]
+     {:floki, "~> 0.10.1"},
+     {:ex_machina, "~> 1.0", only: [:test]}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

@@ -22,7 +22,12 @@ defmodule CanvasAPI.CanvasView do
       },
       relationships: %{
         team: %{
-          related: team_path(CanvasAPI.Endpoint, :show, canvas.team_id)
+          data: %{
+            id: canvas.team_id, type: "teams"
+          },
+          links: %{
+            related: team_path(CanvasAPI.Endpoint, :show, canvas.team_id)
+          }
         }
       },
       type: "canvases"
