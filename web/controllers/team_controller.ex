@@ -7,13 +7,14 @@ defmodule CanvasAPI.TeamController do
 
   plug CanvasAPI.CurrentAccountPlug
 
-  def index(conn, _params) do
+  def index(conn, params) do
     account = conn.private.current_account
 
     teams =
       from(t in assoc(account, :teams),
            order_by: [:name],
            preload: [users: ^from(u in assoc(account, :users))])
+      |> filter(params["filter"])
       |> Repo.all
 
     render(conn, "index.json", teams: teams)
@@ -37,4 +38,11 @@ defmodule CanvasAPI.TeamController do
         |> render(ErrorView, "404.json")
     end
   end
+
+  defp filter(query, %{"domain" => domain}) do
+    query
+    |> where([t], t.domain == ^domain)
+  end
+
+  defp filter(query, _), do: query
 end
