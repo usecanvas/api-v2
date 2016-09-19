@@ -1,5 +1,9 @@
 {
   "env": {
+    "DATABASE_POOL_SIZE": {
+      "description": "Size of database pool",
+      "required": false
+    },
     "GITHUB_API_TOKEN": {
       "description": "API token for GitHub"
     },
