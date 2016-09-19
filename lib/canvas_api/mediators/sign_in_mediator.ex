@@ -13,8 +13,8 @@ defmodule CanvasAPI.SignInMediator do
   Sign in a user given a Slack OAuth exchange code.
   """
   @spec sign_in(String.t, Keyword.t) :: {:ok, Account.t} | {:error, any}
-  def sign_in(code, account: account) do
-    with {:ok, info} <- exchange_code(code) do
+  def sign_in(code, account: account, redirect_uri: redirect_uri) do
+    with {:ok, info} <- exchange_code(code, redirect_uri) do
       ensure_account_in_team(account, info)
     end
   end
@@ -39,11 +39,12 @@ defmodule CanvasAPI.SignInMediator do
   end
 
   # Exchange Slack code for Slack information.
-  @spec exchange_code(String.t) :: {:ok, map} | {:error, any}
-  defp exchange_code(code) do
+  @spec exchange_code(String.t, String.t) :: {:ok, map} | {:error, any}
+  defp exchange_code(code, redirect_uri) do
     Slack.OAuth.access(client_id: @client_id,
                        client_secret: @client_secret,
-                       code: code)
+                       code: code,
+                       redirect_uri: redirect_uri)
   end
 
   # Find or insert an account from user info.
