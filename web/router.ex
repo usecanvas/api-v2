@@ -6,6 +6,12 @@ defmodule CanvasAPI.Router do
   end
 
   scope "/", CanvasAPI do
+    scope "/oauth", OAuth do
+      get "/slack/callback", Slack.CallbackController, :callback
+    end
+  end
+
+  scope "/v1", CanvasAPI do
     pipe_through :api
 
     get "/account", AccountController, :show
@@ -17,9 +23,5 @@ defmodule CanvasAPI.Router do
     end
 
     get "/unfurls", UnfurlController, :show
-
-    scope "/oauth", OAuth do
-      get "/slack/callback", Slack.CallbackController, :callback
-    end
   end
 end
