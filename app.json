@@ -1,5 +1,8 @@
 {
   "env": {
+    "GITHUB_API_TOKEN": {
+      "description": "API token for GitHub"
+    },
     "WEB_HOST": {
       "description": "Hostname on which the web app runs"
     },
