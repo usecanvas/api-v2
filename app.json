@@ -1,5 +1,10 @@
 {
   "env": {
+    "COOKIE_DOMAIN": {
+      "description": "Domain for the cookie",
+      "development_value": "localhost",
+      "value": "*.usecanvas.com"
+    },
     "DATABASE_POOL_SIZE": {
       "description": "Size of database pool",
       "required": false
