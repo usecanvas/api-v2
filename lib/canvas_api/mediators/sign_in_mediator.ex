@@ -8,13 +8,14 @@ defmodule CanvasAPI.SignInMediator do
 
   @client_id System.get_env("SLACK_CLIENT_ID")
   @client_secret System.get_env("SLACK_CLIENT_SECRET")
+  @redirect_uri System.get_env("REDIRECT_URI")
 
   @doc """
   Sign in a user given a Slack OAuth exchange code.
   """
   @spec sign_in(String.t, Keyword.t) :: {:ok, Account.t} | {:error, any}
-  def sign_in(code, account: account, redirect_uri: redirect_uri) do
-    with {:ok, info} <- exchange_code(code, redirect_uri) do
+  def sign_in(code, account: account) do
+    with {:ok, info} <- exchange_code(code, @redirect_uri) do
       ensure_account_in_team(account, info)
     end
   end
