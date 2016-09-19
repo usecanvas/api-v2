@@ -7,6 +7,10 @@
     "GITHUB_API_TOKEN": {
       "description": "API token for GitHub"
     },
+    "HOST": {
+      "description": "Hostname for this app",
+      "development_required": false
+    },
     "REDIRECT_ON_LOGIN_URL": {
       "description": "The URL to redirect to on successful login",
       "development_value": "http://localhost:4200"
