@@ -11,13 +11,13 @@
       "description": "Hostname for this app",
       "development_required": false
     },
-    "REDIRECT_URI": {
-      "description": "The redirect URI for Slack",
-      "development_value": "http://localhost:4000/oauth/slack/callback"
-    },
     "REDIRECT_ON_LOGIN_URL": {
       "description": "The URL to redirect to on successful login",
       "development_value": "http://localhost:4200"
+    },
+    "REDIRECT_URI": {
+      "description": "The redirect URI for Slack",
+      "development_value": "http://localhost:4000/oauth/slack/callback"
     },
     "PORT": {
       "description": "Port on which to run the app",
