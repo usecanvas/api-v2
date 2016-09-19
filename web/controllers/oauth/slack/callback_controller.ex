@@ -18,7 +18,9 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         |> fetch_session
         |> put_session(:account_id, account.id)
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
-      {:error, _error} ->
+      {:error, error} ->
+        IO.inspect error
+
         conn
         |> put_status(:bad_request)
         |> render(ErrorView, "400.json")
