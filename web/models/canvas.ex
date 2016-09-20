@@ -5,6 +5,7 @@ defmodule CanvasAPI.Canvas do
 
   schema "canvases" do
     field :blocks, {:array, :map}
+    field :is_template, :boolean, default: false
     field :native_version, :string, default: "1.0.0"
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
@@ -20,7 +21,7 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:blocks])
+    |> cast(params, [:blocks, :is_template])
     |> put_title_block
     |> put_change(:id, Base62UUID.generate)
   end

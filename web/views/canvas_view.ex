@@ -14,6 +14,7 @@ defmodule CanvasAPI.CanvasView do
       id: canvas.id,
       attributes: %{
         blocks: canvas.blocks,
+        is_template: canvas.is_template,
         native_version: canvas.native_version,
         type: canvas.type,
         version: canvas.version,
