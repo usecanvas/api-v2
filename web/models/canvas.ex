@@ -1,8 +1,6 @@
 defmodule CanvasAPI.Canvas do
   use CanvasAPI.Web, :model
 
-  alias CanvasAPI.Base62UUID
-
   @primary_key {:id, :string, autogenerate: false}
 
   schema "canvases" do

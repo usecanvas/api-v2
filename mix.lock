@@ -1,4 +1,5 @@
 %{"base62": {:hex, :base62, "1.2.0", "eb2b1f49a7deae2c10ff4dd862e8a87ed5ac749e6d4497367517e1894c6aa2ef", [:mix], [{:custom_base, "~> 0.2.0", [hex: :custom_base, optional: false]}]},
+  "base62_uuid": {:hex, :base62_uuid, "1.0.1", "349f6113467fa1ed845870e719d54063bea0d4435de4b2c80bc88bb206df89d0", [:mix], [{:base62, "~> 1.2.0", [hex: :base62, optional: false]}, {:uuid, "~> 1.1", [hex: :uuid, optional: false]}]},
   "calecto": {:hex, :calecto, "0.16.0", "ef280e83ed4855067adbc26e0bfc603ce9e9c2d192307c6ffcad2600f8eed93d", [:mix], [{:calendar, "~> 0.16.0", [hex: :calendar, optional: false]}, {:ecto, "~> 1.1.3 or ~> 2.0.0 or ~> 2.0.0-rc5", [hex: :ecto, optional: false]}]},
   "calendar": {:hex, :calendar, "0.16.1", "782327ad8bae7c797b887840dc4ddb933f05ce6e333e5b04964d7a5d5f79bde3", [:mix], [{:tzdata, "~> 0.5.8 or ~> 0.1.201603", [hex: :tzdata, optional: false]}]},
   "certifi": {:hex, :certifi, "0.4.0", "a7966efb868b179023618d29a407548f70c52466bf1849b9e8ebd0e34b7ea11f", [:rebar3], []},
@@ -33,4 +34,5 @@
   "slack_ex": {:hex, :slack_ex, "0.0.14", "623f091a58a0222ceb3de92d6c8b86a379559296a5b70435a963501e8a30cb41", [:mix], [{:httpoison, "~> 0.9.0", [hex: :httpoison, optional: false]}, {:poison, "~> 2.2.0", [hex: :poison, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.0", "edee20847c42e379bf91261db474ffbe373f8acb56e9079acb6038d4e0bf414f", [:rebar, :make], []},
   "timex": {:hex, :timex, "3.0.8", "71d5ebafcdc557c6c866cdc196c5054f587e7cd1118ad8937e2293d51fc85608", [:mix], [{:combine, "~> 0.7", [hex: :combine, optional: false]}, {:gettext, "~> 0.10", [hex: :gettext, optional: false]}, {:tzdata, "~> 0.1.8 or ~> 0.5", [hex: :tzdata, optional: false]}]},
-  "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]}}
+  "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},
+  "uuid": {:hex, :uuid, "1.1.4", "36c7734e4c8e357f2f67ba57fb61799d60c20a7f817b104896cca64b857e3686", [:mix], []}}

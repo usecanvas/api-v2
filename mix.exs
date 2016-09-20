@@ -43,6 +43,7 @@ defmodule CanvasAPI.Mixfile do
      {:httpoison, "~> 0.9.1"},
      {:timex, "~> 3.0"},
      {:floki, "~> 0.10.1"},
+     {:base62_uuid, "~> 1.0.1"},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]}]
   end
