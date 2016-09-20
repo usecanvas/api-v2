@@ -20,9 +20,22 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [])
-    |> put_change(:blocks, [title_block])
+    |> cast(params, [:blocks])
+    |> put_title_block
     |> put_change(:id, Base62UUID.generate)
+  end
+
+  # Put the title block, if necessary.
+  @spec put_title_block(Ecto.Changeset.t) :: Ecto.Changeset.t
+  defp put_title_block(changeset) do
+    case get_change(changeset, :blocks) do
+      [%{"type" => "title"} | _] ->
+        changeset
+      blocks when is_list(blocks) ->
+        put_change(changeset, :blocks, [title_block | blocks])
+      _ ->
+        put_change(changeset, :blocks, [title_block])
+    end
   end
 
   # Get a title block.

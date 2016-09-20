@@ -7,10 +7,10 @@ defmodule CanvasAPI.CanvasController do
   plug :ensure_team
   plug :ensure_user
 
-  def create(conn, _params) do
+  def create(conn, params) do
     changeset =
       %Canvas{}
-      |> Canvas.changeset
+      |> Canvas.changeset(get_in(params, ~w(data attributes)) || %{})
       |> Ecto.Changeset.put_assoc(:creator, conn.private.current_user)
       |> Ecto.Changeset.put_assoc(:team, conn.private.current_team)
 
