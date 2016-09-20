@@ -1,7 +1,6 @@
 defmodule CanvasAPI.UserControllerTest do
   use CanvasAPI.ConnCase
 
-  alias CanvasAPI.{Account, User}
   import CanvasAPI.Factory
 
   @valid_attrs %{}
@@ -11,7 +10,6 @@ defmodule CanvasAPI.UserControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  @tag :focus
   test "shows chosen resource", %{conn: conn} do
     user = insert(:user)
 

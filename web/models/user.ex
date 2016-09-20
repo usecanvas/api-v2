@@ -26,5 +26,8 @@ defmodule CanvasAPI.User do
     |> cast(params, [:email, :identity_token, :name, :slack_id])
     |> validate_required([:email, :identity_token, :name, :slack_id])
     |> put_change(:images, ImageMap.image_map(params))
+    |> unique_constraint(:team_id,
+         name: :users_account_id_team_id_index,
+         message: "already exists for this account")
   end
 end
