@@ -18,7 +18,7 @@ defmodule CanvasAPI.Router do
     delete "/session", SessionController, :delete
 
     resources "/teams", TeamController, only: [:index, :show] do
-      resources "/canvases", CanvasController, only: [:create, :index, :show]
+      resources "/canvases", CanvasController, only: [:create, :index, :show, :delete]
       get "/user", UserController, :show
     end
 

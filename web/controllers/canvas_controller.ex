@@ -50,6 +50,24 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    canvas =
+      conn.private.current_team
+      |> Ecto.assoc(:canvases)
+      |> Repo.get(id)
+
+    if canvas do
+      Repo.delete!(canvas)
+
+      conn
+      |> send_resp(:no_content, "")
+    else
+      conn
+      |> put_status(:not_found)
+      |> render(ErrorView, "404.json")
+    end
+  end
+
   defp ensure_team(conn, _opts) do
     team =
       from(t in Ecto.assoc(conn.private.current_account, :teams))
