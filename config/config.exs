@@ -18,6 +18,9 @@ config :canvas_api, CanvasAPI.Endpoint,
   pubsub: [name: CanvasAPI.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :phoenix, :format_encoders,
+  json: CanvasAPI.JSONEncoder
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
