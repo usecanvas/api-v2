@@ -33,7 +33,7 @@ defmodule Mix.Tasks.CanvasApi.ImportTemplates do
 
   defp import_template(template_url, user) do
     {:ok, %{body: body, status_code: 200}} = HTTPoison.get(template_url)
-    json = Poison.decode!(body)
+    json = Poison.decode!(body) |> Map.put("is_template", true)
 
     Canvas.changeset(%Canvas{}, json)
     |> put_assoc(:creator, user)
