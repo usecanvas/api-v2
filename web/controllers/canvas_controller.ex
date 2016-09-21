@@ -3,9 +3,9 @@ defmodule CanvasAPI.CanvasController do
 
   alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, User}
 
-  plug CanvasAPI.CurrentAccountPlug
-  plug :ensure_team
-  plug :ensure_user
+  plug CanvasAPI.CurrentAccountPlug when not action in [:show]
+  plug :ensure_team when not action in [:show]
+  plug :ensure_user when not action in [:show]
 
   def create(conn, params) do
     changeset =
@@ -47,9 +47,10 @@ defmodule CanvasAPI.CanvasController do
     render(conn, "index.json", canvases: templates)
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id, "team_id" => team_id}) do
     canvas =
-      Ecto.assoc(conn.private.current_team, :canvases)
+      from(c in Canvas,
+           where: c.team_id == ^team_id)
       |> Repo.get(id)
 
     case canvas do
