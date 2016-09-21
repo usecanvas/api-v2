@@ -1,5 +1,5 @@
 defmodule CanvasAPI.Unfurl.Canvas do
-  @canvas_regex Regex.compile!("\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})/[^/]+\\z")
+  @canvas_regex Regex.compile!("\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
 
   alias CanvasAPI.{Canvas, Repo}
   alias CanvasAPI.Unfurl.Field
