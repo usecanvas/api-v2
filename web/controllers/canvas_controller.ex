@@ -47,7 +47,7 @@ defmodule CanvasAPI.CanvasController do
     render(conn, "index.json", canvases: templates)
   end
 
-  def show(conn, %{"id" => id, "team_id" => team_id}) do
+  def show(conn, params = %{"id" => id, "team_id" => team_id}) do
     canvas =
       from(c in Canvas,
            where: c.team_id == ^team_id)
@@ -56,6 +56,7 @@ defmodule CanvasAPI.CanvasController do
     case canvas do
       canvas = %Canvas{} ->
         conn
+        |> maybe_put_octet_stream(params["trailing_format"])
         |> render("show.json", canvas: canvas)
       nil ->
         conn
@@ -116,6 +117,11 @@ defmodule CanvasAPI.CanvasController do
       |> render(ErrorView, "404.json")
     end
   end
+
+  defp maybe_put_octet_stream(conn, "canvas") do
+    conn |> put_resp_header("content-type", "application/octet-stream")
+  end
+  defp maybe_put_octet_stream(conn, _), do: conn
 
   defp merge_global_templates(team_templates) do
     do_merge_global_templates(

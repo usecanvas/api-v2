@@ -2,6 +2,7 @@ defmodule CanvasAPI.Router do
   use CanvasAPI.Web, :router
 
   pipeline :api do
+    plug CanvasAPI.TrailingFormatPlug
     plug :accepts, ~w(json json-api)
   end
 
