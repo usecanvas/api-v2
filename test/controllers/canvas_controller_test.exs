@@ -28,7 +28,7 @@ defmodule CanvasAPI.CanvasControllerTest do
       canvas = insert(:canvas)
       account = canvas.creator.account
 
-      params = %{"filter" => %{"is_template" => true}}
+      params = %{"filter" => %{"is_template" => "true"}}
 
       conn =
         build_conn

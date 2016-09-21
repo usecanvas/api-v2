@@ -105,9 +105,9 @@ defmodule CanvasAPI.CanvasController do
   end
 
   defp filter(query, %{"is_template" => is_template})
-       when is_boolean(is_template) do
+       when is_template in ~w(true false) do
     query
-    |> where([c], c.is_template == ^is_template)
+    |> where([c], c.is_template == ^(is_template == "true"))
   end
 
   defp filter(query, _), do: query
