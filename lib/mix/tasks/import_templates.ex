@@ -28,16 +28,39 @@ defmodule Mix.Tasks.CanvasApi.ImportTemplates do
       Repo.get!(User, System.get_env("TEMPLATE_USER_ID"))
       |> Repo.preload([:team])
 
-    Enum.each(template_urls, fn template -> import_template(template, user) end)
+    Enum.map(template_urls, fn template ->
+      import_template(template, user)
+      |> Map.take([:id, :is_template, :blocks])
+    end)
+    |> Poison.encode!(pretty: true)
+    |> IO.puts
   end
 
   defp import_template(template_url, user) do
     {:ok, %{body: body, status_code: 200}} = HTTPoison.get(template_url)
+
     json = Poison.decode!(body) |> Map.put("is_template", true)
 
-    Canvas.changeset(%Canvas{}, json)
+    json =
+      json
+      |> Map.put("blocks", Enum.map(json["blocks"], fn block ->
+        Map.put(block, "id", Base62UUID.generate)
+      end))
+
+    case json["id"] do
+      nil -> do_import_template(Map.put(json, "id", Base62UUID.generate), user)
+      id when is_binary(id) -> do_import_template(json, user)
+    end
+  end
+
+  defp do_import_template(json, user) do
+    case Repo.get(Canvas, json["id"]) do
+      nil -> %Canvas{id: json["id"]}
+      canvas -> canvas |> Repo.preload([:creator, :team])
+    end
+    |> Canvas.changeset(Map.delete(json, "id"))
     |> put_assoc(:creator, user)
     |> put_assoc(:team, user.team)
-    |> Repo.insert!
+    |> Repo.insert_or_update!
   end
 end
