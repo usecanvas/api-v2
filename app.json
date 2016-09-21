@@ -51,7 +51,8 @@
       "required": false
     },
     "WEB_HOST": {
-      "description": "Hostname on which the web app runs"
+      "description": "Hostname on which the web app runs",
+      "development_value": "localhost:4200"
     }
   }
 }
