@@ -35,7 +35,7 @@ defmodule Mix.Tasks.CanvasApi.ImportTemplates do
     {:ok, %{body: body, status_code: 200}} = HTTPoison.get(template_url)
     json = Poison.decode!(body)
 
-    Canvas.changeset(%Canvas{}, %{"is_template" => true, "blocks" => json})
+    Canvas.changeset(%Canvas{}, json)
     |> put_assoc(:creator, user)
     |> put_assoc(:team, user.team)
     |> Repo.insert!
