@@ -19,6 +19,7 @@ defmodule CanvasAPI.Router do
 
     resources "/teams", TeamController, only: [:index, :show] do
       resources "/canvases", CanvasController, only: [:create, :index, :show, :delete]
+      get "/templates", CanvasController, :index_templates, as: :template
       get "/user", UserController, :show
     end
 
