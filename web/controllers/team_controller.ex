@@ -1,7 +1,7 @@
 defmodule CanvasAPI.TeamController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{ErrorView, Team, User}
+  alias CanvasAPI.{ErrorView, Team}
 
   import Ecto, only: [assoc: 2]
 

@@ -1,8 +1,6 @@
 defmodule CanvasAPI.CanvasControllerTest do
   use CanvasAPI.ConnCase
 
-  alias CanvasAPI.Account
-
   import CanvasAPI.Factory
 
   @valid_attrs %{}
