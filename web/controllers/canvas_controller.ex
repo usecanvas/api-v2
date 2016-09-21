@@ -26,9 +26,10 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  def index(conn, _params) do
+  def index(conn, params) do
     canvases =
       Ecto.assoc(conn.private.current_user, :canvases)
+      |> filter(params["filter"])
       |> Repo.all
 
     render(conn, "index.json", canvases: canvases)
@@ -102,4 +103,12 @@ defmodule CanvasAPI.CanvasController do
       |> render(ErrorView, "404.json")
     end
   end
+
+  defp filter(query, %{"is_template" => is_template})
+       when is_boolean(is_template) do
+    query
+    |> where([c], c.is_template == ^is_template)
+  end
+
+  defp filter(query, _), do: query
 end

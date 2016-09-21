@@ -23,6 +23,7 @@ defmodule CanvasAPI.Team do
     struct
     |> cast(params, [:domain, :name, :slack_id])
     |> validate_required([:domain, :name, :slack_id])
+    |> unique_constraint(:domain)
     |> put_change(:images, ImageMap.image_map(params))
   end
 end

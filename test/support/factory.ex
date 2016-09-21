@@ -5,9 +5,19 @@ defmodule CanvasAPI.Factory do
     %CanvasAPI.Account{}
   end
 
+  def canvas_factory do
+    user = insert(:user)
+
+    %CanvasAPI.Canvas{
+      id: sequence(:id, fn _ -> Base62UUID.generate end),
+      creator: user,
+      team: user.team
+    }
+  end
+
   def team_factory do
     %CanvasAPI.Team{
-      domain: "usecanvas",
+      domain: sequence(:domain, &"domain-#{&1}"),
       images: %{},
       name: "Canvas",
       slack_id: sequence(:slack_id, &"ABCDEFG#{&1}")
