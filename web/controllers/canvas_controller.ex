@@ -1,7 +1,7 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo}
+  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, User}
 
   plug CanvasAPI.CurrentAccountPlug
   plug :ensure_team
@@ -39,6 +39,10 @@ defmodule CanvasAPI.CanvasController do
       from(c in Ecto.assoc(conn.private.current_user, :canvases),
            where: c.is_template == true)
       |> Repo.all
+      |> merge_global_templates
+      |> Enum.sort_by(fn template ->
+        template.blocks |> Enum.at(0) |> Map.get("content")
+      end)
 
     render(conn, "index.json", canvases: templates)
   end
@@ -110,5 +114,20 @@ defmodule CanvasAPI.CanvasController do
       |> put_status(:not_found)
       |> render(ErrorView, "404.json")
     end
+  end
+
+  defp merge_global_templates(team_templates) do
+    do_merge_global_templates(
+      team_templates, System.get_env("TEMPLATE_USER_ID"))
+  end
+
+  defp do_merge_global_templates(templates, nil), do: templates
+  defp do_merge_global_templates(templates, id) do
+    templates ++
+      (from(c in Canvas,
+           join: u in User, on: u.id == c.creator_id,
+           where: u.id == ^id,
+           where: c.is_template == true)
+      |> Repo.all)
   end
 end
