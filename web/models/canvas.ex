@@ -12,6 +12,7 @@ defmodule CanvasAPI.Canvas do
 
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
+    belongs_to :template, CanvasAPI.Canvas
 
     timestamps()
   end
