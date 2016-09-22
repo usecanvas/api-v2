@@ -56,9 +56,7 @@ defmodule CanvasAPI.CanvasController do
 
     case canvas do
       canvas = %Canvas{} ->
-        conn
-        |> maybe_put_octet_stream(params["trailing_format"])
-        |> render("show.json", canvas: canvas)
+        render_show(conn, canvas, params["trailing_format"])
       nil ->
         conn
         |> put_status(:not_found)
@@ -119,10 +117,16 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  defp maybe_put_octet_stream(conn, "canvas") do
-    conn |> put_resp_header("content-type", "application/octet-stream")
+  defp render_show(conn, canvas, "canvas") do
+    conn
+    |> put_resp_header("content-type", "application/octet-stream")
+    |> render("canvas.json", canvas: canvas, json_api: false)
   end
-  defp maybe_put_octet_stream(conn, _), do: conn
+
+  defp render_show(conn, canvas, _) do
+    conn
+    |> render("show.json", canvas: canvas)
+  end
 
   defp merge_global_templates(team_templates) do
     do_merge_global_templates(

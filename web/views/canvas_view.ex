@@ -9,6 +9,21 @@ defmodule CanvasAPI.CanvasView do
     %{data: render_one(canvas, CanvasAPI.CanvasView, "canvas.json")}
   end
 
+  def render("canvas.json", %{canvas: canvas, json_api: false}) do
+    %{
+      id: canvas.id,
+      blocks: canvas.blocks,
+      is_template: canvas.is_template,
+      native_version: canvas.native_version,
+      type: canvas.type,
+      version: canvas.version,
+      inserted_at: canvas.inserted_at,
+      updated_at: canvas.updated_at,
+      team_id: canvas.team_id,
+      type: "canvas"
+    }
+  end
+
   def render("canvas.json", %{canvas: canvas}) do
     %{
       id: canvas.id,
