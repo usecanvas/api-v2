@@ -27,7 +27,7 @@ defmodule CanvasAPI.Unfurl do
       unfurl
     else
       _ ->
-        %__MODULE__{id: url}
+        %__MODULE__{id: url, title: url}
     end
   end
 

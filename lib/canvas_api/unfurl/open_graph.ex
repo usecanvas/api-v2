@@ -1,6 +1,6 @@
 defmodule CanvasAPI.Unfurl.OpenGraph do
   def unfurl(url) do
-    case HTTPoison.get(url) do
+    case HTTPoison.get(url, [], follow_redirect: true, max_redirect: 5) do
       {:ok, %{body: body, status_code: 200}} ->
         unfurl_from_body(body, url)
       _ ->
