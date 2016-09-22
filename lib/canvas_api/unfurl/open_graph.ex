@@ -15,7 +15,7 @@ defmodule CanvasAPI.Unfurl.OpenGraph do
       id: url,
       provider_name: og_tags["site_name"],
       provider_icon_url: "https://s3.amazonaws.com/canvas-assets/provider-icons/fallback.png",
-      title: og_tags["title"],
+      title: og_tags["title"] || url,
       text: og_tags["description"],
       thumbnail_url: og_tags["image"] ||
         og_tags["image:secure_url"] ||
