@@ -22,7 +22,8 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:blocks, :is_template])
+    |> cast(params, [:is_template])
+    |> put_blocks(params)
     |> put_title_block(struct)
     |> put_id(struct)
   end
@@ -41,6 +42,18 @@ defmodule CanvasAPI.Canvas do
   end
 
   def put_template(changeset, _), do: changeset
+
+  defp put_blocks(changeset, %{"blocks" => blocks}) do
+    put_blocks(changeset, %{blocks: blocks})
+  end
+
+  defp put_blocks(changeset, %{blocks: blocks}) do
+    put_change(changeset, :blocks, Enum.map(blocks, fn block ->
+      Map.put(block, "id", Base62UUID.generate)
+    end))
+  end
+
+  defp put_blocks(changeset, %{}), do: changeset
 
   # Copy blocks from a template
   @spec copy_template_blocks([map] | []) :: [map] | []
