@@ -19,7 +19,7 @@ defmodule CanvasAPI.Unfurl do
     width: pos_integer | nil
   }
 
-  def json_api_type, do: "unfurls"
+  def json_api_type, do: "unfurl"
 
   def unfurl(url) do
     with mod when is_atom(mod) <- get_unfurl_mod(url),

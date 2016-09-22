@@ -31,7 +31,7 @@ defmodule CanvasAPI.CanvasView do
           }
         }
       },
-      type: "canvases"
+      type: "canvas"
     }
   end
 end

@@ -48,7 +48,7 @@ defmodule CanvasAPI.TeamView do
           }
         }
       },
-      type: "teams"
+      type: "team"
     }
   end
 end
