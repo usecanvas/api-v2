@@ -13,6 +13,7 @@ defmodule CanvasAPI.CanvasController do
       |> Canvas.changeset(get_in(params, ~w(data attributes)) || %{})
       |> Ecto.Changeset.put_assoc(:creator, conn.private.current_user)
       |> Ecto.Changeset.put_assoc(:team, conn.private.current_team)
+      |> Canvas.put_template(get_in(params, ~w(data relationships template data)))
 
     case Repo.insert(changeset) do
       {:ok, canvas} ->

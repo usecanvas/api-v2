@@ -18,6 +18,8 @@ defmodule CanvasAPI.Web do
 
   def model do
     quote do
+      alias CanvasAPI.Repo
+
       use Ecto.Schema
       use Calecto.Schema, usec: true
 
