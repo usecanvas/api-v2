@@ -1,5 +1,9 @@
 {
   "env": {
+    "APPSIGNAL_PUSH_API_KEY": {
+      "description": "An API key for pushing to Appsignal",
+      "required": false
+    },
     "COOKIE_DOMAIN": {
       "description": "Domain for the cookie",
       "development_value": "localhost",

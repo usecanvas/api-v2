@@ -12,11 +12,15 @@ config :canvas_api,
 
 # Configures the endpoint
 config :canvas_api, CanvasAPI.Endpoint,
+  instrumenters: [Appsignal.Phoenix.Instrumenter],
   url: [host: "localhost"],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: CanvasAPI.ErrorView, accepts: ~w(json)],
   pubsub: [name: CanvasAPI.PubSub,
            adapter: Phoenix.PubSub.PG2]
+
+config :canvas_api, CanvasAPI.Repo,
+  loggers: [Appsignal.Ecto]
 
 config :phoenix, :format_encoders,
   json: CanvasAPI.JSONEncoder
@@ -34,6 +38,12 @@ config :phoenix, :generators,
 config :plug, :types, %{
   "application/vnd.json+api" => ~w(json-api)
 }
+
+# Configure Appsignal
+config :appsignal, :config,
+  name: :canvas_api,
+  env: Mix.env,
+  revision: "dev"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

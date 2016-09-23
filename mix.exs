@@ -20,7 +20,7 @@ defmodule CanvasAPI.Mixfile do
     [mod: {CanvasAPI, []},
      applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext,
                     :phoenix_ecto, :postgrex, :calecto, :slack, :base62,
-                    :httpoison, :timex, :floki]]
+                    :httpoison, :timex, :floki, :appsignal]]
   end
 
   # Specifies which paths to compile per environment.
@@ -44,6 +44,7 @@ defmodule CanvasAPI.Mixfile do
      {:timex, "~> 3.0"},
      {:floki, "~> 0.10.1"},
      {:base62_uuid, "~> 1.0.1"},
+     {:appsignal, "~> 0.4.0"},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]}]
   end

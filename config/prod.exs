@@ -27,6 +27,10 @@ config :canvas_api, CanvasAPI.Repo,
   url: {:system, "DATABASE_URL"},
   pool_size: (System.get_env("DATABASE_POOL_SIZE") || "16") |> String.to_integer
 
+# Configure Appsignal
+config :appsignal, :config,
+  revision: System.get_env("HEROKU_RELEASE_VERSION")
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
