@@ -1,6 +1,8 @@
 defmodule CanvasAPI.Canvas do
   use CanvasAPI.Web, :model
 
+  alias CanvasAPI.Block
+
   @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}
 
   schema "canvases" do
@@ -13,7 +15,7 @@ defmodule CanvasAPI.Canvas do
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas
 
-    embeds_many :blocks, CanvasAPI.Block
+    embeds_many :blocks, Block
 
     timestamps()
   end
@@ -37,7 +39,9 @@ defmodule CanvasAPI.Canvas do
       nil ->
         changeset
       %__MODULE__{blocks: blocks} ->
-        put_embed(changeset, :blocks, blocks)
+        changeset
+        |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
+        |> cast_embed(:blocks)
     end
   end
 
@@ -61,6 +65,6 @@ defmodule CanvasAPI.Canvas do
   # Get a title block.
   @spec title_changeset :: Ecto.Changeset.t
   defp title_changeset do
-    CanvasAPI.Block.changeset(%CanvasAPI.Block{}, %{type: "title"})
+    Block.changeset(%Block{}, %{type: "title"})
   end
 end

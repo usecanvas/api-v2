@@ -19,4 +19,10 @@ defmodule CanvasAPI.Block do
     |> cast(params, [:content, :meta, :type])
     |> cast_embed(:blocks)
   end
+
+  def to_params(struct) do
+    struct
+    |> Map.take([:content, :meta, :type])
+    |> Map.put(:blocks, Enum.map(struct.blocks, &to_params/1))
+  end
 end
