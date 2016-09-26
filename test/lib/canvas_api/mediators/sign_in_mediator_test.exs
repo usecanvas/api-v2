@@ -20,6 +20,11 @@ defmodule CanvasAPI.SignInMediatorTest do
     "image_88" => "https://example.com/user-image.png"
   }
 
+  setup do
+    insert(:whitelisted_domain, domain: @mock_team["domain"])
+    :ok
+  end
+
   test "creates a new account, team, and user" do
     with_mock Slack.OAuth, [access: mock_access] do
       account =

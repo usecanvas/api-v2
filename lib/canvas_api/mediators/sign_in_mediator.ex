@@ -4,6 +4,7 @@ defmodule CanvasAPI.SignInMediator do
   """
 
   alias CanvasAPI.{Account, Repo, Team, User}
+  alias CanvasAPI.WhitelistedSlackDomain, as: SlackDomain
   import Ecto.Query
 
   @client_id System.get_env("SLACK_CLIENT_ID")
@@ -71,11 +72,27 @@ defmodule CanvasAPI.SignInMediator do
     find_team = from(t in Team, where: t.slack_id == ^team_info["id"])
     team_params = team_info |> Map.put("slack_id", team_info["id"])
 
-    with nil <- Repo.one(find_team),
+    with :ok <- check_domain_whitelist(team_info["domain"]),
+         nil <- Repo.one(find_team),
          changeset = Team.changeset(%Team{}, team_params) do
       Repo.insert(changeset)
     else
       team = %Team{} -> {:ok, team}
+      error -> error
+    end
+  end
+
+  # Check a domain against the whitelist.
+  @spec check_domain_whitelist(String.t) :: :ok | {:error, String.t}
+  defp check_domain_whitelist(nil), do: {:error, "No domain provided"}
+  defp check_domain_whitelist(domain) do
+    from(d in SlackDomain, where: d.domain == ^domain)
+    |> Repo.one
+    |> case do
+      nil ->
+        {:error, "Domain not whitelisted"}
+      _ ->
+        :ok
     end
   end
 

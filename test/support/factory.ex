@@ -24,6 +24,12 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def whitelisted_domain_factory do
+    %CanvasAPI.WhitelistedSlackDomain{
+      domain: sequence(:domain, &"domain-#{&1}")
+    }
+  end
+
   def user_factory do
     %CanvasAPI.User{
       email: "user@example.com",
