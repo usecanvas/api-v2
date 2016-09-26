@@ -24,7 +24,8 @@ config :logger, level: :info
 config :canvas_api, CanvasAPI.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: {:system, "DATABASE_URL"},
-  pool_size: (System.get_env("DATABASE_POOL_SIZE") || "16") |> String.to_integer
+  pool_size: (System.get_env("DATABASE_POOL_SIZE") || "16") |> String.to_integer,
+  ssl: true
 
 # Configure Appsignal
 config :appsignal, :config,
