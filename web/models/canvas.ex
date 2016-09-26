@@ -1,10 +1,9 @@
 defmodule CanvasAPI.Canvas do
   use CanvasAPI.Web, :model
 
-  @primary_key {:id, :string, autogenerate: false}
+  @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}
 
   schema "canvases" do
-    field :blocks, {:array, :map}
     field :is_template, :boolean, default: false
     field :native_version, :string, default: "1.0.0"
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
@@ -13,6 +12,8 @@ defmodule CanvasAPI.Canvas do
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas
+
+    embeds_many :blocks, CanvasAPI.Block
 
     timestamps()
   end
@@ -23,9 +24,8 @@ defmodule CanvasAPI.Canvas do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:is_template])
-    |> put_blocks(params)
-    |> put_title_block(struct)
-    |> put_id(struct)
+    |> cast_embed(:blocks)
+    |> put_title_block
   end
 
   @doc """
@@ -37,65 +37,30 @@ defmodule CanvasAPI.Canvas do
       nil ->
         changeset
       %__MODULE__{blocks: blocks} ->
-        put_change(changeset, :blocks, copy_template_blocks(blocks))
+        put_embed(changeset, :blocks, blocks)
     end
   end
 
   def put_template(changeset, _), do: changeset
 
-  defp put_blocks(changeset, %{"blocks" => blocks}) do
-    put_blocks(changeset, %{blocks: blocks})
-  end
-
-  defp put_blocks(changeset, %{blocks: blocks}) do
-    put_change(changeset, :blocks, Enum.map(blocks, fn block ->
-      Map.put(block, "id", Base62UUID.generate)
-    end))
-  end
-
-  defp put_blocks(changeset, %{}), do: changeset
-
-  # Copy blocks from a template
-  @spec copy_template_blocks([map] | []) :: [map] | []
-  defp copy_template_blocks([]), do: []
-
-  defp copy_template_blocks([head | tail]) do
-    case head["blocks"] do
-      nil ->
-        [Map.put(head, "id", Base62UUID.generate) | copy_template_blocks(tail)]
-      blocks when is_list(blocks) ->
-        [head
-         |> Map.put("id", Base62UUID.generate)
-         |> Map.put("blocks", copy_template_blocks(blocks))
-         | copy_template_blocks(tail)]
-    end
-  end
-
-  # Put an ID, if necessary.
-  @spec put_id(Ecto.Changeset.t, %__MODULE__{}) :: Ecto.Changeset.t
-  defp put_id(changeset, struct) do
-    case struct.id do
-      nil -> put_change(changeset, :id, Base62UUID.generate)
-      _id -> changeset
-    end
-  end
-
   # Put the title block, if necessary.
-  @spec put_title_block(Ecto.Changeset.t, %__MODULE__{}) :: Ecto.Changeset.t
-  defp put_title_block(changeset, struct) do
-    case get_change(changeset, :blocks) || struct.blocks do
-      [%{"type" => "title"} | _] ->
+  @spec put_title_block(Ecto.Changeset.t) :: Ecto.Changeset.t
+  defp put_title_block(changeset) do
+    changeset
+    |> get_change(:blocks)
+    |> case do
+      [%Ecto.Changeset{changes: %{type: "title"}} | _] ->
         changeset
-      blocks when is_list(blocks) ->
-        put_change(changeset, :blocks, [title_block | blocks])
-      _ ->
-        put_change(changeset, :blocks, [title_block])
+      blocks_changeset when is_list(blocks_changeset) ->
+        put_embed(changeset, :blocks, [title_changeset | blocks_changeset])
+      nil ->
+        put_embed(changeset, :blocks, [title_changeset])
     end
   end
 
   # Get a title block.
-  @spec title_block :: map
-  defp title_block do
-    %{id: Base62UUID.generate, type: "title", content: "", meta: %{}}
+  @spec title_changeset :: Ecto.Changeset.t
+  defp title_changeset do
+    CanvasAPI.Block.changeset(%CanvasAPI.Block{}, %{type: "title"})
   end
 end

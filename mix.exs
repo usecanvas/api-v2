@@ -45,6 +45,7 @@ defmodule CanvasAPI.Mixfile do
      {:floki, "~> 0.10.1"},
      {:base62_uuid, "~> 1.0.1"},
      {:appsignal, "~> 0.4.0"},
+     {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]}]
   end
