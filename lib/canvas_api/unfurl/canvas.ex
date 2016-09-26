@@ -1,7 +1,7 @@
 defmodule CanvasAPI.Unfurl.Canvas do
   @canvas_regex Regex.compile!("\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
 
-  alias CanvasAPI.{Canvas, Repo}
+  alias CanvasAPI.{Block, Canvas, Repo}
   alias CanvasAPI.Unfurl.Field
 
   def unfurl(url) do
@@ -28,9 +28,9 @@ defmodule CanvasAPI.Unfurl.Canvas do
       |> Enum.at(1)
 
     case first_content_block do
-      %{"blocks" => [block | _]} ->
-        block["content"]
-      %{"content" => content} ->
+      %Block{blocks: [block | _]} ->
+        block.content
+      %Block{content: content} ->
         String.slice(content, 0..140)
     end
   end
@@ -38,7 +38,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   defp canvas_title(canvas) do
     canvas.blocks
     |> Enum.at(0)
-    |> Map.get("content")
+    |> Map.get(:content)
   end
 
   defp progress_field(canvas) do
@@ -50,10 +50,10 @@ defmodule CanvasAPI.Unfurl.Canvas do
   defp do_progress_field(blocks, progress \\ {0, 0}) do
     blocks
     |> Enum.reduce(progress, fn
-      (%{"blocks" => child_blocks}, progress) ->
+      (%Block{blocks: child_blocks}, progress) when length(child_blocks) > 0 ->
         do_progress_field(child_blocks, progress)
-      (block = %{"type" => "checklist-item"}, progress) ->
-        if get_in(block, ~w(meta checked)) do
+      (block = %Block{type: "checklist-item"}, progress) ->
+        if block.meta["checked"] do
           {elem(progress, 0) + 1, elem(progress, 1) + 1}
         else
           {elem(progress, 0), elem(progress, 1) + 1}
