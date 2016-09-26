@@ -15,9 +15,12 @@ defmodule Mix.Tasks.CanvasApi.WhitelistDomain do
 
   @shortdoc "Whitelist a Slack team's domain."
 
-  def run([domain]) do
+  def run(domains) do
     Mix.Task.run("app.start", [])
+    Enum.map(domains, &whitelist_domain/1)
+  end
 
+  defp whitelist_domain(domain) do
     from(d in SlackDomain, where: d.domain == ^domain)
     |> Repo.one
     |> case do
@@ -26,5 +29,7 @@ defmodule Mix.Tasks.CanvasApi.WhitelistDomain do
     end
     |> SlackDomain.changeset(%{domain: domain})
     |> Repo.insert_or_update!
+
+    IO.puts "Whitelisted #{domain}"
   end
 end
