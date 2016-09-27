@@ -142,7 +142,8 @@ defmodule CanvasAPI.CanvasController do
       (from(c in Canvas,
            join: u in User, on: u.id == c.creator_id,
            where: u.id == ^id,
-           where: c.is_template == true)
+           where: c.is_template == true,
+           preload: [creator: [:team]])
       |> Repo.all)
   end
 end
