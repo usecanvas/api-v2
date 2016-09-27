@@ -29,7 +29,6 @@ defmodule CanvasAPI.Unfurl.GitHub.PullRequest do
   end
 
   defp do_get(block, url) do
-    token = CanvasAPI.Unfurl.GitHub.get_token_for_block(block)
-    GitHubAPI.get(url, [{"authorization", "token #{token.token}"}])
+    GitHubAPI.get_by(block.meta["creator_id"], url)
   end
 end

@@ -68,9 +68,7 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
   end
 
   defp do_get(block) do
-    token = CanvasAPI.Unfurl.GitHub.get_token_for_block(block)
-    GitHubAPI.get(endpoint(block.meta["url"]),
-                  [{"authorization", "token #{token.token}"}])
+    GitHubAPI.get_by(block.meta["creator_id"], endpoint(block.meta["url"]))
   end
 
   defp endpoint(url) do
