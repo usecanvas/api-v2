@@ -19,7 +19,7 @@ defmodule CanvasAPI.CanvasController do
       {:ok, canvas} ->
         conn
         |> put_status(:created)
-        |> render("show.json", canvas: canvas)
+        |> render("show.json", canvas: Repo.preload(canvas, creator: [:team]))
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -29,7 +29,8 @@ defmodule CanvasAPI.CanvasController do
 
   def index(conn, _params) do
     canvases =
-      Ecto.assoc(conn.private.current_user, :canvases)
+      from(c in Ecto.assoc(conn.private.current_user, :canvases),
+           preload: [creator: [:team]])
       |> Repo.all
 
     render(conn, "index.json", canvases: canvases)
@@ -38,7 +39,8 @@ defmodule CanvasAPI.CanvasController do
   def index_templates(conn, _params) do
     templates =
       from(c in Ecto.assoc(conn.private.current_user, :canvases),
-           where: c.is_template == true)
+           where: c.is_template == true,
+           preload: [creator: [:team]])
       |> Repo.all
       |> merge_global_templates
       |> Enum.sort_by(fn template ->
@@ -51,7 +53,8 @@ defmodule CanvasAPI.CanvasController do
   def show(conn, params = %{"id" => id, "team_id" => team_id}) do
     canvas =
       from(c in Canvas,
-           where: c.team_id == ^team_id)
+           where: c.team_id == ^team_id,
+           preload: [creator: [:team]])
       |> Repo.get(id)
 
     case canvas do

@@ -24,7 +24,7 @@ defmodule CanvasAPI.UserView do
         },
         team: %{
           data: %{
-            id: user.team.id, type: "teams"
+            id: user.team.id, type: "team"
           },
           links: %{
             related: team_path(CanvasAPI.Endpoint, :show, user.team.id),
