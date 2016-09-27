@@ -10,9 +10,15 @@ defmodule CanvasAPI.Unfurl.GitHub.PullRequest do
     with {:ok, %{body: pull_body, status_code: 200}} <- do_get(account, pull_endpoint(url)),
          {:ok, %{body: issue_body, status_code: 200}} <- do_get(account, issue_endpoint(url)),
          body = Map.merge(pull_body, issue_body) do
-      CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(url, body)
+      CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(block, body)
     else
-      _ -> nil
+      {:ok, %{status_code: 404}} ->
+        CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(
+          block,
+          %{"title" => pull_endpoint(url) |> String.replace("/repos/", "")},
+          false)
+      _ ->
+        nil
     end
   end
 

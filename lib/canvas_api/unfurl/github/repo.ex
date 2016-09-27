@@ -15,7 +15,16 @@ defmodule CanvasAPI.Unfurl.GitHub.Repo do
         thumbnail_url: get_in(body, ~w(owner avatar_url))
       }
     else
-      _ -> nil
+      {:ok, %{body: body, status_code: 404}} ->
+        %CanvasAPI.Unfurl{
+          id: block.id,
+          title: String.replace(endpoint(block.meta["url"]), "/repos/", ""),
+          text: nil,
+          thumbnail_url: get_in(body, ~w(owner avatar_url)),
+          fetched: false
+        }
+      _ ->
+        nil
     end
   end
 
