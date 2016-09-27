@@ -4,20 +4,17 @@ defmodule CanvasAPI.Unfurl.Canvas do
   alias CanvasAPI.{Block, Canvas, Repo}
   alias CanvasAPI.Unfurl.Field
 
-  def unfurl(url) do
-    with id when is_binary(id) <- extract_canvas_id(url),
-         canvas when not is_nil(canvas) <- Repo.get(Canvas, id) do
-      %CanvasAPI.Unfurl{
-        id: url,
-        title: canvas_title(canvas),
-        text: canvas_summary(canvas),
-        provider_name: "Canvas",
-        provider_url: "https://usecanvas.com",
-        fields: [
-          progress_field(canvas)
-        ]
-      }
-    end
+  def unfurl(block) do
+    %CanvasAPI.Unfurl{
+      id: block.id,
+      title: canvas_title(block.canvas),
+      text: canvas_summary(block.canvas),
+      provider_name: "Canvas",
+      provider_url: "https://usecanvas.com",
+      fields: [
+        progress_field(block.canvas)
+      ]
+    }
   end
 
   def canvas_regex, do: @canvas_regex

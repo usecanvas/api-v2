@@ -31,6 +31,20 @@ defmodule CanvasAPI.Canvas do
   end
 
   @doc """
+  Find a block in the given canvas.
+  """
+  def find_block(canvas, id) do
+    canvas.blocks
+    |> Enum.find(fn block ->
+      case block do
+        %Block{id: ^id} -> block
+        %Block{type: "list"} -> find_block(block, id)
+        _ -> false
+      end
+    end)
+  end
+
+  @doc """
   Put a template in a canvas if present.
   """
   @spec put_template(Ecto.Changeset.t, map | nil) :: Ecto.Changeset.t

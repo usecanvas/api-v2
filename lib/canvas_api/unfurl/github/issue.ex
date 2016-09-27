@@ -1,14 +1,14 @@
 defmodule CanvasAPI.Unfurl.GitHub.Issue do
   @match ~r|\Ahttps://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/issues/(?<issue_id>\d+)/?\z|
 
-  alias CanvasAPI.Unfurl
+  alias CanvasAPI.{Block, Unfurl}
   alias Unfurl.GitHub.API, as: GitHubAPI
   alias Unfurl.{Field, Label}
 
   def match, do: @match
 
-  def unfurl(url) do
-    with {:ok, %{body: body, status_code: 200}} <- GitHubAPI.get(endpoint(url)) do
+  def unfurl(block = %Block{meta: %{"url" => url}}) do
+    with {:ok, %{body: body, status_code: 200}} <- do_get(block) do
       unfurl_from_body(url, body)
     else
       _ -> nil
@@ -65,6 +65,12 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
       |> Enum.join(", ")
 
     %Field{title: title, value: assignee_names, short: true}
+  end
+
+  defp do_get(block) do
+    token = CanvasAPI.Unfurl.GitHub.get_token_for_block(block)
+    GitHubAPI.get(endpoint(block.meta["url"]),
+                  [{"authorization", "token #{token.token}"}])
   end
 
   defp endpoint(url) do
