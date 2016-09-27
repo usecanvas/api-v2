@@ -13,8 +13,11 @@
       "description": "Size of database pool",
       "required": false
     },
-    "GITHUB_API_TOKEN": {
-      "description": "API token for GitHub"
+    "GITHUB_CLIENT_ID": {
+      "description": "Client ID for a GitHub OAuth application"
+    },
+    "GITHUB_CLIENT_SECRET": {
+      "description": "Client secret for a GitHub OAuth application"
     },
     "HOST": {
       "description": "Hostname for this app",
