@@ -1,7 +1,8 @@
 defmodule CanvasAPI.Unfurl do
   defstruct id: nil, fields: [], height: nil, html: nil, labels: [],
     provider_icon_url: nil, provider_name: nil, provider_url: nil, text: nil,
-    thumbnail_url: nil, title: nil, type: "link", width: nil, fetched: true
+    thumbnail_url: nil, title: nil, type: "link", width: nil, fetched: true,
+    url: nil
 
   @type t :: %__MODULE__{
     id: String.t | nil,
@@ -17,7 +18,8 @@ defmodule CanvasAPI.Unfurl do
     title: String.t | nil,
     type: String.t,
     width: pos_integer | nil,
-    fetched: boolean
+    fetched: boolean,
+    url: String.t
   }
 
   def json_api_type, do: "unfurl"
@@ -28,7 +30,10 @@ defmodule CanvasAPI.Unfurl do
       unfurl
     else
       _ ->
-        %__MODULE__{id: block.id, title: block.meta["url"] || "No Title"}
+        %__MODULE__{
+          id: block.id,
+          title: block.meta["url"] || "No Title",
+          url: block.meta["url"]}
     end
   end
 

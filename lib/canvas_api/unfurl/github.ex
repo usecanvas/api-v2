@@ -6,7 +6,8 @@ defmodule CanvasAPI.Unfurl.GitHub do
         unfurl |
           provider_name: "GitHub",
           provider_url: "https://github.com",
-          provider_icon_url: "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png"
+          provider_icon_url: "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png",
+          url: block.meta["url"]
       }
     end
   end
