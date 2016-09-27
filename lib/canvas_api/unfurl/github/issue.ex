@@ -7,8 +7,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
 
   def match, do: @match
 
-  def unfurl(block = %Block{meta: %{"url" => url}}) do
-    with {:ok, %{body: body, status_code: 200}} <- do_get(block) do
+  def unfurl(block = %Block{meta: %{"url" => url}}, account: account) do
+    with {:ok, %{body: body, status_code: 200}} <- do_get(account, block) do
       unfurl_from_body(url, body)
     else
       _ -> nil
@@ -67,8 +67,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
     %Field{title: title, value: assignee_names, short: true}
   end
 
-  defp do_get(block) do
-    GitHubAPI.get_by(block.meta["creator_id"], endpoint(block.meta["url"]))
+  defp do_get(account, block) do
+    GitHubAPI.get_by(account, endpoint(block.meta["url"]))
   end
 
   defp endpoint(url) do

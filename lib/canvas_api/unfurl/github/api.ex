@@ -6,9 +6,9 @@ defmodule CanvasAPI.Unfurl.GitHub.API do
 
   @endpoint "https://api.github.com"
 
-  def get_by(creator_id, url) do
+  def get_by(account, url) do
     headers =
-      case get_token_for_block(creator_id) do
+      case get_token_for_block(account) do
         nil -> []
         token ->
           [{"authorization", "token #{token.token}"}]
@@ -17,13 +17,10 @@ defmodule CanvasAPI.Unfurl.GitHub.API do
     get(url, headers)
   end
 
-  def get_token_for_block(creator_id) do
-    from(t in OAuthToken,
-         join: a in Account, on: a.id == t.account_id,
-         join: u in User, on: u.account_id == a.id,
-         where: u.id == ^creator_id,
+  def get_token_for_block(account) do
+    from(t in Ecto.assoc(account, :oauth_tokens),
          where: t.provider == ^"github")
-     |> Repo.one
+    |> Repo.one
   end
 
 

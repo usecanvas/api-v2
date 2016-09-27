@@ -4,7 +4,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   alias CanvasAPI.{Block, Canvas, Repo}
   alias CanvasAPI.Unfurl.Field
 
-  def unfurl(block) do
+  def unfurl(block, _opts) do
     %CanvasAPI.Unfurl{
       id: block.id,
       title: canvas_title(block.canvas),

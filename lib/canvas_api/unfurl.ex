@@ -21,9 +21,9 @@ defmodule CanvasAPI.Unfurl do
 
   def json_api_type, do: "unfurl"
 
-  def unfurl(block) do
+  def unfurl(block, account: account) do
     with mod when is_atom(mod) <- get_unfurl_mod(block),
-         unfurl when not is_nil(unfurl) <- mod.unfurl(block) do
+         unfurl when not is_nil(unfurl) <- mod.unfurl(block, account: account) do
       unfurl
     else
       _ ->

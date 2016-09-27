@@ -8,13 +8,15 @@ defmodule CanvasAPI.UnfurlController do
 
   @spec show(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def show(conn, %{"id" => id}) do
-    if block = Canvas.find_block(conn.private.canvas, id) do
-      block = Map.put(block, :canvas, conn.private.canvas)
+    %{current_account: account, canvas: canvas} = conn.private
 
+    with block when not is_nil(block) <- Canvas.find_block(canvas, id),
+         block = Map.put(block, :canvas, canvas) do
       conn
-      |> render("show.json", unfurl: Unfurl.unfurl(block))
+      |> render("show.json", unfurl: Unfurl.unfurl(block, account: account))
     else
-      not_found(conn)
+      _ ->
+        not_found(conn)
     end
   end
 
