@@ -1,5 +1,5 @@
 defmodule CanvasAPI.Unfurl.OpenGraph do
-  def unfurl(url) do
+  def unfurl(block = %CanvasAPI.Block{meta: %{"url" => url}}, _) do
     case HTTPoison.get(url, [], follow_redirect: true, max_redirect: 5) do
       {:ok, %{body: body, status_code: 200}} ->
         unfurl_from_body(body, url)
@@ -19,7 +19,8 @@ defmodule CanvasAPI.Unfurl.OpenGraph do
       text: og_tags["description"],
       thumbnail_url: og_tags["image"] ||
         og_tags["image:secure_url"] ||
-        og_tags["image:url"]
+        og_tags["image:url"],
+      url: url
     }
   end
 

@@ -1,31 +1,35 @@
 defmodule CanvasAPI.Unfurl.GitHub.Issue do
   @match ~r|\Ahttps://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/issues/(?<issue_id>\d+)/?\z|
 
-  alias CanvasAPI.Unfurl
+  alias CanvasAPI.{Block, Unfurl}
   alias Unfurl.GitHub.API, as: GitHubAPI
   alias Unfurl.{Field, Label}
 
   def match, do: @match
 
-  def unfurl(url) do
-    with {:ok, %{body: body, status_code: 200}} <- GitHubAPI.get(endpoint(url)) do
-      unfurl_from_body(url, body)
+  def unfurl(block = %Block{meta: %{"url" => url}}, account: account) do
+    with {:ok, %{body: body, status_code: 200}} <- do_get(account, block) do
+      unfurl_from_body(block, body)
     else
-      _ -> nil
+      {:ok, %{status_code: 404}} ->
+        unfurl_from_body(
+          block,
+          %{"title" => endpoint(url) |> String.replace("/repos/", "")},
+          false)
+      _ ->
+        nil
     end
   end
 
-  def unfurl_from_body(url, body) do
+  def unfurl_from_body(block, body, fetched \\ true) do
     %Unfurl{
-      id: url,
+      id: block.id,
       title: body["title"],
       text: issue_text(body),
       thumbnail_url: get_in(body, ~w(user avatar_url)),
-      fields: [
-        state_field(body),
-        assignee_field(body)
-      ],
-      labels: labels(body["labels"])
+      fields: fields(body),
+      labels: labels(body["labels"]),
+      fetched: fetched
     }
   end
 
@@ -39,20 +43,29 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
     "##{body["number"]} closed #{time_ago(body["closed_at"])} by #{username}"
   end
 
-  defp issue_text(body) do
+  defp issue_text(body = %{"created_at" => created_at}) do
     username = get_in(body, ~w(user login))
-    "##{body["number"]} opened #{time_ago(body["created_at"])} by #{username}"
+    "##{body["number"]} opened #{time_ago(created_at)} by #{username}"
   end
 
-  defp state_field(%{"merged" => true}) do
-    %Field{title: "State", value: "merged", short: true}
+  defp issue_text(_), do: nil
+
+  defp fields(body = %{}) do
+    add_state_field([], body)
+    |> add_assignee_field(body)
   end
 
-  defp state_field(body) do
-    %Field{title: "State", value: body["state"], short: true}
+  defp add_state_field([], %{"merged" => true}) do
+    [%Field{title: "State", value: "merged", short: true}]
   end
 
-  defp assignee_field(%{"assignees" => assignees}) do
+  defp add_state_field([], body = %{"state" => state}) do
+    [%Field{title: "State", value: body["state"], short: true}]
+  end
+
+  defp add_state_field([], _), do: []
+
+  defp add_assignee_field(list, %{"assignees" => assignees}) do
     title =
       case length(assignees) do
         1 -> "Assignee"
@@ -64,7 +77,13 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
       |> Enum.map(fn assignee -> assignee["login"] end)
       |> Enum.join(", ")
 
-    %Field{title: title, value: assignee_names, short: true}
+    list ++ [%Field{title: title, value: assignee_names, short: true}]
+  end
+
+  defp add_assignee_field(list, _), do: list
+
+  defp do_get(account, block) do
+    GitHubAPI.get_by(account, endpoint(block.meta["url"]))
   end
 
   defp endpoint(url) do
@@ -72,6 +91,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
       Regex.named_captures(@match, url)
     "/repos/#{owner}/#{repo}/issues/#{issue_id}"
   end
+
+  defp labels(nil), do: []
 
   defp labels(labels) do
     labels
