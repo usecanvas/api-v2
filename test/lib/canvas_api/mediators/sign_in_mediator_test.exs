@@ -66,6 +66,15 @@ defmodule CanvasAPI.SignInMediatorTest do
     end
   end
 
+  test "allows only whitelisted teams" do
+    mock_team = @mock_team |> Map.merge(%{"domain" => "un-whitelist"})
+
+    with_mock Slack.OAuth, [access: mock_access(team: mock_team)] do
+      {:error, error} = SIM.sign_in("ABCDEFG", account: nil)
+      assert error == "Domain not whitelisted"
+    end
+  end
+
   defp mock_access(opts \\ []) do
     team = opts[:team] || @mock_team
     user = opts[:user] || @mock_user
