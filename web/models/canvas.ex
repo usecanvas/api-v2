@@ -1,4 +1,9 @@
 defmodule CanvasAPI.Canvas do
+  @moduledoc """
+  A document containing content represented as nested JSON blocks that is
+  editable in realtime.
+  """
+
   use CanvasAPI.Web, :model
 
   alias CanvasAPI.Block

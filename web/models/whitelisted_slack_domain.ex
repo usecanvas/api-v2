@@ -1,4 +1,8 @@
 defmodule CanvasAPI.WhitelistedSlackDomain do
+  @moduledoc """
+  A Slack domain whose users may sign in to Canvas.
+  """
+
   use CanvasAPI.Web, :model
 
   schema "whitelisted_slack_domains" do

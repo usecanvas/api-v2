@@ -34,7 +34,7 @@ defmodule CanvasAPI.Endpoint do
   plug Plug.Session,
     store: :cookie,
     domain: System.get_env("COOKIE_DOMAIN"),
-    max_age: 604800, # 1 week
+    max_age: 604_800, # 1 week
     key: "_canvas_pro_api_key",
     signing_salt: "vMKcfdD0"
 

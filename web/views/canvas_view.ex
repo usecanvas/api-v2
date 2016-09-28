@@ -46,10 +46,10 @@ defmodule CanvasAPI.CanvasView do
       },
       relationships: %{
         creator: %{
-          data: %{ id: canvas.creator_id, type: "user" }
+          data: %{id: canvas.creator_id, type: "user"}
         },
         team: %{
-          data: %{ id: canvas.team_id, type: "team" },
+          data: %{id: canvas.team_id, type: "team"},
           links: %{
             related: team_path(CanvasAPI.Endpoint, :show, canvas.team_id)
           }

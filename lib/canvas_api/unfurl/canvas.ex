@@ -1,8 +1,17 @@
 defmodule CanvasAPI.Unfurl.Canvas do
-  @canvas_regex Regex.compile!("\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
+  @lint {Credo.Check.Readability.MaxLineLength, false}
+  @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+
+  @moduledoc """
+  An unfurled canvas, providing summary and progress information.
+  """
+
+  @canvas_regex Regex.compile!(
+    "\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
 
   alias CanvasAPI.Block
   alias CanvasAPI.Unfurl.Field
+
 
   def unfurl(block, _opts) do
     %CanvasAPI.Unfurl{

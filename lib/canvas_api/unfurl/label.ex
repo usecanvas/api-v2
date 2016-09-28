@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Unfurl.Label do
+  @moduledoc """
+  A label applied to an unfurl.
+  """
+
   defstruct icon: nil, value: nil, color: nil, background_color: nil
 
   @type t :: %__MODULE__{

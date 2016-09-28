@@ -1,12 +1,21 @@
 defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
+  @moduledoc """
+  An unfurled Slack channel message.
+  """
+
+  @lint {Credo.Check.Readability.MaxLineLength, false}
   @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+
+  alias CanvasAPI.Unfurl
+  alias Slack.{Channel, User}
+
   @slack System.get_env("SLACK_API_TOKEN") |> Slack.client
 
   def match, do: @match
 
   def unfurl(url) do
     with response when is_map(response) <- do_request(parse_url(url)) do
-      %CanvasAPI.Unfurl{
+      %Unfurl{
         id: url,
         title: "Message from @#{response[:user]["name"]}",
         text: response[:message]["text"],
@@ -25,16 +34,16 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   end
 
   defp get_channels do
-    Slack.Channel.list(@slack)
+    Channel.list(@slack)
   end
 
   defp get_message(channel, timestamp) do
-    Slack.Channel.history(@slack,
+    Channel.history(@slack,
       channel: channel["id"], oldest: timestamp, inclusive: 1, count: 1)
   end
 
   defp get_user(user_id) do
-    Slack.User.info(@slack, user: user_id)
+    User.info(@slack, user: user_id)
   end
 
   defp find_channel(channels, name) do

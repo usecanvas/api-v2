@@ -1,4 +1,9 @@
 defmodule CanvasAPI.Unfurl.GitHub.Issue do
+  @moduledoc """
+  An unfurled GitHub issue.
+  """
+
+  @lint {Credo.Check.Readability.MaxLineLength, false}
   @match ~r|\Ahttps://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/issues/(?<issue_id>\d+)/?\z|
 
   alias CanvasAPI.{Block, Unfurl}

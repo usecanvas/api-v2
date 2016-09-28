@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Team do
+  @moduledoc """
+  A group of users in a Slack team.
+  """
+
   use CanvasAPI.Web, :model
 
   alias CanvasAPI.ImageMap

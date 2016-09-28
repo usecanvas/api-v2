@@ -1,4 +1,8 @@
 defmodule CanvasAPI.OAuthToken do
+  @moduledoc """
+  A token for making requests to a third-party API.
+  """
+
   use CanvasAPI.Web, :model
 
   schema "oauth_tokens" do

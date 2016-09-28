@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Account do
+  @moduledoc """
+  A user account, representing one or more Slack users.
+  """
+
   use CanvasAPI.Web, :model
 
   schema "accounts" do

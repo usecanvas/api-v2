@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Block do
+  @moduledoc """
+  A block of content in a canvas.
+  """
+
   use CanvasAPI.Web, :model
 
   @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}

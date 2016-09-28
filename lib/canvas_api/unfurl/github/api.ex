@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Unfurl.GitHub.API do
+  @moduledoc """
+  An API used for requesting information from GitHub.
+  """
+
   use HTTPoison.Base
 
   alias CanvasAPI.Repo

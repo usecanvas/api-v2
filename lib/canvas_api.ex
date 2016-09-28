@@ -1,4 +1,8 @@
 defmodule CanvasAPI do
+  @moduledoc """
+  An application for interacting with the Canvas service.
+  """
+
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
@@ -12,7 +16,8 @@ defmodule CanvasAPI do
       supervisor(CanvasAPI.Repo, []),
       # Start the endpoint when the application starts
       supervisor(CanvasAPI.Endpoint, []),
-      # Start your own worker by calling: CanvasAPI.Worker.start_link(arg1, arg2, arg3)
+      # Start your own worker by calling:
+      #   CanvasAPI.Worker.start_link(arg1, arg2, arg3)
       # worker(CanvasAPI.Worker, [arg1, arg2, arg3]),
     ]
 

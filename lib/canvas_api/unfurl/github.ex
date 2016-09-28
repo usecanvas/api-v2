@@ -1,12 +1,23 @@
 defmodule CanvasAPI.Unfurl.GitHub do
+  @moduledoc """
+  An unfurl representing a GitHub repo, issue, or pull request.
+  """
+
+  alias CanvasAPI.Unfurl
+
+  @provider_name "GitHub"
+  @provider_url "https://github.com"
+  @provider_icon_url(
+    "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png")
+
   def unfurl(block, account: account) do
     with mod when is_atom(mod) <- get_unfurl_mod(block),
-         unfurl when not is_nil(unfurl) <- mod.unfurl(block, account: account) do
+         unfurl = %Unfurl{} <- mod.unfurl(block, account: account) do
       %CanvasAPI.Unfurl{
         unfurl |
-          provider_name: "GitHub",
-          provider_url: "https://github.com",
-          provider_icon_url: "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png",
+          provider_name: @provider_name,
+          provider_url: @provider_url,
+          provider_icon_url: @provider_icon_url,
           url: block.meta["url"]
       }
     end

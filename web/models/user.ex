@@ -1,4 +1,8 @@
 defmodule CanvasAPI.User do
+  @moduledoc """
+  A Slack user.
+  """
+
   use CanvasAPI.Web, :model
 
   alias CanvasAPI.ImageMap

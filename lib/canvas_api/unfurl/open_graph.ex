@@ -1,4 +1,11 @@
 defmodule CanvasAPI.Unfurl.OpenGraph do
+  @moduledoc """
+  An unfurled page using data from Open Graph HTML tags.
+  """
+
+  @provider_icon_url(
+    "https://s3.amazonaws.com/canvas-assets/provider-icons/fallback.png")
+
   def unfurl(%CanvasAPI.Block{meta: %{"url" => url}}, _) do
     case HTTPoison.get(url, [], follow_redirect: true, max_redirect: 5) do
       {:ok, %{body: body, status_code: 200}} ->
@@ -14,7 +21,7 @@ defmodule CanvasAPI.Unfurl.OpenGraph do
     %CanvasAPI.Unfurl{
       id: url,
       provider_name: og_tags["site_name"],
-      provider_icon_url: "https://s3.amazonaws.com/canvas-assets/provider-icons/fallback.png",
+      provider_icon_url: @provider_icon_url,
       title: og_tags["title"] || url,
       text: og_tags["description"],
       thumbnail_url: og_tags["image"] ||

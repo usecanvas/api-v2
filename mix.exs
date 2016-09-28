@@ -46,6 +46,7 @@ defmodule CanvasAPI.Mixfile do
      {:base62_uuid, "~> 1.0.1"},
      {:appsignal, "~> 0.4.0"},
      {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
+     {:credo, "~> 0.4", only: [:dev, :test]},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]}]
   end
@@ -59,6 +60,6 @@ defmodule CanvasAPI.Mixfile do
   defp aliases do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
-     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+     "test": ["credo --strict", "ecto.create --quiet", "ecto.migrate", "test"]]
   end
 end

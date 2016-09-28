@@ -1,4 +1,9 @@
 defmodule CanvasAPI.Unfurl do
+  @moduledoc """
+  Some sort of remote data (from GitHub, a web page, Canvas) that is represented
+  in a common way for clients to display.
+  """
+
   defstruct id: nil, fields: [], height: nil, html: nil, labels: [],
     provider_icon_url: nil, provider_name: nil, provider_url: nil, text: nil,
     thumbnail_url: nil, title: nil, type: "link", width: nil, fetched: true,
@@ -26,7 +31,8 @@ defmodule CanvasAPI.Unfurl do
 
   def unfurl(block, account: account) do
     with mod when is_atom(mod) <- get_unfurl_mod(block),
-         unfurl when not is_nil(unfurl) <- mod.unfurl(block, account: account) do
+         unfurl when not is_nil(unfurl) <-
+           mod.unfurl(block, account: account) do
       unfurl
     else
       _ ->
