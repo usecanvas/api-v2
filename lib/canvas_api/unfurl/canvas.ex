@@ -1,29 +1,40 @@
 defmodule CanvasAPI.Unfurl.Canvas do
-  @lint {Credo.Check.Readability.MaxLineLength, false}
-  @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
-
   @moduledoc """
   An unfurled canvas, providing summary and progress information.
   """
 
+  @lint {Credo.Check.Readability.MaxLineLength, false}
+  @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+
   @canvas_regex Regex.compile!(
     "\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
 
-  alias CanvasAPI.Block
-  alias CanvasAPI.Unfurl.Field
-
+  alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
+  alias Unfurl.Field
 
   def unfurl(block, _opts) do
-    %CanvasAPI.Unfurl{
-      id: block.id,
-      title: canvas_title(block.canvas),
-      text: canvas_summary(block.canvas),
-      provider_name: "Canvas",
-      provider_url: "https://usecanvas.com",
-      fields: [
-        progress_field(block.canvas)
-      ]
-    }
+    %{"id" => id, "team_domain" => team_domain} =
+      Map.take(block.meta, ~w(id team_domain))
+
+    if canvas = Repo.get(Canvas, id) do
+      %Unfurl{
+        id: block.id,
+        title: canvas_title(canvas),
+        text: canvas_summary(canvas),
+        provider_name: "Canvas",
+        provider_url: "https://usecanvas.com",
+        fields: [
+          progress_field(canvas)
+        ]
+      }
+    else
+      %Unfurl{
+        id: block.id,
+        title: "https://usecanvas.com/#{team_domain}/#{id}",
+        provider_name: "Canvas",
+        provider_url: "https://usecanvas.com"
+      }
+    end
   end
 
   def canvas_regex, do: @canvas_regex

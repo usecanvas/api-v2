@@ -10,13 +10,11 @@ defmodule CanvasAPI.UnfurlController do
   def show(conn, %{"id" => id}) do
     %{current_account: account, canvas: canvas} = conn.private
 
-    with block when not is_nil(block) <- Canvas.find_block(canvas, id),
-         block = Map.put(block, :canvas, canvas) do
+    if block = Canvas.find_block(canvas, id) do
       conn
       |> render("show.json", unfurl: Unfurl.unfurl(block, account: account))
     else
-      _ ->
-        not_found(conn)
+      not_found(conn)
     end
   end
 
@@ -24,10 +22,8 @@ defmodule CanvasAPI.UnfurlController do
     Canvas
     |> Repo.get(id)
     |> case do
-      nil ->
-        not_found(conn)
-      canvas ->
-        put_private(conn, :canvas, canvas)
+      nil -> not_found(conn)
+      canvas -> put_private(conn, :canvas, canvas)
     end
   end
 
