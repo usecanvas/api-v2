@@ -59,8 +59,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
     [%Field{title: "State", value: "merged", short: true}]
   end
 
-  defp add_state_field([], body = %{"state" => state}) do
-    [%Field{title: "State", value: body["state"], short: true}]
+  defp add_state_field([], %{"state" => state}) do
+    [%Field{title: "State", value: state, short: true}]
   end
 
   defp add_state_field([], _), do: []

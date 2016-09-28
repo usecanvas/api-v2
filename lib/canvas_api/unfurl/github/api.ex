@@ -1,7 +1,7 @@
 defmodule CanvasAPI.Unfurl.GitHub.API do
   use HTTPoison.Base
 
-  alias CanvasAPI.{Account, OAuthToken, Repo, User}
+  alias CanvasAPI.Repo
   import Ecto.Query, only: [from: 2]
 
   @endpoint "https://api.github.com"

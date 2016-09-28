@@ -2,7 +2,6 @@ defmodule CanvasAPI.Unfurl.GitHub.Repo do
   @match ~r|\Ahttps?://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/?\z|
 
   alias CanvasAPI.Unfurl.GitHub.API, as: GitHubAPI
-  import Ecto.Query, only: [from: 2]
 
   def match, do: @match
 

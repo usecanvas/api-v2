@@ -1,7 +1,7 @@
 defmodule CanvasAPI.Unfurl.Canvas do
   @canvas_regex Regex.compile!("\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
 
-  alias CanvasAPI.{Block, Canvas, Repo}
+  alias CanvasAPI.Block
   alias CanvasAPI.Unfurl.Field
 
   def unfurl(block, _opts) do
@@ -58,11 +58,5 @@ defmodule CanvasAPI.Unfurl.Canvas do
       (_, progress) ->
         progress
     end)
-  end
-
-  defp extract_canvas_id(url) do
-    with match when is_map(match) <- Regex.named_captures(@canvas_regex, url) do
-      match["id"]
-    end
   end
 end
