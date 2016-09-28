@@ -25,7 +25,7 @@
     },
     "REDIRECT_ON_LOGIN_URL": {
       "description": "The URL to redirect to on successful login",
-      "development_value": "http://localhost:4200"
+      "development_value": "http://localhost:4200/post-auth"
     },
     "REDIRECT_URI": {
       "description": "The redirect URI for Slack",
