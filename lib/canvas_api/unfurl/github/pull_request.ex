@@ -19,7 +19,7 @@ defmodule CanvasAPI.Unfurl.GitHub.PullRequest do
          body = Map.merge(pull_body, issue_body) do
       CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(block, body)
     else
-      {:ok, %{status_code: 404}} ->
+      {:ok, _} ->
         CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(
           block,
           %{"title" => pull_endpoint(url) |> String.replace("/repos/", "")},

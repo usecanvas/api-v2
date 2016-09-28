@@ -16,7 +16,7 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
     with {:ok, %{body: body, status_code: 200}} <- do_get(account, block) do
       unfurl_from_body(block, body)
     else
-      {:ok, %{status_code: 404}} ->
+      {:ok, _} ->
         unfurl_from_body(
           block,
           %{"title" => endpoint(url) |> String.replace("/repos/", "")},
