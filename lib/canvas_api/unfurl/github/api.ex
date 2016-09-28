@@ -26,7 +26,10 @@ defmodule CanvasAPI.Unfurl.GitHub.API do
   # Get the headers for a request, with a token for the account if available.
   @spec headers(%CanvasAPI.Account{}) :: [] | [{String.t, String.t}]
   defp headers(account) do
-    from(t in assoc(account, :oauth_tokens), where: t.provider == "github")
+    from(t in assoc(account, :oauth_tokens),
+         where: t.provider == "github",
+         order_by: [desc: :inserted_at],
+         limit: 1)
     |> Repo.one
     |> case do
       token = %OAuthToken{} -> [{"authorization", "token #{token.token}"}]

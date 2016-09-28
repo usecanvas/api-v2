@@ -22,8 +22,5 @@ defmodule CanvasAPI.OAuthToken do
     struct
     |> cast(params, [:token, :provider, :meta])
     |> validate_required([:token, :provider])
-    |> unique_constraint(:provider,
-         name: :oauth_tokens_account_id_provider_index,
-         message: "already exists for this account")
   end
 end
