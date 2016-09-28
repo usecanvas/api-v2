@@ -5,33 +5,37 @@ defmodule CanvasAPI.Unfurl.GitHub.API do
 
   use HTTPoison.Base
 
-  alias CanvasAPI.Repo
+  alias CanvasAPI.{OAuthToken, Repo}
   import Ecto.Query, only: [from: 2]
+  import Ecto, only: [assoc: 2]
 
   @endpoint "https://api.github.com"
 
+  @doc """
+  Get a URL by way of a given account.
+
+  Fetches the proper authentication token for the given account, and if it finds
+  one, appends it as a header to the GET request.
+  """
+  @spec get_by(%CanvasAPI.Account{}, String.t) ::
+    {:ok, HTTPoison.Response.t} | {:error, HTTPoison.Error.t}
   def get_by(account, url) do
-    headers =
-      case get_token_for_block(account) do
-        nil -> []
-        token ->
-          [{"authorization", "token #{token.token}"}]
-      end
-
-    get(url, headers)
+    get(url, headers(account))
   end
 
-  def get_token_for_block(account) do
-    from(t in Ecto.assoc(account, :oauth_tokens),
-         where: t.provider == ^"github")
+  # Get the headers for a request, with a token for the account if available.
+  @spec headers(%CanvasAPI.Account{}) :: [] | [{String.t, String.t}]
+  defp headers(account) do
+    from(t in assoc(account, :oauth_tokens), where: t.provider == "github")
     |> Repo.one
+    |> case do
+      token = %OAuthToken{} -> [{"authorization", "token #{token.token}"}]
+      nil -> []
+    end
   end
-
 
   defp process_url(url = "https://" <> _), do: url
   defp process_url(url), do: @endpoint <> url
-
   defp process_request_body(body), do: Poison.encode!(body)
-
   defp process_response_body(body), do: Poison.decode!(body)
 end
