@@ -15,7 +15,7 @@ defmodule CanvasAPI.OAuth.GitHub.CallbackController do
     case GitHubOAuthMediator.persist_token(code, account: account) do
       {:ok, _} ->
         conn
-        |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
+        |> redirect(external: System.get_env("REDIRECT_ON_AUTH_URL"))
       {:error, _error} ->
         conn
         |> put_status(:bad_request)

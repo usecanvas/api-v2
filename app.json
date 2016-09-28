@@ -23,9 +23,13 @@
       "description": "Hostname for this app",
       "development_required": false
     },
+    "REDIRECT_ON_AUTH_URL": {
+      "description": "The URL to redirect to on successful auth",
+      "development_value": "http://localhost:4200/post-auth"
+    },
     "REDIRECT_ON_LOGIN_URL": {
       "description": "The URL to redirect to on successful login",
-      "development_value": "http://localhost:4200/post-auth"
+      "development_value": "http://localhost:4200"
     },
     "REDIRECT_URI": {
       "description": "The redirect URI for Slack",
