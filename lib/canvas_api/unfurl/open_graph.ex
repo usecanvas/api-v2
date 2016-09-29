@@ -35,6 +35,17 @@ defmodule CanvasAPI.Unfurl.OpenGraph do
     html_body
     |> Floki.find("meta")
     |> extract_opengraph
+    |> Enum.reduce(%{}, fn key_value, map ->
+      ensure_valid_string(key_value, map)
+    end)
+  end
+
+  defp ensure_valid_string({key, value}, map) do
+    if String.valid?(value) do
+      Map.put(map, key, value)
+    else
+      Map.put(map, key, "")
+    end
   end
 
   defp extract_opengraph(tags) do
