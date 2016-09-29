@@ -3,38 +3,31 @@ defmodule CanvasAPI.Unfurl.Canvas do
   An unfurled canvas, providing summary and progress information.
   """
 
-  @lint {Credo.Check.Readability.MaxLineLength, false}
-  @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+  @provider_name "Canvas"
+  @provider_icon_url(
+    "https://s3.amazonaws.com/canvas-assets/provider-icons/canvas.png")
+  @provider_url "https://usecanvas.com"
 
   @canvas_regex Regex.compile!(
-    "\\Ahttps?://#{System.get_env("WEB_HOST")}/[^/]+/(?<id>[^/]{22})\\z")
+    "\\A#{System.get_env("WEB_URL")}/[^/]+/(?<id>[^/]{22})\\z")
 
   alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
   alias Unfurl.Field
 
-  def unfurl(block, _opts) do
-    %{"id" => id, "team_domain" => team_domain} =
-      Map.take(block.meta, ~w(id team_domain))
-
-    if canvas = Repo.get(Canvas, id) do
+  def unfurl(url, _opts) do
+    with id when is_binary(id) <- extract_canvas_id(url),
+         canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]) do
       %Unfurl{
-        id: block.id,
+        id: url,
         title: canvas_title(canvas),
         text: canvas_summary(canvas),
-        provider_name: "Canvas",
-        provider_url: "https://usecanvas.com",
-        url: "https://pro.usecanvas.com/#{team_domain}/#{id}",
+        provider_name: @provider_name,
+        provider_icon_url: @provider_icon_url,
+        provider_url: @provider_url,
+        url: "#{System.get_env("WEB_URL")}/#{canvas.team.domain}/#{id}",
         fields: [
           progress_field(canvas)
         ]
-      }
-    else
-      %Unfurl{
-        id: block.id,
-        title: "https://pro.usecanvas.com/#{team_domain}/#{id}",
-        provider_name: "Canvas",
-        provider_url: "https://usecanvas.com",
-        url: block.meta["url"],
       }
     end
   end
@@ -82,5 +75,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
       (_, progress) ->
         progress
     end)
+  end
+
+  defp extract_canvas_id(url) do
+    with match when is_map(match) <- Regex.named_captures(@canvas_regex, url) do
+      match["id"]
+    end
   end
 end

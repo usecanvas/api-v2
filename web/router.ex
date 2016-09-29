@@ -18,12 +18,11 @@ defmodule CanvasAPI.Router do
 
     get "/account", AccountController, :show
     delete "/session", SessionController, :delete
+    resources "/unfurls", UnfurlController, only: [:index]
 
     resources "/teams", TeamController, only: [:index, :show] do
       resources "/canvases", CanvasController,
-        only: [:create, :index, :show, :delete] do
-          resources "/unfurls", UnfurlController, only: [:show]
-      end
+        only: [:create, :index, :show, :delete]
 
       get "/templates", CanvasController, :index_templates, as: :template
       get "/user", UserController, :show

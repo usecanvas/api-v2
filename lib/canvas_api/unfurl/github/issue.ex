@@ -6,19 +6,19 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
   @lint {Credo.Check.Readability.MaxLineLength, false}
   @match ~r|\Ahttps://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/issues/(?<issue_id>\d+)/?\z|
 
-  alias CanvasAPI.{Block, Unfurl}
+  alias CanvasAPI.Unfurl
   alias Unfurl.GitHub.API, as: GitHubAPI
   alias Unfurl.{Field, Label}
 
   def match, do: @match
 
-  def unfurl(block = %Block{meta: %{"url" => url}}, account: account) do
-    with {:ok, %{body: body, status_code: 200}} <- do_get(account, block) do
-      unfurl_from_body(block, body)
+  def unfurl(url, account: account) do
+    with {:ok, %{body: body, status_code: 200}} <- do_get(account, url) do
+      unfurl_from_body(url, body)
     else
       {:ok, _} ->
         unfurl_from_body(
-          block,
+          url,
           %{"title" => endpoint(url) |> String.replace("/repos/", "")},
           false)
       _ ->
@@ -26,9 +26,9 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
     end
   end
 
-  def unfurl_from_body(block, body, fetched \\ true) do
+  def unfurl_from_body(url, body, fetched \\ true) do
     %Unfurl{
-      id: block.id,
+      id: url,
       title: body["title"],
       text: issue_text(body),
       thumbnail_url: get_in(body, ~w(user avatar_url)),
@@ -87,8 +87,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
 
   defp add_assignee_field(list, _), do: list
 
-  defp do_get(account, block) do
-    GitHubAPI.get_by(account, endpoint(block.meta["url"]))
+  defp do_get(account, url) do
+    GitHubAPI.get_by(account, endpoint(url))
   end
 
   defp endpoint(url) do

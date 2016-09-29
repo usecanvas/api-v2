@@ -29,25 +29,22 @@ defmodule CanvasAPI.Unfurl do
 
   def json_api_type, do: "unfurl"
 
-  def unfurl(block, account: account) do
-    with mod when is_atom(mod) <- get_unfurl_mod(block),
-         unfurl when not is_nil(unfurl) <-
-           mod.unfurl(block, account: account) do
+  def unfurl(url, account: account) do
+    with mod when is_atom(mod) <- get_unfurl_mod(url),
+         unfurl = %__MODULE__{} <- mod.unfurl(url, account: account) do
       unfurl
     else
       _ ->
         %__MODULE__{
-          id: block.id,
-          title: block.meta["url"] || "No Title",
-          url: block.meta["url"]}
+          id: url,
+          title: url,
+          url: url}
     end
   end
 
-  defp get_unfurl_mod(block) do
-    url = block.meta["url"] || ""
-
+  defp get_unfurl_mod(url) do
     cond do
-      block.type == "canvas" ->
+      Regex.match?(CanvasAPI.Unfurl.Canvas.canvas_regex, url) ->
         CanvasAPI.Unfurl.Canvas
       Regex.match?(~r|\Ahttps?://(?:www\.)?github\.com/|, url) ->
         CanvasAPI.Unfurl.GitHub

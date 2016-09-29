@@ -61,9 +61,9 @@
       "description": "ID of the user in the team containing templates",
       "required": false
     },
-    "WEB_HOST": {
-      "description": "Hostname on which the web app runs",
-      "development_value": "localhost:4200"
+    "WEB_URL": {
+      "description": "URL on which the web app runs",
+      "development_value": "http://localhost:4200"
     }
   }
 }

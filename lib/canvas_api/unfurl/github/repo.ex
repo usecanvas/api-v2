@@ -5,10 +5,10 @@ defmodule CanvasAPI.Unfurl.GitHub.Repo do
 
   def match, do: @match
 
-  def unfurl(block, account: account) do
-    with {:ok, %{body: body, status_code: 200}} <- do_get(account, block) do
+  def unfurl(url, account: account) do
+    with {:ok, %{body: body, status_code: 200}} <- do_get(account, url) do
       %CanvasAPI.Unfurl{
-        id: block.id,
+        id: url,
         title: body["full_name"],
         text: body["description"],
         thumbnail_url: get_in(body, ~w(owner avatar_url))
@@ -16,8 +16,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Repo do
     else
       {:ok, _} ->
         %CanvasAPI.Unfurl{
-          id: block.id,
-          title: String.replace(endpoint(block.meta["url"]), "/repos/", ""),
+          id: url,
+          title: String.replace(endpoint(url), "/repos/", ""),
           text: nil,
           thumbnail_url: nil,
           fetched: false
@@ -27,8 +27,8 @@ defmodule CanvasAPI.Unfurl.GitHub.Repo do
     end
   end
 
-  defp do_get(account, block) do
-    GitHubAPI.get_by(account, endpoint(block.meta["url"]))
+  defp do_get(account, url) do
+    GitHubAPI.get_by(account, endpoint(url))
   end
 
   defp endpoint(url) do

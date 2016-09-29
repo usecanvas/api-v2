@@ -11,17 +11,17 @@ defmodule CanvasAPI.Unfurl.GitHub.PullRequest do
 
   def match, do: @match
 
-  def unfurl(block = %Block{meta: %{"url" => url}}, account: account) do
+  def unfurl(url, account: account) do
     with {:ok, %{body: pull_body, status_code: 200}} <-
            do_get(account, pull_endpoint(url)),
          {:ok, %{body: issue_body, status_code: 200}} <-
            do_get(account, issue_endpoint(url)),
          body = Map.merge(pull_body, issue_body) do
-      CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(block, body)
+      CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(url, body)
     else
       {:ok, _} ->
         CanvasAPI.Unfurl.GitHub.Issue.unfurl_from_body(
-          block,
+          url,
           %{"title" => pull_endpoint(url) |> String.replace("/repos/", "")},
           false)
       _ ->

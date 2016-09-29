@@ -10,22 +10,21 @@ defmodule CanvasAPI.Unfurl.GitHub do
   @provider_icon_url(
     "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png")
 
-  def unfurl(block, account: account) do
-    with mod when is_atom(mod) <- get_unfurl_mod(block),
-         unfurl = %Unfurl{} <- mod.unfurl(block, account: account) do
+  def unfurl(url, account: account) do
+    with mod when is_atom(mod) <- get_unfurl_mod(url),
+         unfurl = %Unfurl{} <- mod.unfurl(url, account: account) do
       %CanvasAPI.Unfurl{
         unfurl |
+          id: url,
           provider_name: @provider_name,
           provider_url: @provider_url,
           provider_icon_url: @provider_icon_url,
-          url: block.meta["url"]
+          url: url
       }
     end
   end
 
-  defp get_unfurl_mod(block) do
-    url = block.meta["url"]
-
+  defp get_unfurl_mod(url) do
     cond do
       is_repo?(url) -> CanvasAPI.Unfurl.GitHub.Repo
       is_issue?(url) -> CanvasAPI.Unfurl.GitHub.Issue
