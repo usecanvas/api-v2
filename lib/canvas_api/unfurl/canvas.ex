@@ -56,8 +56,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
   defp progress_fields(canvas) do
     {complete, total} = do_progress_field(canvas.blocks)
 
-    [%Field{title: "tasks_complete", value: complete, short: true},
-     %Field{title: "tasks_total", value: total, short: true}]
+    [%Field{title: "Tasks Complete", value: complete, short: true},
+     %Field{title: "Tasks Total", value: total, short: true}]
   end
 
   defp do_progress_field(blocks, progress \\ {0, 0}) do
