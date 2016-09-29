@@ -23,6 +23,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
         text: canvas_summary(canvas),
         provider_name: "Canvas",
         provider_url: "https://usecanvas.com",
+        url: "https://usecanvas.com/#{team_domain}/#{id}",
         fields: [
           progress_field(canvas)
         ]
@@ -32,7 +33,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
         id: block.id,
         title: "https://usecanvas.com/#{team_domain}/#{id}",
         provider_name: "Canvas",
-        provider_url: "https://usecanvas.com"
+        provider_url: "https://usecanvas.com",
+        url: block.meta["url"],
       }
     end
   end
@@ -49,6 +51,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
         block.content
       %Block{content: content} ->
         String.slice(content, 0..140)
+      nil ->
+        ""
     end
   end
 
