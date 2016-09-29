@@ -25,9 +25,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
         provider_icon_url: @provider_icon_url,
         provider_url: @provider_url,
         url: "#{System.get_env("WEB_URL")}/#{canvas.team.domain}/#{id}",
-        fields: [
-          progress_field(canvas)
-        ]
+        fields: progress_fields(canvas)
       }
     end
   end
@@ -55,10 +53,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
     |> Map.get(:content)
   end
 
-  defp progress_field(canvas) do
+  defp progress_fields(canvas) do
     {complete, total} = do_progress_field(canvas.blocks)
-    progress = if total > 0, do: (complete / total * 100) |> Float.round(2)
-    %Field{title: "progress", value: progress, short: true}
+
+    [%Field{title: "tasks_complete", value: complete, short: true},
+     %Field{title: "tasks_total", value: total, short: true}]
   end
 
   defp do_progress_field(blocks, progress \\ {0, 0}) do
