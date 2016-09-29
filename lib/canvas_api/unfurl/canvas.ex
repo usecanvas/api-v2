@@ -54,17 +54,17 @@ defmodule CanvasAPI.Unfurl.Canvas do
   end
 
   defp progress_fields(canvas) do
-    {complete, total} = do_progress_field(canvas.blocks)
+    {complete, total} = get_progress(canvas.blocks)
 
     [%Field{title: "Tasks Complete", value: complete, short: true},
      %Field{title: "Tasks Total", value: total, short: true}]
   end
 
-  defp do_progress_field(blocks, progress \\ {0, 0}) do
+  defp get_progress(blocks, progress \\ {0, 0}) do
     blocks
     |> Enum.reduce(progress, fn
       (%Block{blocks: child_blocks}, progress) when length(child_blocks) > 0 ->
-        do_progress_field(child_blocks, progress)
+        get_progress(child_blocks, progress)
       (block = %Block{type: "checklist-item"}, progress) ->
         if block.meta["checked"] do
           {elem(progress, 0) + 1, elem(progress, 1) + 1}
