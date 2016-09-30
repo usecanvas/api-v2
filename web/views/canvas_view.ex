@@ -4,9 +4,12 @@ defmodule CanvasAPI.CanvasView do
   def render("index.json", %{canvases: canvases}) do
     %{
       data: render_many(canvases, CanvasAPI.CanvasView, "canvas.json"),
-      included: Enum.map(canvases, fn canvas ->
-        render_one(canvas.creator, CanvasAPI.UserView, "user.json")
-      end) |> Enum.uniq
+      included: canvases
+                |> Enum.map(&(&1.creator))
+                |> Enum.uniq
+                |> Enum.map(fn user ->
+                  render_one(user, CanvasAPI.UserView, "user.json")
+                end)
     }
   end
 
