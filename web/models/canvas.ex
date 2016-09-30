@@ -20,7 +20,7 @@ defmodule CanvasAPI.Canvas do
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas
 
-    embeds_many :blocks, Block
+    embeds_many :blocks, Block, on_replace: :delete
 
     timestamps()
   end
