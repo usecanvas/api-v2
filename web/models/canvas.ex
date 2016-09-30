@@ -16,8 +16,8 @@ defmodule CanvasAPI.Canvas do
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
 
-    belongs_to :creator, CanvasAPI.User
-    belongs_to :team, CanvasAPI.Team
+    belongs_to :creator, CanvasAPI.User, on_replace: :delete
+    belongs_to :team, CanvasAPI.Team, on_replace: :delete
     belongs_to :template, CanvasAPI.Canvas
 
     embeds_many :blocks, Block, on_replace: :delete
