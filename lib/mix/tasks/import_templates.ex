@@ -54,15 +54,14 @@ defmodule Mix.Tasks.CanvasApi.ImportTemplates do
   end
 
   defp do_import_template(json, user) do
-    changeset =
-      case Repo.get(Canvas, json["id"]) do
-        nil -> %Canvas{id: json["id"]}
-        canvas -> canvas |> Repo.preload([:creator, :team])
-      end
-      |> Canvas.changeset(json |> Map.delete("blocks"))
-      |> put_embed(:blocks, json["blocks"])
-      |> put_assoc(:creator, user)
-      |> put_assoc(:team, user.team)
-      |> Repo.insert_or_update!
+    case Repo.get(Canvas, json["id"]) do
+      nil -> %Canvas{id: json["id"]}
+      canvas -> canvas |> Repo.preload([:creator, :team])
+    end
+    |> Canvas.changeset(json |> Map.delete("blocks"))
+    |> put_embed(:blocks, json["blocks"])
+    |> put_assoc(:creator, user)
+    |> put_assoc(:team, user.team)
+    |> Repo.insert_or_update!
   end
 end
