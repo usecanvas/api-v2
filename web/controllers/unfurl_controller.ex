@@ -5,11 +5,14 @@ defmodule CanvasAPI.UnfurlController do
 
   plug CanvasAPI.CurrentAccountPlug
 
-  @spec index(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
-  def index(conn, %{"url" => url}) do
-    account = conn.private.current_account
+  def index(conn, %{"url" => url}, current_account) do
+    unfurl = Unfurl.unfurl(url, account: current_account)
+    render(conn, "show.json", unfurl: unfurl)
+  end
 
-    conn
-    |> render("show.json", unfurl: Unfurl.unfurl(url, account: account))
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn,
+                                          conn.params,
+                                          conn.private.current_account])
   end
 end

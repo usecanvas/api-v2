@@ -1,6 +1,7 @@
 defmodule CanvasAPI.CanvasControllerTest do
   use CanvasAPI.ConnCase
 
+  alias CanvasAPI.Block
   import CanvasAPI.Factory
 
   @valid_attrs %{}
@@ -11,7 +12,7 @@ defmodule CanvasAPI.CanvasControllerTest do
   end
 
   describe "GET :index" do
-    test "lists all entries on index", %{conn: conn} do
+    test "lists all canvases", %{conn: conn} do
       canvas = insert(:canvas)
       account = canvas.creator.account
 
@@ -22,13 +23,20 @@ defmodule CanvasAPI.CanvasControllerTest do
 
       %{"data" => [%{"id" => id}]} = json_response(conn, 200)
       assert id == canvas.id
-      canvas = insert(:canvas)
+    end
+  end
+
+  describe "GET :index_templates" do
+    test "lists all template canvases", %{conn: conn} do
+      canvas = insert(:canvas,
+                      is_template: true,
+                      blocks: [%Block{content: "Foo", type: "title"}])
       account = canvas.creator.account
 
       conn =
-        build_conn
+        conn
         |> put_private(:current_account, account)
-        |> get(team_canvas_path(conn, :index, canvas.team))
+        |> get(team_template_path(conn, :index_templates, canvas.team))
 
       %{"data" => [%{"id" => id}]} = json_response(conn, 200)
       assert id == canvas.id

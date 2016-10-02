@@ -66,6 +66,17 @@ defmodule CanvasAPI.Canvas do
 
   def put_template(changeset, _), do: changeset
 
+  @doc """
+  Get the title of a canvas.
+  """
+  @spec title(%__MODULE__{}) :: String.t
+  def title(%__MODULE__{blocks: blocks}) do
+    case blocks do
+      [%Block{type: "title", content: content} | _] -> content
+      _ -> ""
+    end
+  end
+
   # Put the title block, if necessary.
   @spec put_title_block(Ecto.Changeset.t) :: Ecto.Changeset.t
   defp put_title_block(changeset) do

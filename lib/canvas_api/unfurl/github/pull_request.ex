@@ -6,7 +6,7 @@ defmodule CanvasAPI.Unfurl.GitHub.PullRequest do
   @lint {Credo.Check.Readability.MaxLineLength, false}
   @match ~r|\Ahttps://(?:www\.)?github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)/pull/(?<pull_id>\d+)/?\z|
 
-  alias CanvasAPI.{Block, Unfurl}
+  alias CanvasAPI.Unfurl
   alias Unfurl.GitHub.API, as: GitHubAPI
 
   def match, do: @match

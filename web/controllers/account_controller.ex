@@ -4,7 +4,6 @@ defmodule CanvasAPI.AccountController do
   plug CanvasAPI.CurrentAccountPlug
 
   def show(conn, _params) do
-    conn
-    |> render("show.json", account: conn.private.current_account)
+    render(conn, "show.json", account: conn.private.current_account)
   end
 end

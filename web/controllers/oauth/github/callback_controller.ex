@@ -8,18 +8,20 @@ defmodule CanvasAPI.OAuth.GitHub.CallbackController do
   @doc """
   Respond to a GitHub OAuth callback by persisting a token
   """
-  @spec callback(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
-  def callback(conn, %{"code" => code}) do
-    account = conn.private[:current_account]
-
-    case GitHubOAuthMediator.persist_token(code, account: account) do
+  def callback(conn, %{"code" => code}, current_account) do
+    case GitHubOAuthMediator.persist_token(code, account: current_account) do
       {:ok, _} ->
-        conn
-        |> redirect(external: System.get_env("REDIRECT_ON_AUTH_URL"))
+        redirect(conn, external: System.get_env("REDIRECT_ON_AUTH_URL"))
       {:error, _error} ->
         conn
         |> put_status(:bad_request)
         |> render(ErrorView, "400.json")
     end
+  end
+
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn,
+                                          conn.params,
+                                          conn.private.current_account])
   end
 end

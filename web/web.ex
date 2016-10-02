@@ -39,6 +39,7 @@ defmodule CanvasAPI.Web do
       alias CanvasAPI.Repo
       import Ecto
       import Ecto.Query
+      import Ecto.Changeset
 
       import CanvasAPI.Router.Helpers
       import CanvasAPI.Gettext

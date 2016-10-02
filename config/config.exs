@@ -19,9 +19,6 @@ config :canvas_api, CanvasAPI.Endpoint,
   pubsub: [name: CanvasAPI.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
-config :canvas_api, CanvasAPI.Repo,
-  loggers: [Appsignal.Ecto]
-
 config :phoenix, :format_encoders,
   json: CanvasAPI.JSONEncoder
 

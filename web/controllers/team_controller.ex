@@ -3,46 +3,39 @@ defmodule CanvasAPI.TeamController do
 
   alias CanvasAPI.{ErrorView, Team}
 
-  import Ecto, only: [assoc: 2]
-
   plug CanvasAPI.CurrentAccountPlug
 
-  def index(conn, params) do
-    account = conn.private.current_account
-
+  def index(conn, params, current_account) do
     teams =
-      from(t in assoc(account, :teams),
+      from(assoc(current_account, :teams),
            order_by: [:name],
-           preload: [users: ^from(u in assoc(account, :users))])
+           preload: [users: ^assoc(current_account, :users)])
       |> filter(params["filter"])
       |> Repo.all
 
     render(conn, "index.json", teams: teams)
   end
 
-  def show(conn, %{"id" => id}) do
-    account = conn.private.current_account
-
-    team =
-      Ecto.assoc(conn.private.current_account, :teams)
-      |> preload([users: ^from(u in assoc(account, :users))])
-      |> Repo.get(id)
-
-    case team do
+  def show(conn, %{"id" => id}, current_account) do
+    assoc(current_account, :teams)
+    |> preload([users: ^assoc(current_account, :users)])
+    |> Repo.get(id)
+    |> case do
       team = %Team{} ->
-        conn
-        |> render("show.json", team: team)
-      nil ->
+        render(conn, "show.json", team: team)
+      _ ->
         conn
         |> put_status(:not_found)
         |> render(ErrorView, "404.json")
     end
   end
 
-  defp filter(query, %{"domain" => domain}) do
-    query
-    |> where([t], t.domain == ^domain)
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn,
+                                          conn.params,
+                                          conn.private.current_account])
   end
 
+  defp filter(query, %{"domain" => domain}), do: where(query, [domain: ^domain])
   defp filter(query, _), do: query
 end
