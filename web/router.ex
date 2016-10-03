@@ -18,7 +18,8 @@ defmodule CanvasAPI.Router do
     pipe_through :oauth
 
     scope "/oauth", OAuth do
-      get "/slack/callback", Slack.CallbackController, :callback
+      get "/slack/callback", Slack.CallbackController, :sign_in
+      get "/slack/add-to-slack/callback", Slack.CallbackController, :add_to
       get "/github/callback", GitHub.CallbackController, :callback
     end
   end

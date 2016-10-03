@@ -16,6 +16,7 @@ defmodule CanvasAPI.Team do
     many_to_many :accounts, CanvasAPI.Account, join_through: "users"
     has_many :canvases, CanvasAPI.Canvas
     has_many :users, CanvasAPI.User
+    has_many :oauth_tokens, CanvasAPI.OAuthToken
 
     timestamps()
   end

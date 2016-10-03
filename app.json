@@ -1,5 +1,9 @@
 {
   "env": {
+    "ADD_TO_SLACK_REDIRECT_URI": {
+      "description": "The redirect URI for Add-to-Slack",
+      "development_value": "http://localhost:4000/oauth/slack/add-to-slack/callback"
+    },
     "APPSIGNAL_PUSH_API_KEY": {
       "description": "An API key for pushing to Appsignal",
       "required": false
