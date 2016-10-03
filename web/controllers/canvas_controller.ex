@@ -75,36 +75,6 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  defp ensure_team(conn, _opts) do
-    from(assoc(conn.private.current_account, :teams))
-    |> Repo.get(conn.params["team_id"])
-    |> case do
-      team = %Team{} ->
-        put_private(conn, :current_team, team)
-      _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
-    end
-  end
-
-  defp ensure_user(conn, _opts) do
-    from(assoc(conn.private.current_account, :users),
-         where: [team_id: ^conn.private.current_team.id])
-    |> first
-    |> Repo.one
-    |> case do
-      user = %User{} ->
-        put_private(conn, :current_user, user)
-      _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
-    end
-  end
-
   defp render_show(conn, canvas, "canvas") do
     conn
     |> put_resp_header("content-type", "application/octet-stream")

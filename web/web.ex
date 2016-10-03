@@ -37,6 +37,7 @@ defmodule CanvasAPI.Web do
       use Phoenix.Controller, namespace: CanvasAPI
 
       alias CanvasAPI.Repo
+      import CanvasAPI.TeamPlug
       import Ecto
       import Ecto.Query
       import Ecto.Changeset

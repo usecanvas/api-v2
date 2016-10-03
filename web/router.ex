@@ -32,6 +32,10 @@ defmodule CanvasAPI.Router do
     resources "/unfurls", UnfurlController, only: [:index]
 
     resources "/teams", TeamController, only: [:index, :show] do
+      scope "/slack", Slack do
+        resources "/channels", ChannelController, only: [:index]
+      end
+
       resources "/canvases", CanvasController,
         only: [:create, :index, :show, :delete]
 
