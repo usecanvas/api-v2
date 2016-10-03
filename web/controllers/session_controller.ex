@@ -3,8 +3,8 @@ defmodule CanvasAPI.SessionController do
 
   def delete(conn, _params) do
     conn
-    |> fetch_session
     |> clear_session
+    |> delete_resp_cookie("csrf_token")
     |> send_resp(204, "")
   end
 end

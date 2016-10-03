@@ -14,8 +14,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
   def call(conn = %{private: %{current_account: %Account{}}}, _), do: conn
 
   def call(conn, opts) do
-    with conn <- fetch_session(conn),
-         account_id when not is_nil(account_id) <-
+    with account_id when not is_nil(account_id) <-
            get_session(conn, :account_id),
          account = %Account{} <- Repo.get(Account, account_id) do
       put_private(conn, :current_account, account)

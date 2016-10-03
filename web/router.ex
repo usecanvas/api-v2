@@ -1,13 +1,22 @@
 defmodule CanvasAPI.Router do
   use CanvasAPI.Web, :router
 
+  pipeline :oauth do
+    plug :fetch_session
+    plug Plug.CSRFProtection, with: :clear_session
+  end
+
   pipeline :api do
-    plug CanvasAPI.TrailingFormatPlug
     plug CanvasAPI.OriginCheckPlug
+    plug :fetch_session
+    plug Plug.CSRFProtection, with: :clear_session
+    plug CanvasAPI.TrailingFormatPlug
     plug :accepts, ~w(json json-api)
   end
 
   scope "/", CanvasAPI do
+    pipe_through :oauth
+
     scope "/oauth", OAuth do
       get "/slack/callback", Slack.CallbackController, :callback
       get "/github/callback", GitHub.CallbackController, :callback

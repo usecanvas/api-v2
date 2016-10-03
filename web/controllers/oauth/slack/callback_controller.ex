@@ -16,7 +16,9 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     case SignInMediator.sign_in(code, account: account) do
       {:ok, account} ->
         conn
-        |> fetch_session
+        |> put_resp_cookie("csrf_token", get_csrf_token(),
+                           domain: System.get_env("COOKIE_DOMAIN"),
+                           http_only: false)
         |> put_session(:account_id, account.id)
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
       {:error, _error} ->
