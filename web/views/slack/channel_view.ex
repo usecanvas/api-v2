@@ -15,7 +15,16 @@ defmodule CanvasAPI.Slack.ChannelView do
       attributes: %{
         name: channel["name"],
         topic: channel_topic(channel)
-      }
+      },
+      relationships: %{
+        team: %{
+          data: %{id: channel["team"].id, type: "team"},
+          links: %{
+            related: team_path(CanvasAPI.Endpoint, :show, channel["team"].id)
+          }
+        }
+      },
+      type: "slack-channel"
     }
   end
 

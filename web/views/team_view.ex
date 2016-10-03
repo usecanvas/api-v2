@@ -41,6 +41,11 @@ defmodule CanvasAPI.TeamView do
             related: team_canvas_path(CanvasAPI.Endpoint, :index, team.id)
           }
         },
+        channels: %{
+          links: %{
+            related: team_channel_path(CanvasAPI.Endpoint, :index, team.id)
+          }
+        },
         user: %{
           data: %{
             id: user.id, type: "user"
