@@ -7,6 +7,8 @@ defmodule CanvasAPI.CurrentAccountPlug do
   import Phoenix.Controller
   import Plug.Conn
 
+  @behaviour Plug
+
   def init(opts), do: opts
 
   def call(conn = %{private: %{current_account: %Account{}}}, _), do: conn

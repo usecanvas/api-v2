@@ -3,6 +3,7 @@ defmodule CanvasAPI.Router do
 
   pipeline :api do
     plug CanvasAPI.TrailingFormatPlug
+    plug CanvasAPI.OriginCheckPlug
     plug :accepts, ~w(json json-api)
   end
 
