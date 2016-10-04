@@ -68,6 +68,9 @@ defmodule CanvasAPI.CanvasController do
     |> Repo.update
     |> case do
       {:ok, canvas} ->
+        notify_channels(conn,
+          conn.private.canvas.slack_channel_ids,
+          get_in(params, ~w(data attributes slack_channel_ids)))
         render_show(conn, canvas)
       {:error, changeset} ->
         conn
@@ -88,6 +91,41 @@ defmodule CanvasAPI.CanvasController do
         |> put_status(:not_found)
         |> render(ErrorView, "404.json")
     end
+  end
+
+  defp notify_channels(conn, old_channel_ids, new_channel_ids) do
+    token =
+      assoc(conn.private.current_team, :oauth_tokens)
+      |> first
+      |> Repo.one
+      |> Map.get(:meta)
+      |> get_in(~w(bot bot_access_token))
+
+    (new_channel_ids -- old_channel_ids)
+    |> Enum.each(&(notify_channel(conn, token, &1)))
+  end
+
+  defp notify_channel(conn, token, channel_id) do
+    %{canvas: canvas, current_user: user, current_team: team} = conn.private
+
+    author_email_hash =
+      :crypto.hash(:md5, String.downcase(canvas.creator.email))
+      |> Base.encode16(case: :lower)
+
+    text =
+      "#{user.name} posted a new canvas to this channel."
+
+    Slack.client(token)
+    |> Slack.Chat.postMessage(
+      channel: channel_id,
+      text: text,
+      attachments: Poison.encode!([%{
+        author_name: canvas.creator.name,
+        author_icon: "https://www.gravatar.com/avatar/#{author_email_hash}",
+        title: Canvas.title(canvas),
+        title_link: "#{System.get_env("WEB_URL")}/#{team.domain}/#{canvas.id}",
+        text: Canvas.summary(canvas)
+      }]))
   end
 
   defp ensure_canvas(conn, _opts) do

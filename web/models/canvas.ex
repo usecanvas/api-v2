@@ -76,6 +76,21 @@ defmodule CanvasAPI.Canvas do
   def put_template(changeset, _), do: changeset
 
   @doc """
+  Get the summary of a canvas.
+  """
+  @spec summary(%__MODULE__{}) :: String.t
+  def summary(%__MODULE__{blocks: blocks}) do
+    case Enum.at(blocks, 1) do
+      %Block{blocks: [block | _]} ->
+        String.slice(block.content, 0..140)
+      %Block{content: content} ->
+        String.slice(content, 0..140)
+      nil ->
+        ""
+    end
+  end
+
+  @doc """
   Get the title of a canvas.
   """
   @spec title(%__MODULE__{}) :: String.t
