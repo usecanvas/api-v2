@@ -29,6 +29,7 @@ defmodule CanvasAPI.TeamView do
       id: team.id,
       attributes: %{
         domain: team.domain,
+        has_slack_token: Enum.any?(team.oauth_tokens),
         images: team.images,
         name: team.name,
         slack_id: team.slack_id,
@@ -39,6 +40,11 @@ defmodule CanvasAPI.TeamView do
         canvases: %{
           links: %{
             related: team_canvas_path(CanvasAPI.Endpoint, :index, team.id)
+          }
+        },
+        channels: %{
+          links: %{
+            related: team_channel_path(CanvasAPI.Endpoint, :index, team.id)
           }
         },
         user: %{

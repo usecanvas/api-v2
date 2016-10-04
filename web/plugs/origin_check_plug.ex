@@ -28,6 +28,7 @@ defmodule CanvasAPI.OriginCheckPlug do
     |> render(ErrorView, "400.json")
   end
 
-  defp get_host([header]), do: URI.parse(header) |> Map.get(:host)
+  defp get_host([header]) when header != nil,
+    do: URI.parse(header) |> Map.get(:host)
   defp get_host(_), do: nil
 end

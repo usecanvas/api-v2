@@ -15,6 +15,7 @@ defmodule CanvasAPI.Canvas do
     field :native_version, :string, default: "1.0.0"
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
+    field :slack_channel_ids, {:array, :string}, default: []
 
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
@@ -30,9 +31,17 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:is_template])
+    |> cast(params, [:is_template, :slack_channel_ids])
     |> cast_embed(:blocks)
     |> put_title_block
+  end
+
+  @doc """
+  Builds a changeset for updating a canvas.
+  """
+  def update_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:slack_channel_ids])
   end
 
   @doc """
@@ -67,6 +76,21 @@ defmodule CanvasAPI.Canvas do
   def put_template(changeset, _), do: changeset
 
   @doc """
+  Get the summary of a canvas.
+  """
+  @spec summary(%__MODULE__{}) :: String.t
+  def summary(%__MODULE__{blocks: blocks}) do
+    case Enum.at(blocks, 1) do
+      %Block{blocks: [block | _]} ->
+        String.slice(block.content, 0..140)
+      %Block{content: content} ->
+        String.slice(content, 0..140)
+      nil ->
+        ""
+    end
+  end
+
+  @doc """
   Get the title of a canvas.
   """
   @spec title(%__MODULE__{}) :: String.t
@@ -75,6 +99,14 @@ defmodule CanvasAPI.Canvas do
       [%Block{type: "title", content: content} | _] -> content
       _ -> ""
     end
+  end
+
+  @doc """
+  Get the web URL of a canvas.
+  """
+  @spec web_url(%__MODULE__{}) :: String.t
+  def web_url(canvas) do
+    "#{System.get_env("WEB_URL")}/#{canvas.team.domain}/#{canvas.id}"
   end
 
   # Put the title block, if necessary.

@@ -1,4 +1,8 @@
 defmodule CanvasAPI.AddToSlackMediator do
+  @moduledoc """
+  Performs the "Add to Slack" OAuth exchange for a team.
+  """
+
   @client_id System.get_env("SLACK_CLIENT_ID")
   @client_secret System.get_env("SLACK_CLIENT_SECRET")
   @redirect_uri System.get_env("ADD_TO_SLACK_REDIRECT_URI")
@@ -7,9 +11,9 @@ defmodule CanvasAPI.AddToSlackMediator do
   import Ecto.Query
 
   def add(code) do
-    with {:ok, %{"access_token" => token, "team_id" => team_id}}
+    with {:ok, %{"access_token" => token, "bot" => bot, "team_id" => team_id}}
       <- exchange_code(code) do
-      persist_token(token, team_id)
+      persist_token(token, bot, team_id)
     end
   end
 
@@ -23,12 +27,13 @@ defmodule CanvasAPI.AddToSlackMediator do
   end
 
   # Persist a slack token.
-  @spec persist_token(String.t, String.t) :: {:ok, %OAuthToken{}} | {:error, any}
-  defp persist_token(token, team_id) do
+  @spec persist_token(String.t, map, String.t) :: {:ok, %OAuthToken{}} | {:error, any}
+  defp persist_token(token, bot, team_id) do
     with team = %Team{} <- find_team(team_id),
          nil <- find_existing_token(team.oauth_tokens) do
       %OAuthToken{}
-      |> OAuthToken.changeset(%{provider: "slack", token: token})
+      |> OAuthToken.changeset(
+        %{meta: %{bot: bot}, provider: "slack", token: token})
       |> Ecto.Changeset.put_assoc(:team, team)
       |> Repo.insert
     else

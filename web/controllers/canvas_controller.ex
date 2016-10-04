@@ -1,11 +1,13 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, Team, User}
+  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, SlackChannelNotifier,
+                   User}
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug :ensure_team when not action in [:show]
   plug :ensure_user when not action in [:show]
+  plug :ensure_canvas when action in [:update]
 
   def create(conn, params) do
     %Canvas{}
@@ -61,6 +63,23 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  def update(conn, params) do
+    conn.private.canvas
+    |> Canvas.update_changeset(get_in(params, ~w(data attributes)))
+    |> Repo.update
+    |> case do
+      {:ok, canvas} ->
+        notify_channels(conn,
+          conn.private.canvas.slack_channel_ids,
+          get_in(params, ~w(data attributes slack_channel_ids)))
+        render_show(conn, canvas)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     assoc(conn.private.current_team, :canvases)
     |> Repo.get(id)
@@ -75,35 +94,36 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  defp ensure_team(conn, _opts) do
-    from(assoc(conn.private.current_account, :teams))
-    |> Repo.get(conn.params["team_id"])
-    |> case do
-      team = %Team{} ->
-        put_private(conn, :current_team, team)
-      _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+  defp notify_channels(conn, old_channel_ids, new_channel_ids) do
+    token =
+      assoc(conn.private.current_team, :oauth_tokens)
+      |> first
+      |> Repo.one
+      |> Map.get(:meta)
+      |> get_in(~w(bot bot_access_token))
+
+    (new_channel_ids -- old_channel_ids)
+    |> Enum.each(
+      &SlackChannelNotifier.notify_new(
+        token,
+        conn.private.canvas,
+        conn.private.current_user,
+        &1))
+  end
+
+  defp ensure_canvas(conn, _opts) do
+    if canvas = Repo.get(Canvas, conn.params["id"]) do
+      put_private(conn, :canvas,
+                  Repo.preload(canvas, [:team, creator: [:team]]))
+    else
+      conn
+      |> halt
+      |> put_status(:not_found)
+      |> render(ErrorView, "404.json")
     end
   end
 
-  defp ensure_user(conn, _opts) do
-    from(assoc(conn.private.current_account, :users),
-         where: [team_id: ^conn.private.current_team.id])
-    |> first
-    |> Repo.one
-    |> case do
-      user = %User{} ->
-        put_private(conn, :current_user, user)
-      _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
-    end
-  end
+  defp render_show(conn, canvas, format \\ "json")
 
   defp render_show(conn, canvas, "canvas") do
     conn

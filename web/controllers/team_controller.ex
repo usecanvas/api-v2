@@ -9,7 +9,7 @@ defmodule CanvasAPI.TeamController do
     teams =
       from(assoc(current_account, :teams),
            order_by: [:name],
-           preload: [users: ^assoc(current_account, :users)])
+           preload: [{:users, ^assoc(current_account, :users)}, :oauth_tokens])
       |> filter(params["filter"])
       |> Repo.all
 
@@ -18,7 +18,7 @@ defmodule CanvasAPI.TeamController do
 
   def show(conn, %{"id" => id}, current_account) do
     assoc(current_account, :teams)
-    |> preload([users: ^assoc(current_account, :users)])
+    |> preload([{:users, ^assoc(current_account, :users)}, :oauth_tokens])
     |> Repo.get(id)
     |> case do
       team = %Team{} ->

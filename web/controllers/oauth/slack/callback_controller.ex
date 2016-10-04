@@ -35,7 +35,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
   @spec add_to(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def add_to(conn, %{"code" => code, "state" => "add"}) do
     case AddToSlackMediator.add(code) do
-      {:ok, token} ->
+      {:ok, _token} ->
         conn
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
       _ ->
