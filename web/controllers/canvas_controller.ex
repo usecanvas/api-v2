@@ -19,7 +19,7 @@ defmodule CanvasAPI.CanvasController do
     |> Repo.insert
     |> case do
       {:ok, canvas} ->
-        notify_channels(conn, canvas, [], delay: true)
+        notify_channels(conn, canvas, [], delay: 300)
 
         conn
         |> put_status(:created)
@@ -97,9 +97,7 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  defp notify_channels(conn, canvas, old_channel_ids, opts \\ [])
-
-  defp notify_channels(conn, canvas, old_channel_ids, delay: true) do
+  defp notify_channels(conn, canvas, old_channel_ids, opts \\ []) do
     token =
       assoc(conn.private.current_team, :oauth_tokens)
       |> first
@@ -112,26 +110,9 @@ defmodule CanvasAPI.CanvasController do
       &Exq.enqueue_in(
         Exq,
         "default",
-        10, # 5 minutes
+        opts[:delay] || 0, # 5 minutes
         SlackChannelNotifier.NotifyNewWorker,
         [token, canvas.id, conn.private.current_user.id, &1]))
-  end
-
-  defp notify_channels(conn, canvas, old_channel_ids, _) do
-    token =
-      assoc(conn.private.current_team, :oauth_tokens)
-      |> first
-      |> Repo.one
-      |> Map.get(:meta)
-      |> get_in(~w(bot bot_access_token))
-
-    (canvas.slack_channel_ids -- old_channel_ids)
-    |> Enum.each(
-      &SlackChannelNotifier.notify_new(
-        token,
-        canvas,
-        conn.private.current_user,
-        &1))
   end
 
   defp ensure_canvas(conn, _opts) do
