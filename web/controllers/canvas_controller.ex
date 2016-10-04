@@ -1,7 +1,8 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, User}
+  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, SlackChannelNotifier,
+                   User}
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug :ensure_team when not action in [:show]
@@ -102,35 +103,18 @@ defmodule CanvasAPI.CanvasController do
       |> get_in(~w(bot bot_access_token))
 
     (new_channel_ids -- old_channel_ids)
-    |> Enum.each(&(notify_channel(conn, token, &1)))
-  end
-
-  defp notify_channel(conn, token, channel_id) do
-    %{canvas: canvas, current_user: user, current_team: team} = conn.private
-
-    author_email_hash =
-      :crypto.hash(:md5, String.downcase(canvas.creator.email))
-      |> Base.encode16(case: :lower)
-
-    text =
-      "#{user.name} posted a new canvas to this channel."
-
-    Slack.client(token)
-    |> Slack.Chat.postMessage(
-      channel: channel_id,
-      text: text,
-      attachments: Poison.encode!([%{
-        author_name: canvas.creator.name,
-        author_icon: "https://www.gravatar.com/avatar/#{author_email_hash}",
-        title: Canvas.title(canvas),
-        title_link: "#{System.get_env("WEB_URL")}/#{team.domain}/#{canvas.id}",
-        text: Canvas.summary(canvas)
-      }]))
+    |> Enum.each(
+      &SlackChannelNotifier.notify_new(
+        token,
+        conn.private.canvas,
+        conn.private.current_user,
+        &1))
   end
 
   defp ensure_canvas(conn, _opts) do
     if canvas = Repo.get(Canvas, conn.params["id"]) do
-      put_private(conn, :canvas, Repo.preload(canvas, creator: [:team]))
+      put_private(conn, :canvas,
+                  Repo.preload(canvas, [:team, creator: [:team]]))
     else
       conn
       |> halt

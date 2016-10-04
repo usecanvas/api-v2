@@ -1,4 +1,8 @@
 defmodule CanvasAPI.AddToSlackMediator do
+  @moduledoc """
+  Performs the "Add to Slack" OAuth exchange for a team.
+  """
+
   @client_id System.get_env("SLACK_CLIENT_ID")
   @client_secret System.get_env("SLACK_CLIENT_SECRET")
   @redirect_uri System.get_env("ADD_TO_SLACK_REDIRECT_URI")

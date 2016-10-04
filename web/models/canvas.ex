@@ -101,6 +101,14 @@ defmodule CanvasAPI.Canvas do
     end
   end
 
+  @doc """
+  Get the web URL of a canvas.
+  """
+  @spec web_url(%__MODULE__{}) :: String.t
+  def web_url(canvas) do
+    "#{System.get_env("WEB_URL")}/#{canvas.team.domain}/#{canvas.id}"
+  end
+
   # Put the title block, if necessary.
   @spec put_title_block(Ecto.Changeset.t) :: Ecto.Changeset.t
   defp put_title_block(changeset) do

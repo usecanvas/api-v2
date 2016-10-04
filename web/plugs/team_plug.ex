@@ -1,4 +1,9 @@
 defmodule CanvasAPI.TeamPlug do
+  @moduledoc """
+  Provides plugs that ensure that a team and user are present for a given
+  request.
+  """
+
   alias CanvasAPI.{Repo, Team, User}
 
   import Ecto, only: [assoc: 2]
