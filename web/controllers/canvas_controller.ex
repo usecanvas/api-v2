@@ -64,7 +64,7 @@ defmodule CanvasAPI.CanvasController do
 
   def update(conn, params) do
     conn.private.canvas
-    |> Canvas.changeset(get_in(params, ~w(data attributes)))
+    |> Canvas.update_changeset(get_in(params, ~w(data attributes)))
     |> Repo.update
     |> case do
       {:ok, canvas} ->

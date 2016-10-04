@@ -37,6 +37,14 @@ defmodule CanvasAPI.Canvas do
   end
 
   @doc """
+  Builds a changeset for updating a canvas.
+  """
+  def update_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:slack_channel_ids])
+  end
+
+  @doc """
   Find a block in the given canvas.
   """
   def find_block(canvas, id) do
