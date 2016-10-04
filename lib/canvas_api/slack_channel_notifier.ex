@@ -3,7 +3,21 @@ defmodule CanvasAPI.SlackChannelNotifier do
   Notifes a Slack channel of canvas activity.
   """
 
-  alias CanvasAPI.{Canvas, User}
+  alias CanvasAPI.{Canvas, Repo, User}
+
+  defmodule NotifyNewWorker do
+    @moduledoc """
+    Asynchronously notifies Slack channels of new canvases.
+    """
+
+    def perform(token, canvas_id, notifier_id, channel_id) do
+      CanvasAPI.SlackChannelNotifier.notify_new(
+        token,
+        Repo.get(Canvas, canvas_id) |> Repo.preload([:creator, :team]),
+        Repo.get(User, notifier_id),
+        channel_id)
+    end
+  end
 
   @doc """
   Notify a Slack channel of a new canvas.

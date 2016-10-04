@@ -19,6 +19,8 @@ defmodule CanvasAPI.CanvasController do
     |> Repo.insert
     |> case do
       {:ok, canvas} ->
+        notify_channels(conn, canvas, [], delay: true)
+
         conn
         |> put_status(:created)
         |> render("show.json", canvas: Repo.preload(canvas, creator: [:team]))
@@ -69,9 +71,10 @@ defmodule CanvasAPI.CanvasController do
     |> Repo.update
     |> case do
       {:ok, canvas} ->
-        notify_channels(conn,
-          conn.private.canvas.slack_channel_ids,
-          get_in(params, ~w(data attributes slack_channel_ids)))
+        notify_channels(
+          conn,
+          canvas,
+          conn.private.canvas.slack_channel_ids)
         render_show(conn, canvas)
       {:error, changeset} ->
         conn
@@ -94,7 +97,9 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
-  defp notify_channels(conn, old_channel_ids, new_channel_ids) do
+  defp notify_channels(conn, canvas, old_channel_ids, opts \\ [])
+
+  defp notify_channels(conn, canvas, old_channel_ids, delay: true) do
     token =
       assoc(conn.private.current_team, :oauth_tokens)
       |> first
@@ -102,11 +107,29 @@ defmodule CanvasAPI.CanvasController do
       |> Map.get(:meta)
       |> get_in(~w(bot bot_access_token))
 
-    (new_channel_ids -- old_channel_ids)
+    (canvas.slack_channel_ids -- old_channel_ids)
+    |> Enum.each(
+      &Exq.enqueue_in(
+        Exq,
+        "default",
+        10, # 5 minutes
+        SlackChannelNotifier.NotifyNewWorker,
+        [token, canvas.id, conn.private.current_user.id, &1]))
+  end
+
+  defp notify_channels(conn, canvas, old_channel_ids, _) do
+    token =
+      assoc(conn.private.current_team, :oauth_tokens)
+      |> first
+      |> Repo.one
+      |> Map.get(:meta)
+      |> get_in(~w(bot bot_access_token))
+
+    (canvas.slack_channel_ids -- old_channel_ids)
     |> Enum.each(
       &SlackChannelNotifier.notify_new(
         token,
-        conn.private.canvas,
+        canvas,
         conn.private.current_user,
         &1))
   end

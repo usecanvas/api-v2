@@ -1,4 +1,7 @@
 {
+  "addons": [
+    "heroku-redis"
+  ],
   "env": {
     "ADD_TO_SLACK_REDIRECT_URI": {
       "description": "The redirect URI for Add-to-Slack",
@@ -38,6 +41,11 @@
     "REDIRECT_URI": {
       "description": "The redirect URI for Slack",
       "development_value": "http://localhost:4000/oauth/slack/callback"
+    },
+    "REDIS_URL": {
+      "description": "The URL to connect to Redis with",
+      "development_value": "redis://localhost:6379",
+      "required": false
     },
     "PORT": {
       "description": "Port on which to run the app",
