@@ -1,13 +1,13 @@
 defmodule CanvasAPI.Slack.ChannelController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, Team, User}
+  alias CanvasAPI.Repo
 
   plug CanvasAPI.CurrentAccountPlug
   plug :ensure_team
   plug :ensure_user
 
-  def index(conn, params) do
+  def index(conn, _params) do
     with token <- get_slack_token(conn),
          channels <- get_slack_channels(token, conn.private.current_team) do
       render(conn, "index.json", channels: channels)

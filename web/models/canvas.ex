@@ -15,6 +15,7 @@ defmodule CanvasAPI.Canvas do
     field :native_version, :string, default: "1.0.0"
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
+    field :slack_channel_ids, {:array, :string}, default: []
 
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
@@ -30,7 +31,7 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:is_template])
+    |> cast(params, [:is_template, :slack_channel_ids])
     |> cast_embed(:blocks)
     |> put_title_block
   end

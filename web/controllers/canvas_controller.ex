@@ -1,11 +1,12 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, Team, User}
+  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, User}
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug :ensure_team when not action in [:show]
   plug :ensure_user when not action in [:show]
+  plug :ensure_canvas when action in [:update]
 
   def create(conn, params) do
     %Canvas{}
@@ -61,6 +62,20 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  def update(conn, params) do
+    conn.private.canvas
+    |> Canvas.changeset(get_in(params, ~w(data attributes)))
+    |> Repo.update
+    |> case do
+      {:ok, canvas} ->
+        render_show(conn, canvas)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   def delete(conn, %{"id" => id}) do
     assoc(conn.private.current_team, :canvases)
     |> Repo.get(id)
@@ -74,6 +89,19 @@ defmodule CanvasAPI.CanvasController do
         |> render(ErrorView, "404.json")
     end
   end
+
+  defp ensure_canvas(conn, _opts) do
+    if canvas = Repo.get(Canvas, conn.params["id"]) do
+      put_private(conn, :canvas, Repo.preload(canvas, creator: [:team]))
+    else
+      conn
+      |> halt
+      |> put_status(:not_found)
+      |> render(ErrorView, "404.json")
+    end
+  end
+
+  defp render_show(conn, canvas, format \\ "json")
 
   defp render_show(conn, canvas, "canvas") do
     conn

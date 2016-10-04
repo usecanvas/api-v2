@@ -37,7 +37,7 @@ defmodule CanvasAPI.Router do
       end
 
       resources "/canvases", CanvasController,
-        only: [:create, :index, :show, :delete]
+        only: [:create, :index, :show, :update, :delete]
 
       get "/templates", CanvasController, :index_templates, as: :template
       get "/user", UserController, :show
