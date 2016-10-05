@@ -42,7 +42,19 @@ defmodule CanvasAPI.Web do
       import Ecto.Query
       import Ecto.Changeset
 
+      import CanvasAPI.CommonRenders
       import CanvasAPI.Router.Helpers
+      import CanvasAPI.Gettext
+    end
+  end
+
+  def service do
+    quote do
+      alias CanvasAPI.Repo
+      import Ecto
+      import Ecto.Query
+      import Ecto.Changeset
+
       import CanvasAPI.Gettext
     end
   end

@@ -1,7 +1,7 @@
 defmodule CanvasAPI.OAuth.Slack.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{AddToSlackMediator, ErrorView, SignInMediator}
+  alias CanvasAPI.{AddToSlackMediator, SignInMediator}
 
   plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
@@ -23,9 +23,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         |> put_session(:account_id, account.id)
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
       {:error, _error} ->
-        conn
-        |> put_status(:bad_request)
-        |> render(ErrorView, "400.json")
+        bad_request(conn)
     end
   end
 
@@ -39,9 +37,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         conn
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
       _ ->
-        conn
-        |> put_status(:bad_request)
-        |> render(ErrorView, "400.json")
+        bad_request(conn)
     end
   end
 end

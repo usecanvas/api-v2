@@ -11,8 +11,8 @@ defmodule CanvasAPI.SlackChannelNotifier do
     """
 
     def perform(token, canvas_id, notifier_id, channel_id) do
-      with canvas = %Canvas{}
-             <- Repo.get(Canvas, canvas_id, preload: [:creator, :team]),
+      with canvas = %Canvas{} <- Repo.get(Canvas, canvas_id),
+           canvas = Repo.preload(canvas, [:creator, :team]),
            notifier = %User{} <- Repo.get(User, notifier_id) do
         CanvasAPI.SlackChannelNotifier.notify_new(
           token,

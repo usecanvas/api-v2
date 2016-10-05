@@ -1,8 +1,7 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, ChangesetView, ErrorView, Repo, SlackChannelNotifier,
-                   User}
+  alias CanvasAPI.CanvasService
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug :ensure_team when not action in [:show]
@@ -10,120 +9,69 @@ defmodule CanvasAPI.CanvasController do
   plug :ensure_canvas when action in [:update]
 
   def create(conn, params) do
-    %Canvas{}
-    |> Canvas.changeset(get_in(params, ~w(data attributes)) || %{})
-    |> put_assoc(:creator, conn.private.current_user)
-    |> put_assoc(:team, conn.private.current_team)
-    |> Canvas.put_template(
-         get_in(params, ~w(data relationships template data)))
-    |> Repo.insert
-    |> case do
-      {:ok, canvas} ->
-        notify_channels(conn, canvas, [], delay: 300)
-
-        conn
-        |> put_status(:created)
-        |> render("show.json", canvas: Repo.preload(canvas, creator: [:team]))
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ChangesetView, "error.json", changeset: changeset)
-    end
+    case CanvasService.create(
+      get_in(params, ~w(data attributes)),
+      creator: conn.private.current_user,
+      team: conn.private.current_team,
+      template: get_in(params, ~w(data relationships template data)),
+      notify: conn.private.current_user) do
+        {:ok, canvas} ->
+          conn
+          |> put_status(:created)
+          |> render("show.json", canvas: canvas)
+        {:error, changeset} ->
+          unprocessable_entity(conn, changeset)
+      end
   end
 
   def index(conn, _params) do
-    canvases =
-      from(assoc(conn.private.current_user, :canvases),
-           preload: [creator: [:team]])
-      |> Repo.all
-
+    canvases = CanvasService.list(user: conn.private.current_user)
     render(conn, "index.json", canvases: canvases)
   end
 
   def index_templates(conn, _params) do
     templates =
-      from(assoc(conn.private.current_user, :canvases),
-           where: [is_template: true],
-           preload: [creator: [:team]])
-      |> Repo.all
-      |> merge_global_templates
-      |> Enum.sort_by(&Canvas.title/1)
-
+      CanvasService.list(user: conn.private.current_user, only_templates: true)
     render(conn, "index.json", canvases: templates)
   end
 
   def show(conn, params = %{"id" => id, "team_id" => team_id}) do
-    from(Canvas, where: [team_id: ^team_id], preload: [creator: [:team]])
-    |> Repo.get(id)
-    |> case do
-      canvas = %Canvas{} ->
+    case CanvasService.show(id, team_id: team_id) do
+      canvas when canvas != nil ->
         render_show(conn, canvas, params["trailing_format"])
       nil ->
-        conn
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+        not_found(conn)
     end
   end
 
   def update(conn, params) do
-    conn.private.canvas
-    |> Canvas.update_changeset(get_in(params, ~w(data attributes)))
-    |> Repo.update
-    |> case do
-      {:ok, canvas} ->
-        notify_channels(
-          conn,
-          canvas,
-          conn.private.canvas.slack_channel_ids)
-        render_show(conn, canvas)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ChangesetView, "error.json", changeset: changeset)
-    end
+    case CanvasService.update(
+      conn.private.canvas,
+      get_in(params, ~w(data attributes)),
+      notify: conn.private.current_user) do
+        {:ok, canvas} ->
+          render_show(conn, canvas)
+        {:error, changeset} ->
+          unprocessable_entity(conn, changeset)
+      end
   end
 
-  def delete(conn, %{"id" => id}) do
-    assoc(conn.private.current_team, :canvases)
-    |> Repo.get(id)
-    |> case do
-      canvas = %Canvas{} ->
-        Repo.delete!(canvas)
+  def delete(conn, %{"id" => id, "team_id" => team_id}) do
+    case CanvasService.delete(id, team_id: team_id) do
+      {:ok, _} ->
         send_resp(conn, :no_content, "")
-      _ ->
-        conn
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+      {:error, changeset} ->
+        unprocessable_entity(conn, changeset)
+      nil ->
+        not_found(conn)
     end
-  end
-
-  defp notify_channels(conn, canvas, old_channel_ids, opts \\ []) do
-    token =
-      assoc(conn.private.current_team, :oauth_tokens)
-      |> first
-      |> Repo.one
-      |> Map.get(:meta)
-      |> get_in(~w(bot bot_access_token))
-
-    (canvas.slack_channel_ids -- old_channel_ids)
-    |> Enum.each(
-      &Exq.enqueue_in(
-        Exq,
-        "default",
-        opts[:delay] || 0, # 5 minutes
-        SlackChannelNotifier.NotifyNewWorker,
-        [token, canvas.id, conn.private.current_user.id, &1]))
   end
 
   defp ensure_canvas(conn, _opts) do
-    if canvas = Repo.get(Canvas, conn.params["id"]) do
-      put_private(conn, :canvas,
-                  Repo.preload(canvas, [:team, creator: [:team]]))
-    else
-      conn
-      |> halt
-      |> put_status(:not_found)
-      |> render(ErrorView, "404.json")
+    CanvasService.show(conn.params["id"], team_id: conn.params["team_id"])
+    |> case do
+      canvas when canvas != nil -> put_private(conn, :canvas, canvas)
+      nil -> not_found(conn, halt: true)
     end
   end
 
@@ -137,21 +85,5 @@ defmodule CanvasAPI.CanvasController do
 
   defp render_show(conn, canvas, _) do
     render(conn, "show.json", canvas: canvas)
-  end
-
-  defp merge_global_templates(team_templates) do
-    do_merge_global_templates(
-      team_templates, System.get_env("TEMPLATE_USER_ID"))
-  end
-
-  defp do_merge_global_templates(templates, nil), do: templates
-  defp do_merge_global_templates(templates, id) do
-    templates ++
-      (from(c in Canvas,
-           join: u in User, on: u.id == c.creator_id,
-           where: u.id == ^id,
-           where: c.is_template == true,
-           preload: [creator: [:team]])
-      |> Repo.all)
   end
 end

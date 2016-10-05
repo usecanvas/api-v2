@@ -1,0 +1,350 @@
+    <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.14.1">
+    <title>CanvasAPI.JSONAPIView – canvas_api v0.0.1</title>
+    <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
+    
+    <script src="dist/sidebar_items.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>if(localStorage.getItem('night-mode')) document.body.className += ' night-mode';</script>
+
+    <div class="main">
+<button class="sidebar-toggle">
+  <i class="icon-menu"></i>
+</button>
+<section class="sidebar">
+
+  
+  <a href="api-reference.html" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        canvas_api
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.0.1
+      </h2>
+    </div>
+    
+  </a>
+
+  <div class="sidebar-search">
+    <i class="icon-search"></i>
+    <input type="text" class="sidebar-searchInput" placeholder="search" autocomplete="off" />
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">canvas_api v0.0.1</small>
+        CanvasAPI.JSONAPIView
+        
+        
+      </h1>
+
+      
+        <section id="moduledoc">
+          <p>A view of a resource according to the JSON API spec.</p>
+<p><a href="http://jsonapi.org">http://jsonapi.org</a></p>
+
+        </section>
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <i class="icon-link"></i>
+            </a>
+            Summary
+          </h1>
+          
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#include/4">include(json_object, bool, resource, resource_func)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Include a resource object in a JSON object</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#json_object/2">json_object(data, type \\ :data)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Get a top-level JSON object of the <code class="inline">data</code> or <code class="inline">errors</code> type</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#link/3">link(resource_object, rel, url)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Add a link to a JSON object or a resource object</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#paginate/5">paginate(json_object, params, page, func, action)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Add pagination links to a JSON object</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#relate/3">relate(resource_object, key, resource_identifier)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Add a relationship identity object to a resource object</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#resource_object/2">resource_object(resource, attributes)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Build a resource object from a given resource and attributes</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#resource_object/3">resource_object(resource, attributes, type)</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+
+          
+
+        </section>
+      
+
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <i class="icon-link"></i>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="include/4">
+  <div class="detail-header">
+    <a href="#include/4" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">include(json_object, bool, resource, resource_func)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>include(map, boolean, map, (() -> map | [map])) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Include a resource object in a JSON object.</p>
+<p><a href="http://jsonapi.org/format/#fetching-includes">http://jsonapi.org/format/#fetching-includes</a></p>
+
+  </section>
+</div>
+<div class="detail" id="json_object/2">
+  <div class="detail-header">
+    <a href="#json_object/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">json_object(data, type \\ :data)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>json_object(map, :data | :errors) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Get a top-level JSON object of the <code class="inline">data</code> or <code class="inline">errors</code> type.</p>
+<p><a href="http://jsonapi.org/format/#document-top-level">http://jsonapi.org/format/#document-top-level</a></p>
+
+  </section>
+</div>
+<div class="detail" id="link/3">
+  <div class="detail-header">
+    <a href="#link/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">link(resource_object, rel, url)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>link(map, atom, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Add a link to a JSON object or a resource object.</p>
+<p><a href="http://jsonapi.org/format/#document-links">http://jsonapi.org/format/#document-links</a></p>
+
+  </section>
+</div>
+<div class="detail" id="paginate/5">
+  <div class="detail-header">
+    <a href="#paginate/5" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">paginate(json_object, params, page, func, action)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>paginate(map, map, map, (... -> any), atom) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Add pagination links to a JSON object.</p>
+<p><a href="http://jsonapi.org/format/#fetching-pagination">http://jsonapi.org/format/#fetching-pagination</a></p>
+
+  </section>
+</div>
+<div class="detail" id="relate/3">
+  <div class="detail-header">
+    <a href="#relate/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">relate(resource_object, key, resource_identifier)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>relate(map, atom, map) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Add a relationship identity object to a resource object.</p>
+<p><a href="http://jsonapi.org/format/#document-resource-object-relationships">http://jsonapi.org/format/#document-resource-object-relationships</a></p>
+
+  </section>
+</div>
+<div class="detail" id="resource_object/2">
+  <div class="detail-header">
+    <a href="#resource_object/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">resource_object(resource, attributes)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>resource_object(map, map) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Build a resource object from a given resource and attributes.</p>
+<p><a href="http://jsonapi.org/format/#document-resource-objects">http://jsonapi.org/format/#document-resource-objects</a></p>
+
+  </section>
+</div>
+<div class="detail" id="resource_object/3">
+  <div class="detail-header">
+    <a href="#resource_object/3" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">resource_object(resource, attributes, type)</span>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>resource_object(map, map, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: map</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+
+        </section>
+      
+
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.14.1),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+        <button class="night-mode-toggle" />
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-5d1225399a.js"></script>
+  </body>
+</html>
+

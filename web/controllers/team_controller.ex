@@ -1,7 +1,7 @@
 defmodule CanvasAPI.TeamController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{ErrorView, Team}
+  alias CanvasAPI.Team
 
   plug CanvasAPI.CurrentAccountPlug
 
@@ -24,9 +24,7 @@ defmodule CanvasAPI.TeamController do
       team = %Team{} ->
         render(conn, "show.json", team: team)
       _ ->
-        conn
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+        not_found(conn)
     end
   end
 

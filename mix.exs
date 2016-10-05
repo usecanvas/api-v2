@@ -48,6 +48,7 @@ defmodule CanvasAPI.Mixfile do
      {:exq, github: "akira/exq", ref: "84e05ff"},
      {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
      {:credo, "~> 0.4", only: [:dev, :test]},
+     {:ex_doc, "~> 0.14", only: [:dev]},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]}]
   end

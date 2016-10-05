@@ -1,7 +1,7 @@
 defmodule CanvasAPI.OAuth.GitHub.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{ErrorView, GitHubOAuthMediator}
+  alias CanvasAPI.GitHubOAuthMediator
 
   plug CanvasAPI.CurrentAccountPlug
 
@@ -13,9 +13,7 @@ defmodule CanvasAPI.OAuth.GitHub.CallbackController do
       {:ok, _} ->
         redirect(conn, external: System.get_env("REDIRECT_ON_AUTH_URL"))
       {:error, _error} ->
-        conn
-        |> put_status(:bad_request)
-        |> render(ErrorView, "400.json")
+        bad_request(conn)
     end
   end
 

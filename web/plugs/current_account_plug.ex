@@ -3,8 +3,8 @@ defmodule CanvasAPI.CurrentAccountPlug do
   A plug for ensuring that the current account is present on the connection.
   """
 
-  alias CanvasAPI.{Account, ErrorView, Repo}
-  import Phoenix.Controller
+  alias CanvasAPI.{Account, Repo}
+  import CanvasAPI.CommonRenders
   import Plug.Conn
 
   @behaviour Plug
@@ -23,10 +23,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
         if opts[:permit_none] do
           conn
         else
-          conn
-          |> halt
-          |> put_status(:unauthorized)
-          |> render(ErrorView, "401.json")
+          unauthorized(conn, halt: true)
         end
     end
   end

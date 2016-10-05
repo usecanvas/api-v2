@@ -31,4 +31,13 @@ defmodule CanvasAPI.Team do
     |> unique_constraint(:domain)
     |> put_change(:images, ImageMap.image_map(params))
   end
+
+  @doc """
+  Fetches the OAuth token for the given team and provider.
+  """
+  def get_token(team, provider) do
+    from(assoc(team, :oauth_tokens), where: [provider: ^provider])
+    |> first
+    |> Repo.one
+  end
 end

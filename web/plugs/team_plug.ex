@@ -6,9 +6,9 @@ defmodule CanvasAPI.TeamPlug do
 
   alias CanvasAPI.{Repo, Team, User}
 
+  import CanvasAPI.CommonRenders
   import Ecto, only: [assoc: 2]
   import Ecto.Query
-  import Phoenix.Controller
   import Plug.Conn
 
   def ensure_team(conn, _opts) do
@@ -18,10 +18,7 @@ defmodule CanvasAPI.TeamPlug do
       team = %Team{} ->
         put_private(conn, :current_team, team)
       _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+        not_found(conn, halt: true)
     end
   end
 
@@ -34,10 +31,7 @@ defmodule CanvasAPI.TeamPlug do
       user = %User{} ->
         put_private(conn, :current_user, user)
       _ ->
-        conn
-        |> halt
-        |> put_status(:not_found)
-        |> render(ErrorView, "404.json")
+        not_found(conn, halt: true)
     end
   end
 end

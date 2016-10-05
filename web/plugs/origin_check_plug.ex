@@ -3,8 +3,7 @@ defmodule CanvasAPI.OriginCheckPlug do
   A plug for ensuring that the origin/referer headers are valid when present.
   """
 
-  alias CanvasAPI.ErrorView
-  import Phoenix.Controller
+  import CanvasAPI.CommonRenders
   import Plug.Conn
 
   @behaviour Plug
@@ -22,10 +21,7 @@ defmodule CanvasAPI.OriginCheckPlug do
   defp do_call(conn, origin, origin, origin), do: conn
   defp do_call(conn, origin, nil, origin), do: conn
   defp do_call(conn, _, _, _) do
-    conn
-    |> halt
-    |> put_status(:bad_request)
-    |> render(ErrorView, "400.json")
+    bad_request(conn, halt: true)
   end
 
   defp get_host([header]) when header != nil,
