@@ -1,9 +1,16 @@
 defmodule CanvasAPI.Mixfile do
   use Mix.Project
 
+  @github_url "https://github.com/usecanvas/pro-api"
+  @version "0.0.1"
+
   def project do
     [app: :canvas_api,
-     version: "0.0.1",
+     description: "The Canvas API",
+     version: @version,
+     name: "Canvas API",
+     homepage_url: @github_url,
+     source_url: @github_url,
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
