@@ -167,11 +167,7 @@ defmodule CanvasAPI.CanvasService do
 
     (canvas.slack_channel_ids -- old_channel_ids)
     |> Enum.each(
-      &Exq.enqueue_in(
-        Exq,
-        "default",
-        Keyword.get(opts, :delay, 0),
-        SlackChannelNotifier.NotifyNewWorker,
-        [token, canvas.id, notifier.id, &1]))
+      &SlackChannelNotifier.delay_notify_new(
+        token, canvas.id, notifier.id, &1, opts))
   end
 end

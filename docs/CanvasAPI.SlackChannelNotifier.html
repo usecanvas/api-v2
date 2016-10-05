@@ -92,7 +92,13 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#notify_new/4">notify_new(token, canvas, notifier, channel_id)</a>
+    <a href="#delay_notify_new/5">delay_notify_new(token, canvas_id, notifier_id, channel_id, opts \\ [])</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#notify_new/4">notify_new(token, canvas_id, notifier_id, channel_id)</a>
   </div>
   
     <div class="summary-synopsis"><p>Notify a Slack channel of a new canvas</p>
@@ -120,14 +126,32 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="notify_new/4">
+          <div class="detail" id="delay_notify_new/5">
+  <div class="detail-header">
+    <a href="#delay_notify_new/5" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">delay_notify_new(token, canvas_id, notifier_id, channel_id, opts \\ [])</span>
+    
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_channel_notifier.ex#L44" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="notify_new/4">
   <div class="detail-header">
     <a href="#notify_new/4" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">notify_new(token, canvas, notifier, channel_id)</span>
+    <span class="signature">notify_new(token, canvas_id, notifier_id, channel_id)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_channel_notifier.ex#L30" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_channel_notifier.ex#L26" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -135,7 +159,7 @@
     
       <div class="specs">
         
-          <pre>notify_new(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}, %CanvasAPI.User{__meta__: term, account: term, account_id: term, canvases: term, created_canvases: term, email: term, id: term, identity_token: term, images: term, inserted_at: term, name: term, slack_id: term, team: term, team_id: term, updated_at: term}, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: any</pre>
+          <pre>notify_new(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) :: any</pre>
         
       </div>
     
