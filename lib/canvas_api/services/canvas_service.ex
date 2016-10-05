@@ -61,7 +61,7 @@ defmodule CanvasAPI.CanvasService do
   ## Examples
 
   ```elixir
-  CanvasService.list(current_user, only_templates: true)
+  CanvasService.list(user: current_user, only_templates: true)
   ```
   """
   @spec list(Keyword.t) :: [%Canvas{}] | []
