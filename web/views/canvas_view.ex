@@ -29,6 +29,7 @@ defmodule CanvasAPI.CanvasView do
       slack_channel_ids: canvas.slack_channel_ids,
       type: canvas.type,
       version: canvas.version,
+      edited_at: canvas.edited_at,
       inserted_at: canvas.inserted_at,
       updated_at: canvas.updated_at,
       team_id: canvas.team_id,
@@ -46,6 +47,7 @@ defmodule CanvasAPI.CanvasView do
         slack_channel_ids: canvas.slack_channel_ids,
         type: canvas.type,
         version: canvas.version,
+        edited_at: canvas.edited_at,
         inserted_at: canvas.inserted_at,
         updated_at: canvas.updated_at
       },

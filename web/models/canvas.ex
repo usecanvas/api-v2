@@ -16,6 +16,7 @@ defmodule CanvasAPI.Canvas do
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
     field :slack_channel_ids, {:array, :string}, default: []
+    field :edited_at, Calecto.DateTimeUTC
 
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
