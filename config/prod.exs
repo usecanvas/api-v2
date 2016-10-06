@@ -30,7 +30,7 @@ config :canvas_api, CanvasAPI.Repo,
 
 # Configure Appsignal
 config :appsignal, :config,
-  revision: System.get_env("HEROKU_RELEASE_VERSION")
+  revision: System.get_env("HEROKU_SLUG_COMMIT")
 
 # ## SSL Support
 #
