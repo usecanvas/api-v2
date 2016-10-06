@@ -36,6 +36,15 @@ config :exq,
 config :phoenix, :generators,
   binary_id: true
 
+# Configure Sentry
+config :sentry,
+  dsn: System.get_env("SENTRY_DSN"),
+  environment_name: to_string(Mix.env),
+  included_environments: ~w(prod),
+  use_error_logger: true,
+  release: System.get_env("HEROKU_RELEASE_VERSION")
+
+
 # Configure JSON API mime type
 config :plug, :types, %{
   "application/vnd.json+api" => ~w(json-api)

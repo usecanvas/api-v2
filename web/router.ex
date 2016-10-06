@@ -1,5 +1,7 @@
 defmodule CanvasAPI.Router do
   use CanvasAPI.Web, :router
+  use Plug.ErrorHandler
+  use Sentry.Plug
 
   pipeline :oauth do
     plug :fetch_session
@@ -15,9 +17,12 @@ defmodule CanvasAPI.Router do
   end
 
   scope "/", CanvasAPI do
-    pipe_through :oauth
+    get "/boom", MetaController, :boom
+    get "/health", MetaController, :health
 
     scope "/oauth", OAuth do
+      pipe_through :oauth
+
       get "/slack/callback", Slack.CallbackController, :sign_in
       get "/slack/add-to-slack/callback", Slack.CallbackController, :add_to
       get "/github/callback", GitHub.CallbackController, :callback

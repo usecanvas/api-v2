@@ -56,6 +56,10 @@
       "description": "A secret key for encrypting and signing data",
       "development_value": "Bah0Bijei9epheeshuod4eBaB3aeThaeshet6vaevighieMai9maeti1aeb4Oa7ko9ohfoX2Quah0riec"
     },
+    "SENTRY_DSN": {
+      "description": "A key for sending events to Sentry",
+      "required": false
+    },
     "SLACK_API_TOKEN": {
       "description": "An API token for Slack unfurls"
     },
