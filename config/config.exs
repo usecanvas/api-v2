@@ -42,7 +42,7 @@ config :sentry,
   environment_name: to_string(Mix.env),
   included_environments: ~w(prod),
   use_error_logger: true,
-  release: String.slice(System.get_env("HEROKU_SLUG_COMMIT") || "", 0..11)
+  release: System.get_env("HEROKU_SLUG_COMMIT")
 
 
 # Configure JSON API mime type
