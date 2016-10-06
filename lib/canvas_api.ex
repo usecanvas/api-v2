@@ -17,6 +17,7 @@ defmodule CanvasAPI do
       # Start the endpoint when the application starts
       supervisor(CanvasAPI.Endpoint, []),
       # Start your own worker by calling:
+      worker(Exq.Enqueuer, [[name: CanvasAPI.Queue]])
       #   CanvasAPI.Worker.start_link(arg1, arg2, arg3)
       # worker(CanvasAPI.Worker, [arg1, arg2, arg3]),
     ]

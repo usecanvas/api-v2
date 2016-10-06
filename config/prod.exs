@@ -13,6 +13,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :canvas_api, CanvasAPI.Endpoint,
   http: [port: {:system, "PORT"}],
+  instrumenters: [Appsignal.Phoenix.Instrumenter],
   url: [host: System.get_env("HOST"), port: 80],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
   # force_ssl: [hsts: true]
@@ -30,7 +31,17 @@ config :canvas_api, CanvasAPI.Repo,
 
 # Configure Appsignal
 config :appsignal, :config,
+  name: :canvas_api,
+  env: to_string(Mix.env),
   revision: System.get_env("HEROKU_SLUG_COMMIT")
+
+# Configure Sentry
+config :sentry,
+  dsn: System.get_env("SENTRY_DSN"),
+  environment_name: to_string(Mix.env),
+  included_environments: ~w(prod),
+  use_error_logger: true,
+  release: System.get_env("HEROKU_SLUG_COMMIT")
 
 # ## SSL Support
 #

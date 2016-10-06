@@ -42,8 +42,8 @@ defmodule CanvasAPI.SlackChannelNotifier do
   end
 
   def delay_notify_new(token, canvas_id, notifier_id, channel_id, opts \\ []) do
-    Exq.enqueue_in(
-      Exq,
+    Exq.Enqueuer.enqueue_in(
+      CanvasAPI.Queue.Enqueuer,
       "default",
       Keyword.get(opts, :delay, 0),
       NotifyNewWorker,

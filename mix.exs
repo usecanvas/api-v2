@@ -25,9 +25,18 @@ defmodule CanvasAPI.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {CanvasAPI, []},
-     applications: [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :calecto, :slack, :base62,
-                    :httpoison, :timex, :floki, :appsignal, :exq, :sentry]]
+     applications: applications(Mix.env)]
+  end
+
+  defp applications(:prod) do
+    applications ++ [:appsignal, :sentry]
+  end
+
+  defp applications(_), do: applications
+
+  defp applications do
+    [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext, :phoenix_ecto,
+     :postgrex, :calecto, :slack, :base62, :httpoison, :timex, :floki]
   end
 
   # Specifies which paths to compile per environment.

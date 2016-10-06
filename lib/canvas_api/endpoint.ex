@@ -38,6 +38,6 @@ defmodule CanvasAPI.Endpoint do
     key: "_canvas_pro_api_key",
     signing_salt: "vMKcfdD0"
 
-  use Appsignal.Phoenix
+  if Mix.env == :prod, do: use Appsignal.Phoenix
   plug CanvasAPI.Router
 end
