@@ -32,7 +32,7 @@ config :canvas_api, CanvasAPI.Repo,
 # Configure Appsignal
 config :appsignal, :config,
   name: :canvas_api,
-  env: to_string(Mix.env),
+  env: Mix.env,
   revision: System.get_env("HEROKU_SLUG_COMMIT")
 
 # Configure Sentry
