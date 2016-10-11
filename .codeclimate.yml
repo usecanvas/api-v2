@@ -2,3 +2,7 @@ engines:
   credo:
     enabled: true
     channel: beta
+ratings:
+  patchs:
+    - "**.ex"
+    - "**.exs"
