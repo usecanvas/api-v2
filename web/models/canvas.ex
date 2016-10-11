@@ -20,7 +20,7 @@ defmodule CanvasAPI.Canvas do
 
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
-    belongs_to :template, CanvasAPI.Canvas
+    belongs_to :template, CanvasAPI.Canvas, type: :string
 
     embeds_many :blocks, Block, on_replace: :delete
 
@@ -68,10 +68,11 @@ defmodule CanvasAPI.Canvas do
     case Repo.get(__MODULE__, id) do
       nil ->
         changeset
-      %__MODULE__{blocks: blocks} ->
+      template = %__MODULE__{blocks: blocks} ->
         changeset
         |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
         |> cast_embed(:blocks)
+        |> put_assoc(:template, template)
     end
   end
 
