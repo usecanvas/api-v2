@@ -1,0 +1,4 @@
+engines:
+  credo:
+    enabled: true
+    channel: beta
