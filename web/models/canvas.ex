@@ -34,6 +34,7 @@ defmodule CanvasAPI.Canvas do
     struct
     |> cast(params, [:is_template, :slack_channel_ids])
     |> cast_embed(:blocks)
+    |> put_change(:edited_at, DateTime.utc_now)
     |> put_title_block
   end
 
