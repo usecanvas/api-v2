@@ -21,6 +21,7 @@ defmodule CanvasAPI.Canvas do
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas, type: :string
+    has_many :pulse_events, CanvasAPI.PulseEvent
 
     embeds_many :blocks, Block, on_replace: :delete
 
