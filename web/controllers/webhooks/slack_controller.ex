@@ -1,6 +1,8 @@
 defmodule CanvasAPI.Webhooks.SlackController do
   use CanvasAPI.Web, :controller
 
+  alias CanvasAPI.SlackTrackback
+
   @token System.get_env("SLACK_VERIFICATION_TOKEN")
 
   def handle(conn, %{
@@ -10,11 +12,13 @@ defmodule CanvasAPI.Webhooks.SlackController do
     render(conn, "verify.json", challenge: challenge)
   end
 
-  def handle(conn, %{
+  def handle(conn, params = %{
     "type" => "event_callback",
     "token" => @token,
-    "event" => event}) do
-    IO.inspect event
+    "event" => event,
+    "team_id" => team_id}) do
+    IO.inspect params
+    # SlackTrackback.add(event, team_id)
     send_resp(conn, :no_content, "")
   end
 end
