@@ -8,7 +8,7 @@ defmodule CanvasAPI.PulseEventController do
   plug :ensure_user
   plug :ensure_canvas
 
-  def index(conn, params) do
+  def index(conn, _params) do
     pulse_events =
       from(assoc(conn.private.canvas, :pulse_events),
            order_by: [desc: :inserted_at],
