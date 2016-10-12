@@ -20,6 +20,10 @@ defmodule CanvasAPI.Router do
     get "/boom", MetaController, :boom
     get "/health", MetaController, :health
 
+    scope "/webhooks", Webhooks do
+      post "/slack", SlackController, :handle
+    end
+
     scope "/oauth", OAuth do
       pipe_through :oauth
 
