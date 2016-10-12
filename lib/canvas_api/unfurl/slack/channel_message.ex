@@ -74,56 +74,23 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
     String.split_at(timestamp, -6) |> Tuple.to_list |> Enum.join(".")
   end
 
-  defp format_message(message) do
-    message
-    |> String.next_grapheme
-    |> do_format_message("", state: :garbage)
-  end
-
-  defp do_format_message(nil, result, state: :garbage), do: result
-  defp do_format_message(nil, result, state: :bracket, rem: rem) do
-    result <> rem
-  end
-
-  defp do_format_message({"<", tail}, result, state: :garbage) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result, state: :bracket, rem: "")
-  end
-
-  defp do_format_message({grapheme, tail}, result, state: :garbage) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result <> grapheme, state: :garbage)
-  end
-
-  defp do_format_message({" ", tail}, result, state: :bracket, rem: rem) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message("<" <> result <> rem <> " ", state: :garbage)
-  end
-
-  defp do_format_message({"!", tail}, result, state: :bracket, rem: rem) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result, state: :bracket, rem: rem)
-  end
-
-  defp do_format_message({"|", tail}, result, state: :bracket, rem: _rem) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result, state: :bracket, rem: "")
-  end
-
-  defp do_format_message({">", tail}, result, state: :bracket, rem: rem) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result <> rem, state: :garbage)
-  end
-
-  defp do_format_message({char, tail}, result, state: :bracket, rem: rem) do
-    tail
-    |> String.next_grapheme
-    |> do_format_message(result, state: :bracket, rem: rem <> char)
-  end
+  def format_message(message, result \\ "", state \\ [state: :garbage])
+  def format_message("", result, state: :garbage),
+    do: result
+  def format_message("", result, rem: rem),
+    do: result <> rem
+  def format_message(<<?<, tail::binary>>, result, state: :garbage),
+    do: tail |> format_message(result, state: :bracket, rem: "")
+  def format_message(<<char::binary-size(1), tail::binary>>, result, state: :garbage),
+    do: tail |> format_message(result <> char, state: :garbage)
+  def format_message(<<?\s, tail::binary>>, result, state: :bracket, rem: rem),
+    do: tail |> format_message("<" <> result <> rem <> " ", state: :garbage)
+  def format_message(<<?!, tail::binary>>, result, state: :bracket, rem: rem),
+    do: tail |> format_message(result, state: :bracket, rem: rem)
+  def format_message(<<?|, tail::binary>>, result, state: :bracket, rem: _rem),
+    do: tail |> format_message(result, state: :bracket, rem: "")
+  def format_message(<<?>, tail::binary>>, result, state: :bracket, rem: rem),
+    do: tail |> format_message(result <> rem, state: :garbage)
+  def format_message(<<char::binary-size(1), tail::binary>>, result, state: :bracket, rem: rem),
+    do: tail |> format_message(result, state: :bracket, rem: rem <> char)
 end
