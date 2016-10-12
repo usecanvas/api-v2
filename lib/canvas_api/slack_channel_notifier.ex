@@ -58,10 +58,6 @@ defmodule CanvasAPI.SlackChannelNotifier do
   # Get a Gravatar URL for a user.
   @spec user_icon_url(%User{}) :: String.t
   defp user_icon_url(user) do
-    email_hash =
-      :crypto.hash(:md5, String.downcase(user.email))
-      |> Base.encode16(case: :lower)
-
-    "https://www.gravatar.com/avatar/#{email_hash}"
+    CanvasAPI.AvatarURL.create(user.email)
   end
 end

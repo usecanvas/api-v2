@@ -1,7 +1,11 @@
 defmodule CanvasAPI.CanvasTrackback do
-  alias CanvasAPI.{Account, Canvas, Repo, User}
+  alias CanvasAPI.{Account, AvatarURL, Canvas, PulseEvent, Repo, User}
   import Ecto.Query
+  import Ecto.Changeset
   import Ecto
+
+  # target: The canvas that was referenced
+  # soruce: The canvas that the target was reference in
 
   defmodule Worker do
     def perform("add", target_canvas_id, source_canvas_id, acct_id) do
@@ -17,19 +21,50 @@ defmodule CanvasAPI.CanvasTrackback do
 
   def add(target_id, source_id, acct_id) do
     with [target, source, user] <- get_models(target_id, source_id, acct_id) do
-      IO.inspect user
+      %PulseEvent{}
+      |> PulseEvent.changeset(%{
+          provider_name: "Canvas",
+          provider_url: "https://pro.usecanvas.com",
+          type: "reference_added",
+          url: Canvas.web_url(source),
+          referencer: %{
+            id: user.id,
+            avatar_url: AvatarURL.create(user.email),
+            email: user.email,
+            name: user.name,
+            url: "mailto:#{user.email}"
+          }
+        })
+      |> put_assoc(:canvas, target)
+      |> Repo.insert!
     end
   end
 
   def remove(target_id, source_id, acct_id) do
     with [target, source, user] <- get_models(target_id, source_id, acct_id) do
-      IO.inspect user
+      %PulseEvent{}
+      |> PulseEvent.changeset(%{
+          provider_name: "Canvas",
+          provider_url: "https://pro.usecanvas.com",
+          type: "reference_removed",
+          url: Canvas.web_url(source),
+          referencer: %{
+            id: user.id,
+            avatar_url: AvatarURL.create(user.email),
+            email: user.email,
+            name: user.name,
+            url: "mailto:#{user.email}"
+          }
+        })
+      |> put_assoc(:canvas, target)
+      |> Repo.insert!
     end
   end
 
   defp get_models(target_id, source_id, acct_id) do
     with target = %Canvas{} <- Repo.get(Canvas, target_id),
-         source = %Canvas{} <- Repo.get(Canvas, source_id),
+         source = %Canvas{} <-
+           Repo.get(Canvas, source_id) |> Repo.preload([:team]),
          account = %Account{} <- Repo.get(Account, acct_id),
          user = %User{} <- get_user(account, source.team_id) do
       [target, source, user]

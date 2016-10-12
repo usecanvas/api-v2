@@ -1,22 +1,24 @@
 defmodule CanvasAPI.CanvasView do
   use CanvasAPI.Web, :view
 
+  alias CanvasAPI.{Endpoint, UserView}
+
   def render("index.json", %{canvases: canvases}) do
     %{
-      data: render_many(canvases, CanvasAPI.CanvasView, "canvas.json"),
+      data: render_many(canvases, __MODULE__, "canvas.json"),
       included: canvases
                 |> Enum.map(&(&1.creator))
                 |> Enum.uniq
                 |> Enum.map(fn user ->
-                  render_one(user, CanvasAPI.UserView, "user.json")
+                  render_one(user, UserView, "user.json")
                 end)
     }
   end
 
   def render("show.json", %{canvas: canvas}) do
     %{
-      data: render_one(canvas, CanvasAPI.CanvasView, "canvas.json"),
-      included: [render_one(canvas.creator, CanvasAPI.UserView, "user.json")]
+      data: render_one(canvas, __MODULE__, "canvas.json"),
+      included: [render_one(canvas.creator, UserView, "user.json")]
     }
   end
 
@@ -55,10 +57,16 @@ defmodule CanvasAPI.CanvasView do
         creator: %{
           data: %{id: canvas.creator_id, type: "user"}
         },
+        pulse_events: %{
+          links: %{
+            related: team_canvas_pulse_event_path(
+              Endpoint, :index, canvas.team_id, canvas.id)
+          }
+        },
         team: %{
           data: %{id: canvas.team_id, type: "team"},
           links: %{
-            related: team_path(CanvasAPI.Endpoint, :show, canvas.team_id)
+            related: team_path(Endpoint, :show, canvas.team_id)
           }
         }
       },

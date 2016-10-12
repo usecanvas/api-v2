@@ -1,6 +1,8 @@
 defmodule CanvasAPI.UserView do
   use CanvasAPI.Web, :view
 
+  alias CanvasAPI.AvatarURL
+
   def render("show.json", %{user: user}) do
     %{data: render_one(user, CanvasAPI.UserView, "user.json")}
   end
@@ -9,6 +11,7 @@ defmodule CanvasAPI.UserView do
     %{
       id: user.id,
       attributes: %{
+        avatar_url: AvatarURL.create(user.email),
         email: user.email,
         images: user.images,
         name: user.name,

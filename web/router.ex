@@ -41,8 +41,9 @@ defmodule CanvasAPI.Router do
         resources "/channels", ChannelController, only: [:index]
       end
 
-      resources "/canvases", CanvasController,
-        only: [:create, :index, :show, :update, :delete]
+      resources "/canvases", CanvasController do
+        resources "/pulse-events", PulseEventController, only: [:index]
+      end
 
       get "/templates", CanvasController, :index_templates, as: :template
       get "/user", UserController, :show
