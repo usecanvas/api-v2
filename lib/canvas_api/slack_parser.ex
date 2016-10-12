@@ -10,7 +10,7 @@ defmodule CanvasAPI.SlackParser do
   ## Examples
 
       iex> CanvasAPI.SlackParser.to_text("Foo <bar>")
-      "Foo bar
+      "Foo bar"
 
       iex> CanvasAPI.SlackParser.to_text("Foo <!here|@here> Bar")
       "Foo @here Bar"
