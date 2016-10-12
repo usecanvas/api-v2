@@ -1,12 +1,19 @@
 defmodule CanvasAPI.Webhooks.SlackController do
   use CanvasAPI.Web, :controller
 
-  @secret System.get_env("SLACK_CLIENT_SECRET")
+  @token System.get_env("SLACK_VERIFICATION_TOKEN")
 
   def handle(conn, %{
     "type" => "url_verification",
     "challenge" => challenge,
-    "token" => _}) do
+    "token" => @token}) do
     render(conn, "verify.json", challenge: challenge)
+  end
+
+  def handle(conn, params = %{
+    "type" => "message.channels",
+    "token" => @token}) do
+    IO.inspect params
+    send_resp(conn, :no_content, "")
   end
 end

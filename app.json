@@ -73,6 +73,10 @@
       "description": "A key used to encrypt and decrypt Slack tokens",
       "development_value": "thaen6kiuNaoka4aengighoh5coo7soo"
     },
+    "SLACK_VERIFICATION_TOKEN": {
+      "description": "A verification token for Slack Events API",
+      "development_required": false
+    },
     "TEMPLATE_USER_ID": {
       "description": "ID of the user in the team containing templates",
       "required": false
