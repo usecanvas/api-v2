@@ -24,7 +24,7 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
       %Unfurl{
         id: url,
         title: "Message from @#{response[:user]["name"]}",
-        text: response[:message]["text"],
+        text: format_message(response[:message]["text"]),
         thumbnail_url: response[:user]["profile"]["image_original"]
       }
     end
@@ -72,5 +72,58 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
 
   defp parse_timestamp(timestamp) do
     String.split_at(timestamp, -6) |> Tuple.to_list |> Enum.join(".")
+  end
+
+  defp format_message(message) do
+    message
+    |> String.next_grapheme
+    |> do_format_message("", state: :garbage)
+  end
+
+  defp do_format_message(nil, result, state: :garbage), do: result
+  defp do_format_message(nil, result, state: :bracket, rem: rem) do
+    result <> rem
+  end
+
+  defp do_format_message({"<", tail}, result, state: :garbage) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result, state: :bracket, rem: "")
+  end
+
+  defp do_format_message({grapheme, tail}, result, state: :garbage) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result <> grapheme, state: :garbage)
+  end
+
+  defp do_format_message({" ", tail}, result, state: :bracket, rem: rem) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message("<" <> result <> rem <> " ", state: :garbage)
+  end
+
+  defp do_format_message({"!", tail}, result, state: :bracket, rem: rem) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result, state: :bracket, rem: rem)
+  end
+
+  defp do_format_message({"|", tail}, result, state: :bracket, rem: _rem) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result, state: :bracket, rem: "")
+  end
+
+  defp do_format_message({">", tail}, result, state: :bracket, rem: rem) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result <> rem, state: :garbage)
+  end
+
+  defp do_format_message({char, tail}, result, state: :bracket, rem: rem) do
+    tail
+    |> String.next_grapheme
+    |> do_format_message(result, state: :bracket, rem: rem <> char)
   end
 end
