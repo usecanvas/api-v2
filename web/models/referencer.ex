@@ -1,4 +1,8 @@
 defmodule CanvasAPI.Referencer do
+  @moduledoc """
+  A user of some service that has referenced a canvas.
+  """
+
   use CanvasAPI.Web, :model
 
   @primary_key {:id, :string, autogenerate: false}

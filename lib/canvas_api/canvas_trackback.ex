@@ -1,4 +1,8 @@
 defmodule CanvasAPI.CanvasTrackback do
+  @moduledoc """
+  A reference from one canvas to another.
+  """
+
   alias CanvasAPI.{Account, AvatarURL, Canvas, PulseEvent, Repo, User}
   import Ecto.Query
   import Ecto.Changeset
@@ -8,6 +12,10 @@ defmodule CanvasAPI.CanvasTrackback do
   # soruce: The canvas that the target was reference in
 
   defmodule Worker do
+    @moduledoc """
+    A worker for creating canvas trackbacks.
+    """
+
     def perform("add", target_canvas_id, source_canvas_id, acct_id) do
       CanvasAPI.CanvasTrackback.add(
         target_canvas_id, source_canvas_id, acct_id)
