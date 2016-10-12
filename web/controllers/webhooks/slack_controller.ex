@@ -10,9 +10,14 @@ defmodule CanvasAPI.Webhooks.SlackController do
     render(conn, "verify.json", challenge: challenge)
   end
 
-  def handle(conn, params = %{
-    "type" => "message.channels",
-    "token" => @token}) do
+  # def handle(conn, params = %{
+  #   "type" => "message.channels",
+  #   "token" => @token}) do
+  #   IO.inspect params
+  #   send_resp(conn, :no_content, "")
+  # end
+
+  def handle(conn, params) do
     IO.inspect params
     send_resp(conn, :no_content, "")
   end
