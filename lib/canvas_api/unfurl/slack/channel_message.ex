@@ -6,7 +6,7 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   @lint {Credo.Check.Readability.MaxLineLength, false}
   @match ~r|\Ahttps://(?<domain>[^\.]+)\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
 
-  alias CanvasAPI.{OAuthToken, Repo, Team, Unfurl}
+  alias CanvasAPI.{OAuthToken, Repo, SlackParser, Team, Unfurl}
   alias Slack.{Channel, User}
 
   import Ecto.Query, only: [from: 2]
@@ -24,7 +24,7 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
       %Unfurl{
         id: url,
         title: "Message from @#{response[:user]["name"]}",
-        text: format_message(response[:message]["text"]),
+        text: SlackParser.to_text(response[:message]["text"]),
         thumbnail_url: response[:user]["profile"]["image_original"]
       }
     end
@@ -73,24 +73,4 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   defp parse_timestamp(timestamp) do
     String.split_at(timestamp, -6) |> Tuple.to_list |> Enum.join(".")
   end
-
-  def format_message(message, result \\ "", state \\ [state: :garbage])
-  def format_message("", result, state: :garbage),
-    do: result
-  def format_message("", result, rem: rem),
-    do: result <> rem
-  def format_message(<<?<, tail::binary>>, result, state: :garbage),
-    do: tail |> format_message(result, state: :bracket, rem: "")
-  def format_message(<<char::binary-size(1), tail::binary>>, result, state: :garbage),
-    do: tail |> format_message(result <> char, state: :garbage)
-  def format_message(<<?\s, tail::binary>>, result, state: :bracket, rem: rem),
-    do: tail |> format_message("<" <> result <> rem <> " ", state: :garbage)
-  def format_message(<<?!, tail::binary>>, result, state: :bracket, rem: rem),
-    do: tail |> format_message(result, state: :bracket, rem: rem)
-  def format_message(<<?|, tail::binary>>, result, state: :bracket, rem: _rem),
-    do: tail |> format_message(result, state: :bracket, rem: "")
-  def format_message(<<?>, tail::binary>>, result, state: :bracket, rem: rem),
-    do: tail |> format_message(result <> rem, state: :garbage)
-  def format_message(<<char::binary-size(1), tail::binary>>, result, state: :bracket, rem: rem),
-    do: tail |> format_message(result, state: :bracket, rem: rem <> char)
 end
