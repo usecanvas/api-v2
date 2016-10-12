@@ -148,6 +148,7 @@ defmodule CanvasAPI.CanvasService do
   end
 
   defp do_merge_global_templates(templates, nil), do: templates
+  defp do_merge_global_templates(templates, ""), do: templates
   defp do_merge_global_templates(templates, id) do
     templates ++
       (from(c in Canvas,
