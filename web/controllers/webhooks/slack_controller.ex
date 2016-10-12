@@ -12,13 +12,12 @@ defmodule CanvasAPI.Webhooks.SlackController do
     render(conn, "verify.json", challenge: challenge)
   end
 
-  def handle(conn, params = %{
+  def handle(conn, %{
     "type" => "event_callback",
     "token" => @token,
     "event" => event,
     "team_id" => team_id}) do
-    IO.inspect params
-    # SlackTrackback.add(event, team_id)
+    SlackTrackback.delay_add(event, team_id)
     send_resp(conn, :no_content, "")
   end
 end

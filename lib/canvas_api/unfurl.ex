@@ -48,8 +48,8 @@ defmodule CanvasAPI.Unfurl do
         CanvasAPI.Unfurl.Canvas
       Regex.match?(~r|\Ahttps?://(?:www\.)?github\.com/|, url) ->
         CanvasAPI.Unfurl.GitHub
-      # Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->
-      #   CanvasAPI.Unfurl.Slack
+      Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->
+        CanvasAPI.Unfurl.Slack
       Regex.match?(~r|\Ahttps?://|, url) ->
         CanvasAPI.Unfurl.OpenGraph
       true ->

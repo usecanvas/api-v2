@@ -8,14 +8,16 @@ defmodule CanvasAPI.Unfurl.Slack do
   @provider_icon_url(
     "https://s3.amazonaws.com/canvas-assets/provider-icons/slack.png")
 
-  def unfurl(url) do
+  def unfurl(url, account: account) do
     with mod when is_atom(mod) <- get_unfurl_mod(url),
-         unfurl when not is_nil(unfurl) <- mod.unfurl(url) do
+         unfurl when not is_nil(unfurl) <- mod.unfurl(url, account: account) do
       %CanvasAPI.Unfurl{
         unfurl |
+          id: url,
           provider_name: @provider_name,
           provider_url: @provider_url,
-          provider_icon_url: @provider_icon_url
+          provider_icon_url: @provider_icon_url,
+          url: url
       }
     end
   end

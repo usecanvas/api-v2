@@ -4,17 +4,23 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   """
 
   @lint {Credo.Check.Readability.MaxLineLength, false}
-  @match ~r|\Ahttps://[^\.]+\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+  @match ~r|\Ahttps://(?<domain>[^\.]+)\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
 
-  alias CanvasAPI.Unfurl
+  alias CanvasAPI.{OAuthToken, Repo, Team, Unfurl}
   alias Slack.{Channel, User}
 
-  @slack System.get_env("SLACK_API_TOKEN") |> Slack.client
+  import Ecto.Query, only: [from: 2]
+  import Ecto, only: [assoc: 2]
 
   def match, do: @match
 
-  def unfurl(url) do
-    with response when is_map(response) <- do_request(parse_url(url)) do
+  def unfurl(url, account: account) do
+    with %{channel: channel, domain: domain, timestamp: timestamp}
+           <- parse_url(url),
+         team = %Team{} <- get_team(account, domain),
+         token = %OAuthToken{} <- Team.get_token(team, "slack"),
+         response when response != nil <-
+           do_request(token.token, channel, timestamp) do
       %Unfurl{
         id: url,
         title: "Message from @#{response[:user]["name"]}",
@@ -24,26 +30,33 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
     end
   end
 
-  defp do_request(%{channel: name, timestamp: timestamp}) do
-    with {:ok, %{"channels" => channels}} <- get_channels,
+  defp do_request(token, name, timestamp) do
+    with client = Slack.client(token),
+         {:ok, %{"channels" => channels}} <- get_channels(client),
          channel when not is_nil(channel) <- find_channel(channels, name),
-         {:ok, %{"messages" => [message]}} <- get_message(channel, timestamp),
-         {:ok, %{"user" => user}} <- get_user(message["user"]) do
+         {:ok, %{"messages" => [message]}} <-
+           get_message(client, channel, timestamp),
+         {:ok, %{"user" => user}} <- get_user(client, message["user"]) do
       %{channel: channel, message: message, user: user}
     end
   end
 
-  defp get_channels do
-    Channel.list(@slack)
+  defp get_channels(client) do
+    Channel.list(client)
   end
 
-  defp get_message(channel, timestamp) do
-    Channel.history(@slack,
+  defp get_team(account, domain) do
+    from(assoc(account, :teams), where: [domain: ^domain])
+    |> Repo.one
+  end
+
+  defp get_message(client, channel, timestamp) do
+    Channel.history(client,
       channel: channel["id"], oldest: timestamp, inclusive: 1, count: 1)
   end
 
-  defp get_user(user_id) do
-    User.info(@slack, user: user_id)
+  defp get_user(client, user_id) do
+    User.info(client, user: user_id)
   end
 
   defp find_channel(channels, name) do
@@ -52,9 +65,9 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   end
 
   defp parse_url(url) do
-    %{"channel" => channel, "timestamp" => timestamp} =
+    %{"channel" => channel, "domain" => domain, "timestamp" => timestamp} =
       Regex.named_captures(@match, url)
-    %{channel: channel, timestamp: parse_timestamp(timestamp)}
+    %{channel: channel, domain: domain, timestamp: parse_timestamp(timestamp)}
   end
 
   defp parse_timestamp(timestamp) do
