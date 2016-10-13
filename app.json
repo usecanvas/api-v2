@@ -60,9 +60,6 @@
       "description": "A key for sending events to Sentry",
       "required": false
     },
-    "SLACK_API_TOKEN": {
-      "description": "An API token for Slack unfurls"
-    },
     "SLACK_CLIENT_ID": {
       "description": "A key for a Slack app"
     },
