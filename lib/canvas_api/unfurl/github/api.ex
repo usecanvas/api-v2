@@ -39,6 +39,7 @@ defmodule CanvasAPI.Unfurl.GitHub.API do
 
   defp process_url(url = "https://" <> _), do: url
   defp process_url(url), do: @endpoint <> url
+  defp process_request_body(""), do: ""
   defp process_request_body(body), do: Poison.encode!(body)
   defp process_response_body(body), do: Poison.decode!(body)
 end
