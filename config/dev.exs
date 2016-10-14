@@ -26,3 +26,6 @@ config :canvas_api, CanvasAPI.Repo,
   database: "canvas_pro_api_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :mix_test_watch,
+  tasks: ["test", "credo-strict"]

@@ -5,6 +5,7 @@ System.put_env("SLACK_CLIENT_ID", String.duplicate("x", 8) <> "." <> String.dupl
 System.put_env("SLACK_CLIENT_SECRET", String.duplicate("x", 32))
 System.put_env("REDIRECT_URI", "http://localhost:4200")
 
+ExUnit.configure formatters: [ExUnit.CLIFormatter, ExUnitNotifier]
 ExUnit.start
 
 Ecto.Adapters.SQL.Sandbox.mode(CanvasAPI.Repo, :manual)

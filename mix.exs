@@ -66,8 +66,10 @@ defmodule CanvasAPI.Mixfile do
      {:sentry, "~> 1.0"},
      {:credo, "~> 0.4", only: [:dev, :test]},
      {:ex_doc, "~> 0.14", only: [:dev]},
+     {:mix_test_watch, "~> 0.2", only: [:dev]},
      {:ex_machina, "~> 1.0", only: [:test]},
-     {:mock, "~> 0.2.0", only: [:test]}]
+     {:mock, "~> 0.2.0", only: [:test]},
+     {:ex_unit_notifier, "~> 0.1", only: [:test]}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
@@ -80,6 +82,7 @@ defmodule CanvasAPI.Mixfile do
     ["ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
      "docs": ["docs --output=docs"],
-     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+     "test": ["ecto.create --quiet", "ecto.migrate", "test"],
+     "credo-strict": ["credo --strict"]]
   end
 end
