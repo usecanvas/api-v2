@@ -51,7 +51,7 @@ defmodule CanvasAPI.Unfurl do
       Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->
         CanvasAPI.Unfurl.Slack
       Regex.match?(~r|\Ahttps?://|, url) ->
-        CanvasAPI.Unfurl.OpenGraph
+        CanvasAPI.Unfurl.Embedly
       true ->
         nil
     end

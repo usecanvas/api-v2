@@ -1,4 +1,4 @@
-defmodule CanvasAPI.Unfurl.OpenGraph do
+defmodule CanvasAPI.Unfurl.Embedly do
   @moduledoc """
   An unfurled page using data from Open Graph HTML tags.
   """

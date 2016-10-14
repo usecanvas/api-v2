@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.1">
-    <title>CanvasAPI – Canvas API v0.0.1</title>
+    <title>CanvasAPI.SlackTrackback – Canvas API v0.0.1</title>
     <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -59,10 +59,10 @@
 
       <h1>
         <small class="visible-xs">Canvas API v0.0.1</small>
-        CanvasAPI
+        CanvasAPI.SlackTrackback
         
         
-          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L1" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -70,7 +70,7 @@
 
       
         <section id="moduledoc">
-          <p>An application for interacting with the Canvas service.</p>
+          <p>A reference of a canvas in Slack.</p>
 
         </section>
       
@@ -92,17 +92,23 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#config_change/3">config_change(changed, new, removed)</a>
+    <a href="#add/1">add()</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#start/2">start(type, args)</a>
+    <a href="#add/2">add(map, team_id)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a></p>
+    <div class="summary-synopsis"><p>Add a slack trackback to a canvas</p>
 </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#delay_add/2">delay_add(params, team_id)</a>
+  </div>
   
 </div>
 
@@ -126,14 +132,14 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="config_change/3">
+          <div class="detail" id="add/1">
   <div class="detail-header">
-    <a href="#config_change/3" class="detail-link" title="Link to this function">
+    <a href="#add/1" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">config_change(changed, new, removed)</span>
+    <span class="signature">add()</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L33" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L60" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -144,14 +150,43 @@
     
   </section>
 </div>
-<div class="detail" id="start/2">
+<div class="detail" id="add/2">
   <div class="detail-header">
-    <a href="#start/2" class="detail-link" title="Link to this function">
+    <a href="#add/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">start(type, args)</span>
+    <span class="signature">add(map, team_id)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L10" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L32" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>add(map, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) ::
+  {:ok, %CanvasAPI.PulseEvent{__meta__: term, canvas: term, canvas_id: term, id: term, inserted_at: term, provider_name: term, provider_url: term, referencer: term, type: term, updated_at: term, url: term}} |
+  {:error, Ecto.Changeset.t} |
+  nil</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Add a slack trackback to a canvas.</p>
+<p>TODO: This only tracks the first canvas mentioned in the message.</p>
+
+  </section>
+</div>
+<div class="detail" id="delay_add/2">
+  <div class="detail-header">
+    <a href="#delay_add/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">delay_add(params, team_id)</span>
+    
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L62" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -159,8 +194,7 @@
     
   </div>
   <section class="docstring">
-    <p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a>.</p>
-
+    
   </section>
 </div>
 

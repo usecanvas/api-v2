@@ -29,7 +29,7 @@ defmodule CanvasAPI.Unfurl.GitHub do
       is_repo?(url) -> CanvasAPI.Unfurl.GitHub.Repo
       is_issue?(url) -> CanvasAPI.Unfurl.GitHub.Issue
       is_pull_request?(url) -> CanvasAPI.Unfurl.GitHub.PullRequest
-      true -> CanvasAPI.Unfurl.OpenGraph
+      true -> CanvasAPI.Unfurl.Embedly
     end
   end
 

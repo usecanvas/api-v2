@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.1">
-    <title>CanvasAPI – Canvas API v0.0.1</title>
+    <title>CanvasAPI.SlackParser – Canvas API v0.0.1</title>
     <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -59,10 +59,10 @@
 
       <h1>
         <small class="visible-xs">Canvas API v0.0.1</small>
-        CanvasAPI
+        CanvasAPI.SlackParser
         
         
-          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_parser.ex#L1" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -70,7 +70,7 @@
 
       
         <section id="moduledoc">
-          <p>An application for interacting with the Canvas service.</p>
+          <p>Provides functionality for parsing Slack messages.</p>
 
         </section>
       
@@ -92,16 +92,11 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#config_change/3">config_change(changed, new, removed)</a>
+    <a href="#to_text/3">to_text(message, result \\ &quot;&quot;, state \\ [state: :garbage])</a>
   </div>
   
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#start/2">start(type, args)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a></p>
+    <div class="summary-synopsis"><p>Convert a Slack message to plain text by stripping brackets and
+leaving only link text and labels</p>
 </div>
   
 </div>
@@ -126,40 +121,42 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="config_change/3">
+          <div class="detail" id="to_text/3">
   <div class="detail-header">
-    <a href="#config_change/3" class="detail-link" title="Link to this function">
+    <a href="#to_text/3" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">config_change(changed, new, removed)</span>
+    <span class="signature">to_text(message, result \\ &quot;&quot;, state \\ [state: :garbage])</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L33" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_parser.ex#L22" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
     
     
-  </div>
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="start/2">
-  <div class="detail-header">
-    <a href="#start/2" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">start(type, args)</span>
-    
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L10" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
+      <div class="specs">
+        
+          <pre>to_text(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) :: <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a></pre>
+        
+      </div>
     
   </div>
   <section class="docstring">
-    <p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a>.</p>
+    <p>Convert a Slack message to plain text by stripping brackets and
+leaving only link text and labels.</p>
+<h2 id="to_text/3-examples" class="section-heading">
+  <a href="#to_text/3-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; CanvasAPI.SlackParser.to_text(&quot;Foo &lt;bar&gt;&quot;)
+&quot;Foo bar&quot;
+
+iex&gt; CanvasAPI.SlackParser.to_text(&quot;Foo &lt;!here|@here&gt; Bar&quot;)
+&quot;Foo @here Bar&quot;
+
+iex&gt; CanvasAPI.SlackParser.to_text(&quot;Foo &lt;https://www.example.com&gt;&quot;)
+&quot;Foo https://www.example.com&quot;</code></pre>
 
   </section>
 </div>

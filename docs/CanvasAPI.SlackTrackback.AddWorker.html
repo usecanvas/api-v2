@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.1">
-    <title>CanvasAPI – Canvas API v0.0.1</title>
+    <title>CanvasAPI.SlackTrackback.AddWorker – Canvas API v0.0.1</title>
     <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -59,10 +59,10 @@
 
       <h1>
         <small class="visible-xs">Canvas API v0.0.1</small>
-        CanvasAPI
+        CanvasAPI.SlackTrackback.AddWorker
         
         
-          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L14" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -70,7 +70,7 @@
 
       
         <section id="moduledoc">
-          <p>An application for interacting with the Canvas service.</p>
+          <p>Asynchronously adds a Slack mention Pulse event.</p>
 
         </section>
       
@@ -92,17 +92,8 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#config_change/3">config_change(changed, new, removed)</a>
+    <a href="#perform/2">perform(params, team_id)</a>
   </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#start/2">start(type, args)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a></p>
-</div>
   
 </div>
 
@@ -126,14 +117,14 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="config_change/3">
+          <div class="detail" id="perform/2">
   <div class="detail-header">
-    <a href="#config_change/3" class="detail-link" title="Link to this function">
+    <a href="#perform/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">config_change(changed, new, removed)</span>
+    <span class="signature">perform(params, team_id)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L33" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/slack_trackback.ex#L19" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -142,25 +133,6 @@
   </div>
   <section class="docstring">
     
-  </section>
-</div>
-<div class="detail" id="start/2">
-  <div class="detail-header">
-    <a href="#start/2" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">start(type, args)</span>
-    
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api.ex#L10" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
-    
-  </div>
-  <section class="docstring">
-    <p>Callback implementation for <a href="http://elixir-lang.org/docs/stable/elixir/Application.html#c:start/2"><code class="inline">Application.start/2</code></a>.</p>
-
   </section>
 </div>
 

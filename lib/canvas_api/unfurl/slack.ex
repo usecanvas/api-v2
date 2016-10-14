@@ -26,7 +26,7 @@ defmodule CanvasAPI.Unfurl.Slack do
     if is_channel_message?(url) do
       CanvasAPI.Unfurl.Slack.ChannelMessage
     else
-      CanvasAPI.Unfurl.OpenGraph
+      CanvasAPI.Unfurl.Embedly
     end
   end
 

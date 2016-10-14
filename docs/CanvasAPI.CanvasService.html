@@ -172,7 +172,7 @@
       <div class="specs">
         
           <pre>create(map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   {:error, Ecto.Changeset.t}</pre>
         
       </div>
@@ -212,7 +212,7 @@ template.</p>
     </a>
     <span class="signature">delete(id, list)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L138" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L141" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -221,7 +221,7 @@ template.</p>
       <div class="specs">
         
           <pre>delete(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   nil |
   {:error, Ecto.Changeset.t}</pre>
         
@@ -258,7 +258,7 @@ template.</p>
       <div class="specs">
         
           <pre>list(<a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  [%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}] |
+  [%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}] |
   []</pre>
         
       </div>
@@ -290,7 +290,7 @@ template.</p>
     </a>
     <span class="signature">show(id, list)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L93" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L96" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -299,7 +299,7 @@ template.</p>
       <div class="specs">
         
           <pre>show(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
+  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
   nil</pre>
         
       </div>
@@ -324,7 +324,7 @@ template.</p>
     </a>
     <span class="signature">update(canvas, params, opts \\ [])</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L108" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L111" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -332,8 +332,8 @@ template.</p>
     
       <div class="specs">
         
-          <pre>update(%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}, map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+          <pre>update(%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}, map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   {:error, Ecto.Changeset.t}</pre>
         
       </div>
