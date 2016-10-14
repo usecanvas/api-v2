@@ -33,7 +33,7 @@ defmodule CanvasAPI.AddToSlackMediator do
          nil <- find_existing_token(team.oauth_tokens) do
       %OAuthToken{}
       |> OAuthToken.changeset(
-        %{meta: %{bot: bot}, provider: "slack", token: token})
+        %{meta: %{"bot" => bot}, provider: "slack", token: token})
       |> Ecto.Changeset.put_assoc(:team, team)
       |> Repo.insert
     else

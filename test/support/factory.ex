@@ -15,6 +15,16 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def oauth_token_factory do
+    %CanvasAPI.OAuthToken{
+      token: "token",
+      account: build(:account),
+      team: build(:team),
+      provider: "provider",
+      meta: %{}
+    }
+  end
+
   def team_factory do
     %CanvasAPI.Team{
       domain: sequence(:domain, &"domain-#{&1}"),

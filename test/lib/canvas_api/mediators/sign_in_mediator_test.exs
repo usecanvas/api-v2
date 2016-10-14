@@ -1,7 +1,7 @@
 defmodule CanvasAPI.SignInMediatorTest do
   use CanvasAPI.ModelCase
 
-  alias CanvasAPI.SignInMediator, as: SIM
+  alias CanvasAPI.SignInMediator, as: Mediator
 
   import Mock
   import CanvasAPI.Factory
@@ -28,7 +28,7 @@ defmodule CanvasAPI.SignInMediatorTest do
   test "creates a new account, team, and user" do
     with_mock Slack.OAuth, [access: mock_access] do
       account =
-        SIM.sign_in("ABCDEFG", account: nil)
+        Mediator.sign_in("ABCDEFG", account: nil)
         |> elem(1)
         |> Repo.preload([:teams, :users])
 
@@ -45,7 +45,7 @@ defmodule CanvasAPI.SignInMediatorTest do
     account = insert(:account)
 
     with_mock Slack.OAuth, [access: mock_access] do
-      {:ok, linked_account} = SIM.sign_in("ABCDEFG", account: account)
+      {:ok, linked_account} = Mediator.sign_in("ABCDEFG", account: account)
       assert linked_account.id == account.id
     end
   end
@@ -54,13 +54,13 @@ defmodule CanvasAPI.SignInMediatorTest do
     account = insert(:account)
 
     with_mock Slack.OAuth, [access: mock_access] do
-      {:ok, _} = SIM.sign_in("ABCDEFG", account: account)
+      {:ok, _} = Mediator.sign_in("ABCDEFG", account: account)
     end
 
     user = %{"id" => "user_2_id", "email" => "email", "name" => "Name"}
 
     with_mock Slack.OAuth, [access: mock_access(user: user)] do
-      {:error, changeset} = SIM.sign_in("ABCDEFG", account: account)
+      {:error, changeset} = Mediator.sign_in("ABCDEFG", account: account)
       assert(
         {:team_id, {"already exists for this account", []}} in changeset.errors)
     end
@@ -70,7 +70,7 @@ defmodule CanvasAPI.SignInMediatorTest do
     mock_team = @mock_team |> Map.merge(%{"domain" => "un-whitelist"})
 
     with_mock Slack.OAuth, [access: mock_access(team: mock_team)] do
-      {:error, error} = SIM.sign_in("ABCDEFG", account: nil)
+      {:error, error} = Mediator.sign_in("ABCDEFG", account: nil)
       assert error == "Domain not whitelisted"
     end
   end
