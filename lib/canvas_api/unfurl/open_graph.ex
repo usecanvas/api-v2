@@ -3,67 +3,36 @@ defmodule CanvasAPI.Unfurl.OpenGraph do
   An unfurled page using data from Open Graph HTML tags.
   """
 
-  def unfurl(url, _) do
-    case HTTPoison.get(url, [], follow_redirect: true, max_redirect: 5) do
-      {:ok, %{body: body, status_code: 200}} ->
-        unfurl_from_body(body, url)
+  @embedly_key System.get_env("EMBEDLY_API_KEY")
+
+  def unfurl(url, _opts \\ []) do
+    with {:ok, extracted} <- extract(url) do
+      unfurl_from_body(extracted, url)
+    else
+      _ -> nil
+    end
+  end
+
+  defp extract(url) do
+    HTTPoison.get("https://api.embedly.com/1/extract", [], params: [
+      key: @embedly_key,
+      url: url])
+    |> case do
+      {:ok, %HTTPoison.Response{body: body, status_code: 200}} ->
+        {:ok, Poison.decode!(body)}
       _ ->
         nil
     end
   end
 
-  defp unfurl_from_body(body, url) do
-    og_tags = get_opengraph(body)
-
+  defp unfurl_from_body(extracted, url) do
     %CanvasAPI.Unfurl{
       id: url,
-      provider_name: og_tags["site_name"],
-      title: og_tags["title"] || url,
-      text: og_tags["description"],
-      thumbnail_url: og_tags["image"] ||
-        og_tags["image:secure_url"] ||
-        og_tags["image:url"],
+      provider_name: extracted["site_name"],
+      title: extracted["title"] || url,
+      text: extracted["description"],
+      thumbnail_url: get_in(extracted, ["images", Access.at(0), "url"]),
       url: url
     }
-  end
-
-  defp get_opengraph(html_body) do
-    html_body
-    |> Floki.find("meta")
-    |> extract_opengraph
-    |> Enum.reduce(%{}, fn key_value, map ->
-      ensure_valid_string(key_value, map)
-    end)
-  end
-
-  defp ensure_valid_string({key, value}, map) do
-    if String.valid?(value) do
-      Map.put(map, key, value)
-    else
-      Map.put(map, key, "")
-    end
-  end
-
-  defp extract_opengraph(tags) do
-    tags
-    |> Enum.reduce(%{}, fn
-      (tag = {"meta", attributes, _}, data) ->
-        with key when not is_nil(key) <- find_opengraph_key(attributes),
-             [value | _] <- Floki.attribute(tag, "content") do
-          Map.put(data, key, value)
-        else
-          _ -> data
-        end
-    end)
-  end
-
-  defp find_opengraph_key(attributes) do
-    attributes
-    |> Enum.find_value(fn attribute ->
-      case attribute do
-        {"property", "og:" <> key} -> key
-        _ -> nil
-      end
-    end)
   end
 end
