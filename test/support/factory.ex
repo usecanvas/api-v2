@@ -21,7 +21,7 @@ defmodule CanvasAPI.Factory do
       account: build(:account),
       team: build(:team),
       provider: "provider",
-      meta: %{}
+      meta: %{"bot" => %{"bot_access_token" => "bot_access_token"}}
     }
   end
 
@@ -34,12 +34,6 @@ defmodule CanvasAPI.Factory do
     }
   end
 
-  def whitelisted_domain_factory do
-    %CanvasAPI.WhitelistedSlackDomain{
-      domain: sequence(:domain, &"domain-#{&1}")
-    }
-  end
-
   def user_factory do
     %CanvasAPI.User{
       email: "user@example.com",
@@ -49,6 +43,12 @@ defmodule CanvasAPI.Factory do
       slack_id: sequence(:slack_id, &"ABCDEFG#{&1}"),
       account: build(:account),
       team: build(:team)
+    }
+  end
+
+  def whitelisted_domain_factory do
+    %CanvasAPI.WhitelistedSlackDomain{
+      domain: sequence(:domain, &"domain-#{&1}")
     }
   end
 end

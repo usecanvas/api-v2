@@ -66,13 +66,16 @@ defmodule CanvasAPI.CanvasService do
   """
   @spec list(Keyword.t) :: [%Canvas{}] | []
   def list(user: user) do
-    from(assoc(user, :canvases), preload: ^@preload)
+    from(assoc(user, :canvases),
+         order_by: [asc: :inserted_at],
+         preload: ^@preload)
     |> Repo.all
   end
 
   def list(user: user, only_templates: true) do
     from(assoc(user, :canvases),
          where: [is_template: true],
+         order_by: [asc: :inserted_at],
          preload: ^@preload)
     |> Repo.all
     |> merge_global_templates

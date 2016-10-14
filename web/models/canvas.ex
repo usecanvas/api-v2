@@ -63,6 +63,9 @@ defmodule CanvasAPI.Canvas do
 
   @doc """
   Put a template in a canvas if present.
+
+  TODO: This currently allows finding a canvas by ID only (not requiring to be
+  in the team).
   """
   @spec put_template(Ecto.Changeset.t, map | nil) :: Ecto.Changeset.t
   def put_template(changeset, %{"id" => id, "type" => "canvases"}) do
