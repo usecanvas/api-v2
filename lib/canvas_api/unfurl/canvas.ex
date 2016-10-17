@@ -21,7 +21,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
   alias Unfurl.Field
 
-  def unfurl(url, _opts) do
+  def unfurl(url, _opts \\ []) do
     with id when is_binary(id) <- extract_canvas_id(url),
          canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]) do
 

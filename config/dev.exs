@@ -28,4 +28,4 @@ config :canvas_api, CanvasAPI.Repo,
   pool_size: 10
 
 config :mix_test_watch,
-  tasks: ["test", "credo-strict"]
+  tasks: ["test --stale", "credo --strict"]
