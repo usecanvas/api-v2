@@ -119,12 +119,4 @@ defmodule CanvasAPI.Unfurl.Canvas do
       match["id"]
     end
   end
-
-  defp get_query(url) do
-    url
-    |> URI.parse
-    |> Map.get(:query)
-    |> Kernel.||("")
-    |> URI.decode_query
-  end
 end
