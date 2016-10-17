@@ -89,6 +89,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
   defp fragment_block(blocks, nil), do: blocks
 
   defp fragment_block(blocks, fragment) do
+    Enum.find_value(blocks, fn
+      block = %Block{type: "list"} -> fragment_block(block.blocks, fragment)
+      block = %Block{id: id} when id == fragment -> block
+      _ -> nil
+    end)
     Enum.find(blocks, & &1.id == fragment)
     |> case do
       block = %Block{} -> [block]
