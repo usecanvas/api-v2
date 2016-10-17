@@ -25,7 +25,10 @@ defmodule CanvasAPI.Unfurl.Canvas do
     with id when is_binary(id) <- extract_canvas_id(url),
          canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]) do
 
-      blocks = filter_blocks(canvas.blocks, get_query(url)["filter"])
+      blocks =
+        canvas.blocks
+        |> Enum.slice(1..-1)
+        |> filter_blocks(get_query(url)["filter"])
 
       %Unfurl{
         id: url,
