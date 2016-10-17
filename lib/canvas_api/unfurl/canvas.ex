@@ -94,10 +94,10 @@ defmodule CanvasAPI.Unfurl.Canvas do
       block = %Block{id: id} when id == fragment -> block
       _ -> nil
     end)
-    Enum.find(blocks, & &1.id == fragment)
     |> case do
-      block = %Block{} -> [block]
       nil -> nil
+      blocks when is_list(blocks) -> blocks
+      block -> [block]
     end
   end
 
