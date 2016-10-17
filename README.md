@@ -1,4 +1,4 @@
-# CanvasAPI
+# CanvasAPI [![CircleCI](https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39)](https://circleci.com/gh/usecanvas/pro-api)
 
 To start your Phoenix app:
 
