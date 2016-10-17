@@ -46,6 +46,8 @@ defmodule CanvasAPI.Unfurl do
     cond do
       Regex.match?(CanvasAPI.Unfurl.Canvas.canvas_regex, url) ->
         CanvasAPI.Unfurl.Canvas
+      Regex.match?(CanvasAPI.Unfurl.Gist.gist_regex, url) ->
+        CanvasAPI.Unfurl.Gist
       Regex.match?(~r|\Ahttps?://(?:www\.)?github\.com/|, url) ->
         CanvasAPI.Unfurl.GitHub
       Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->

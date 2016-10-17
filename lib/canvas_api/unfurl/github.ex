@@ -10,6 +10,9 @@ defmodule CanvasAPI.Unfurl.GitHub do
   @provider_icon_url(
     "https://s3.amazonaws.com/canvas-assets/provider-icons/github.png")
 
+  @spec provider_icon_url() :: String.t
+  def provider_icon_url, do: @provider_icon_url
+
   def unfurl(url, account: account) do
     with mod when is_atom(mod) <- get_unfurl_mod(url),
          unfurl = %Unfurl{} <- mod.unfurl(url, account: account) do
