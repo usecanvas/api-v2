@@ -23,12 +23,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
 
   def unfurl(url, _opts \\ []) do
     with id when is_binary(id) <- extract_canvas_id(url),
-         canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]) do
-
-      blocks =
-        canvas.blocks
-        |> Enum.slice(1..-1)
-        |> filter_blocks(get_query(url)["filter"])
+         canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]),
+         uri = URI.parse(url),
+         filter = URI.decode_query(uri.query || "") |> Map.get("filter"),
+         blocks = canvas.blocks |> Enum.slice(1..-1) |> filter_blocks(filter),
+         blocks when is_list(blocks) <- fragment_block(blocks, uri.fragment) do
 
       %Unfurl{
         id: url,
@@ -87,7 +86,17 @@ defmodule CanvasAPI.Unfurl.Canvas do
     end)
   end
 
-  defp filter_blocks(blocks, term, list \\ [])
+  defp fragment_block(blocks, nil), do: blocks
+
+  defp fragment_block(blocks, fragment) do
+    Enum.find(blocks, & &1.id == fragment)
+    |> case do
+      block = %Block{} -> [block]
+      nil -> nil
+    end
+  end
+
+  defp filter_blocks(blocks, filter, list \\ [])
 
   defp filter_blocks(blocks, nil, _), do: blocks
 
