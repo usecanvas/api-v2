@@ -1,6 +1,9 @@
 machine:
   environment:
     PATH: "$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
+  services:
+    - postgresql
+    - redis
 
 dependencies:
   pre:
