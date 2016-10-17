@@ -12,8 +12,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
   \\A#{System.get_env("WEB_URL")}/
   [^/]+/
   (?<id>[^/]{22})
-  (?:#[^\\?]+)?
   (?:\\?.+)?
+  (?:#[^\\?]+)?
   \\z
   """
   |> String.replace("\n", "")
