@@ -8,15 +8,15 @@ defmodule CanvasAPI.Unfurl.Canvas do
     "https://s3.amazonaws.com/canvas-assets/provider-icons/canvas.png")
   @provider_url "https://usecanvas.com"
 
-  @canvas_regex Regex.compile! """
-  \\A#{System.get_env("WEB_URL")}/
-  [^/]+/
-  (?<id>[^/]{22})
-  (?:\\?.+)?
-  (?:#[^\\?]+)?
+  @canvas_regex Regex.compile!("""
+  \\A
+  #{System.get_env("WEB_URL")}/ # Host
+  [^/]+/                        # Team domain
+  (?<id>[^/]{22})               # Canvas ID
+  (?:\\?.+)?                    # Query
+  (?:\\#[^\\?]+)?               # Document fragment
   \\z
-  """
-  |> String.replace("\n", "")
+  """, "x")
 
   alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
   alias Unfurl.Field
