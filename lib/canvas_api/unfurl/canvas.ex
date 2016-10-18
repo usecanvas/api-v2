@@ -88,16 +88,12 @@ defmodule CanvasAPI.Unfurl.Canvas do
   end
 
   defp canvas_summary(blocks) do
-    first_content_block = Enum.at(blocks, 0)
-
-    case first_content_block do
-      %Block{blocks: [block | _]} ->
-        block.content
-      %Block{content: content} ->
-        String.slice(content, 0..140)
-      nil ->
-        ""
-    end
+    Enum.find_value(blocks, fn
+      %Block{type: "title"} -> nil
+      %Block{type: "heading"} -> nil
+      %Block{type: "list", blocks: blocks} -> canvas_summary(blocks)
+      %Block{content: content} -> content
+    end)
   end
 
   defp canvas_title(canvas) do

@@ -67,6 +67,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
       build(:title_block, content: "Title"),
       build(:block, content: "First Paragraph"),
       build(:heading_block, content: "Section 1"),
+      build(:heading_block, content: "Sub-Section", meta: %{"level" => 2}),
       build(:block, content: "Section Paragraph"),
       build(:heading_block, content: "Sub-Section", meta: %{"level" => 2}),
       build(:list_block, blocks: [
