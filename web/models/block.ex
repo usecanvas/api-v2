@@ -48,9 +48,11 @@ defmodule CanvasAPI.Block do
     |> Enum.any?(&matches_filter?(&1, filter))
   end
 
-  def matches_filter?(block, filter) do
+  def matches_filter?(block = %__MODULE__{content: content}, filter) when is_binary(content) do
     do_matches_filter?(block.content, filter)
   end
+
+  def matches_filter?(_, _), do: false
 
   @spec do_matches_filter?(String.t, String.t) :: boolean
   defp do_matches_filter?(string, term) do

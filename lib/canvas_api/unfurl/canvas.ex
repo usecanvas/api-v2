@@ -21,28 +21,68 @@ defmodule CanvasAPI.Unfurl.Canvas do
   alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
   alias Unfurl.Field
 
+  @doc """
+  Get a regular expression that matches a canvas URL.
+  """
+  @spec canvas_regex() :: Regex.t
+  def canvas_regex, do: @canvas_regex
+
+  @doc """
+  Attempt to unfurl a URL pointing to a canvas into an `Unfurl` struct that
+  contains a summary of the canvas.
+
+  If the URL contains a `filter` query param, it will filter the canvas blocks
+  and summarize them.
+
+  If the URL contains a fragment, it will summarize only the canvas block
+  whose ID matches the fragment (will return `nil` if no such block exists).
+  """
+  @spec unfurl(String.t, Keyword.t) :: Unfurl.t | nil
   def unfurl(url, _opts \\ []) do
-    with id when is_binary(id) <- extract_canvas_id(url),
-         canvas = %Canvas{} <- Repo.get(Canvas, id) |> Repo.preload([:team]),
-         uri = URI.parse(url),
+    uri = URI.parse(url)
+    with id = extract_canvas_id(uri.path),
+         canvas = %Canvas{} <- find_canvas(id),
          filter = URI.decode_query(uri.query || "") |> Map.get("filter"),
          blocks = canvas.blocks |> Enum.slice(1..-1) |> filter_blocks(filter),
-         blocks when is_list(blocks) <- fragment_block(blocks, uri.fragment) do
-
-      %Unfurl{
-        id: url,
-        title: canvas_title(canvas),
-        text: canvas_summary(blocks),
-        provider_name: @provider_name,
-        provider_icon_url: @provider_icon_url,
-        provider_url: @provider_url,
-        url: "#{System.get_env("WEB_URL")}/#{canvas.team.domain}/#{id}",
-        fields: progress_fields(blocks)
-      }
+         unfurl = %Unfurl{} <- do_unfurl(blocks, uri) do
+      unfurl
+      |> Map.put(:id, url)
+      |> Map.put(:provider_icon_url, @provider_icon_url)
+      |> Map.put(:provider_name, @provider_name)
+      |> Map.put(:provider_url, @provider_url)
+      |> Map.put_new(:title, canvas_title(canvas))
+      |> Map.put(:url, url)
     end
   end
 
-  def canvas_regex, do: @canvas_regex
+  @spec do_fragment_unfurl(%Block{}, [%Block{}]) :: Unfurl.t
+  defp do_fragment_unfurl(block, blocks) do
+    blocks = get_fragment_blocks(block, blocks)
+    unfurl =
+      %Unfurl{
+        text: canvas_summary(blocks),
+        fields: progress_fields(blocks)}
+
+    case block.type do
+      "heading" ->
+        unfurl |> Map.put(:title, block.content)
+      _ ->
+        unfurl
+    end
+  end
+
+  @spec do_unfurl([%Block{}], URI.t) :: Unfurl.t |nil
+  defp do_unfurl(blocks, %URI{fragment: fragment}) when is_binary(fragment) do
+    with block = %Block{} <- find_block_by_id(blocks, fragment) do
+      do_fragment_unfurl(block, blocks)
+    end
+  end
+
+  defp do_unfurl(blocks, _) do
+    %Unfurl{
+      text: canvas_summary(blocks),
+      fields: progress_fields(blocks)}
+  end
 
   defp canvas_summary(blocks) do
     first_content_block = Enum.at(blocks, 0)
@@ -86,42 +126,63 @@ defmodule CanvasAPI.Unfurl.Canvas do
     end)
   end
 
-  defp fragment_block(blocks, nil), do: blocks
-
-  defp fragment_block(blocks, fragment) do
-    Enum.find_value(blocks, fn
-      block = %Block{type: "list"} -> fragment_block(block.blocks, fragment)
-      block = %Block{id: id} when id == fragment -> block
-      _ -> nil
-    end)
-    |> case do
-      nil -> nil
-      blocks when is_list(blocks) -> blocks
-      block -> [block]
-    end
+  @spec extract_canvas_id(String.t) :: String.t
+  defp extract_canvas_id(path) do
+    path |> String.split("/") |> List.last
   end
 
+  @spec filter_blocks([%Block{}], String.t | nil, [%Block{}]) :: [%Block{}]
   defp filter_blocks(blocks, filter, list \\ [])
-
   defp filter_blocks(blocks, nil, _), do: blocks
-
   defp filter_blocks(blocks, filter, list) do
     blocks
-    |> Enum.reduce(list, fn block, list ->
-      cond do
-        block.type == "list" ->
-          filter_blocks(block.blocks, filter, list)
-        Block.matches_filter?(block, filter) ->
-          list ++ [block]
-        true ->
+    |> Enum.reduce(list, fn
+      block = %Block{type: "list"}, list ->
+        if Block.matches_filter?(block, filter) do
+          list ++ [Map.put(block, :blocks, filter_blocks(block.blocks, filter))]
+        else
           list
-      end
+        end
+      block, list ->
+        if Block.matches_filter?(block, filter) do
+          list ++ [block]
+        else
+          list
+        end
     end)
   end
 
-  defp extract_canvas_id(url) do
-    with match when is_map(match) <- Regex.named_captures(@canvas_regex, url) do
-      match["id"]
-    end
+  @spec find_block_by_id([%Block{}], String.t) :: %Block{} | nil
+  defp find_block_by_id(blocks, id) do
+    Enum.find_value(blocks, fn
+      block = %Block{id: ^id} -> block
+      block = %Block{type: "list"} -> find_block_by_id(block.blocks, id)
+      _ -> nil
+    end)
   end
+
+  @spec find_canvas(String.t) :: %Canvas{} | nil
+  defp find_canvas(id) do
+    Repo.get(Canvas, id) |> Repo.preload([:team])
+  end
+
+  @spec get_fragment_blocks(%Block{}, [%Block{}]) :: [%Block{}]
+  defp get_fragment_blocks(%Block{type: "list", blocks: blocks}, _), do: blocks
+  defp get_fragment_blocks(block = %Block{type: "heading", meta: %{"level" => level}}, blocks) do
+    min_level = level + 1
+
+    Enum.reduce_while(blocks, {[], :not_found}, fn
+      ^block, {[], :not_found} ->
+        {:cont, {[], :found}}
+      _block, {[], :not_found} ->
+        {:cont, {[], :not_found}}
+      %Block{type: "heading", meta: %{"level" => level}}, {list, :found}
+        when level < min_level ->
+          {:halt, {list, :found}}
+      block, {list, :found} ->
+        {:cont, {list ++ [block], :found}}
+    end)
+    |> elem(0)
+  end
+  defp get_fragment_blocks(block, _), do: [block]
 end

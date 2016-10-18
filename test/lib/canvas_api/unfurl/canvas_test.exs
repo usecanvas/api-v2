@@ -1,16 +1,118 @@
 defmodule CanvasAPI.Unfurl.CanvasTest do
   use CanvasAPI.ModelCase
 
-  alias CanvasAPI.Block
+  alias CanvasAPI.Canvas
   alias CanvasAPI.Unfurl.Canvas, as: UnfurlCanvas
+  alias CanvasAPI.Unfurl.Field
+
   import CanvasAPI.Factory
 
-  @tag :focus
-  test "unfurls fijltered URLs" do
+  test "unfurls filtered URLs" do
     canvas = insert(:canvas, blocks: [
-      %Block{content: "Foo", type: "paragraph"},
-      %Block{content: "Bar", type: "paragraph"}])
-    url = "/#{canvas.team.domain}/#{canvas.id}?filter=bar"
+      build(:title_block, content: "Title"),
+      build(:block, content: "Foo"),
+      build(:block, content: "Bar")])
+    url = Canvas.web_url(canvas) <> "?filter=bar"
     assert UnfurlCanvas.unfurl(url).text == "Bar"
+  end
+
+  test "unfurls lists" do
+    canvas = insert(:canvas, blocks: [
+      build(:title_block, content: "Title"),
+      build(:block, content: "First Paragraph"),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => false}),
+        build(:cl_block, meta: %{"checked" => true})
+      ])
+    ])
+
+    list = List.last(canvas.blocks)
+
+    url = Canvas.web_url(canvas) <> "##{list.id}"
+    unfurl = UnfurlCanvas.unfurl(url)
+    assert unfurl.text == "UL Item"
+    assert unfurl.fields == [
+      %Field{short: true, title: "Tasks Complete", value: 1},
+      %Field{short: true, title: "Tasks Total", value: 2}]
+  end
+
+  test "unfurls filtered lists" do
+    canvas = insert(:canvas, blocks: [
+      build(:title_block, content: "Title"),
+      build(:block, content: "First Paragraph"),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => false}),
+        build(:cl_block, meta: %{"checked" => true})
+      ])
+    ])
+
+    list = List.last(canvas.blocks)
+
+    url = Canvas.web_url(canvas) <> "?filter=UL" <> "##{list.id}"
+    unfurl = UnfurlCanvas.unfurl(url)
+    assert unfurl.text == "UL Item"
+    assert unfurl.fields == [
+      %Field{short: true, title: "Tasks Complete", value: 0},
+      %Field{short: true, title: "Tasks Total", value: 0}]
+  end
+
+  test "unfurls sections" do
+    canvas = insert(:canvas, blocks: [
+      build(:title_block, content: "Title"),
+      build(:block, content: "First Paragraph"),
+      build(:heading_block, content: "Section 1"),
+      build(:block, content: "Section Paragraph"),
+      build(:heading_block, content: "Sub-Section", meta: %{"level" => 2}),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => false}),
+        build(:cl_block, meta: %{"checked" => true})
+      ]),
+      build(:heading_block, content: "Section 2"),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => true})
+      ]),
+    ])
+
+    heading = Enum.at(canvas.blocks, 2)
+    unfurl = Canvas.web_url(canvas) <> "##{heading.id}" |> UnfurlCanvas.unfurl
+    assert unfurl.title == "Section 1"
+    assert unfurl.text == "Section Paragraph"
+    assert unfurl.fields == [
+      %Field{short: true, title: "Tasks Complete", value: 1},
+      %Field{short: true, title: "Tasks Total", value: 2}]
+  end
+
+  test "unfurls filtered sections" do
+    canvas = insert(:canvas, blocks: [
+      build(:title_block, content: "Title"),
+      build(:block, content: "First Paragraph"),
+      build(:heading_block, content: "UL Section 1"),
+      build(:block, content: "Section Paragraph"),
+      build(:heading_block, content: "Sub-Section", meta: %{"level" => 2}),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => false}),
+        build(:cl_block, meta: %{"checked" => true})
+      ]),
+      build(:heading_block, content: "Section 2"),
+      build(:list_block, blocks: [
+        build(:ul_block, content: "UL Item"),
+        build(:cl_block, meta: %{"checked" => true})
+      ]),
+    ])
+
+    heading = Enum.at(canvas.blocks, 2)
+    unfurl =
+      Canvas.web_url(canvas) <> "?filter=UL" <> "##{heading.id}"
+      |> UnfurlCanvas.unfurl
+    assert unfurl.title == "UL Section 1"
+    assert unfurl.text == "UL Item"
+    assert unfurl.fields == [
+      %Field{short: true, title: "Tasks Complete", value: 0},
+      %Field{short: true, title: "Tasks Total", value: 0}]
   end
 end

@@ -1,8 +1,54 @@
 defmodule CanvasAPI.Factory do
   use ExMachina.Ecto, repo: CanvasAPI.Repo
 
+  alias CanvasAPI.Block
+
   def account_factory do
     %CanvasAPI.Account{}
+  end
+
+  def block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "paragraph",
+      content: ""}
+  end
+
+  def heading_block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "heading",
+      content: "",
+      meta: %{"level" => 1}}
+  end
+
+  def title_block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "title",
+      content: ""}
+  end
+
+  def list_block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "list",
+      blocks: []}
+  end
+
+  def cl_block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "checklist-item",
+      content: "",
+      meta: %{"checked" => false}}
+  end
+
+  def ul_block_factory do
+    %Block{
+      id: Base62UUID.generate,
+      type: "unordered-list-item",
+      content: ""}
   end
 
   def canvas_factory do
