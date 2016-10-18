@@ -19,6 +19,7 @@ defmodule CanvasAPI.Unfurl.Gist do
     else
       do_unfurl(url <> ".json")
     end
+    |> Map.put(:id, url)
     |> Map.put(:url, url)
   end
 
@@ -26,7 +27,6 @@ defmodule CanvasAPI.Unfurl.Gist do
   defp do_unfurl(url) do
     with {:ok, json} <- get_gist(url) do
       %Unfurl{
-        id: url,
         html: append_stylesheet(json["div"], json["stylesheet"]),
         provider_icon_url: CanvasAPI.Unfurl.GitHub.provider_icon_url,
         provider_name: @provider_name,
