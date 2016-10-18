@@ -13,7 +13,9 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
       build(:block, content: "Foo"),
       build(:block, content: "Bar")])
     url = Canvas.web_url(canvas) <> "?filter=bar"
-    assert UnfurlCanvas.unfurl(url).text == "Bar"
+    unfurl = UnfurlCanvas.unfurl(url)
+    assert unfurl.title == "Title"
+    assert unfurl.text == "Bar"
   end
 
   test "unfurls lists" do
@@ -31,6 +33,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
 
     url = Canvas.web_url(canvas) <> "##{list.id}"
     unfurl = UnfurlCanvas.unfurl(url)
+    assert unfurl.title == "Title"
     assert unfurl.text == "UL Item"
     assert unfurl.fields == [
       %Field{short: true, title: "Tasks Complete", value: 1},
@@ -52,6 +55,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
 
     url = Canvas.web_url(canvas) <> "?filter=UL" <> "##{list.id}"
     unfurl = UnfurlCanvas.unfurl(url)
+    assert unfurl.title == "Title"
     assert unfurl.text == "UL Item"
     assert unfurl.fields == [
       %Field{short: true, title: "Tasks Complete", value: 0},

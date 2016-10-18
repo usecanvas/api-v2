@@ -50,7 +50,10 @@ defmodule CanvasAPI.Unfurl.Canvas do
       |> Map.put(:provider_icon_url, @provider_icon_url)
       |> Map.put(:provider_name, @provider_name)
       |> Map.put(:provider_url, @provider_url)
-      |> Map.put_new(:title, canvas_title(canvas))
+      |> fn
+           unfurl = %Unfurl{title: title} when is_binary(title) -> unfurl
+           unfurl -> Map.put(unfurl, :title, canvas_title(canvas))
+         end.()
       |> Map.put(:url, url)
     end
   end
