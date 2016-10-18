@@ -64,7 +64,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
     unfurl =
       %Unfurl{
         text: canvas_summary(blocks),
-        fields: progress_fields(blocks)}
+        fields: progress_fields(blocks),
+        type: "canvas:#{block.type}"}
 
     case block.type do
       "heading" ->
@@ -84,7 +85,8 @@ defmodule CanvasAPI.Unfurl.Canvas do
   defp do_unfurl(blocks, _) do
     %Unfurl{
       text: canvas_summary(blocks),
-      fields: progress_fields(blocks)}
+      fields: progress_fields(blocks),
+      type: "canvas"}
   end
 
   defp canvas_summary(blocks) do
