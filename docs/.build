@@ -10,6 +10,9 @@ CanvasAPI.AddToSlackMediator.html
 CanvasAPI.AvatarURL.html
 CanvasAPI.Base62UUIDField.html
 CanvasAPI.Block.html
+CanvasAPI.BulkAdapter.html
+CanvasAPI.BulkController.html
+CanvasAPI.BulkView.html
 CanvasAPI.Canvas.html
 CanvasAPI.CanvasController.html
 CanvasAPI.CanvasService.html
@@ -59,6 +62,8 @@ CanvasAPI.Unfurl.html
 CanvasAPI.Unfurl.Canvas.html
 CanvasAPI.Unfurl.Embedly.html
 CanvasAPI.Unfurl.Field.html
+CanvasAPI.Unfurl.Framer.html
+CanvasAPI.Unfurl.Gist.html
 CanvasAPI.Unfurl.GitHub.html
 CanvasAPI.Unfurl.GitHub.API.html
 CanvasAPI.Unfurl.GitHub.Issue.html
