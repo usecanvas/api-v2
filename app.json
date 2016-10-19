@@ -1,5 +1,6 @@
 {
   "addons": [
+    "heroku-postgresql",
     "heroku-redis"
   ],
   "test": "mix test && mix credo --strict",
