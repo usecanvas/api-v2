@@ -1,4 +1,4 @@
-# CanvasAPI [![CircleCI](https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39)](https://circleci.com/gh/usecanvas/pro-api)
+# CanvasAPI [![CircleCI](https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39)](https://circleci.com/gh/usecanvas/pro-api) [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/usecanvas/pro-api/tree/master)
 
 To start your Phoenix app:
 
