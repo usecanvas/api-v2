@@ -3,6 +3,9 @@
     "heroku-redis"
   ],
   "test": "mix test && mix credo --strict",
+  "buildpacks":[{
+    "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
+  }],
   "env": {
     "ADD_TO_SLACK_REDIRECT_URI": {
       "description": "The redirect URI for Add-to-Slack",
