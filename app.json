@@ -3,6 +3,10 @@
     "heroku-postgresql",
     "heroku-redis"
   ],
+  "scripts": {
+    "test-setup": "mix ecto.migrate",
+    "test": "mix test && mix credo --strict"
+  },
   "test": "mix test && mix credo --strict",
   "buildpacks":[{
     "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
