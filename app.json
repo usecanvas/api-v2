@@ -2,6 +2,7 @@
   "addons": [
     "heroku-redis"
   ],
+  "test": "mix test && mix credo --strict",
   "env": {
     "ADD_TO_SLACK_REDIRECT_URI": {
       "description": "The redirect URI for Add-to-Slack",
