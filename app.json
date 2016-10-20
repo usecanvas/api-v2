@@ -4,7 +4,6 @@
     "heroku-redis"
   ],
   "scripts": {
-    "test-setup": "mix ecto.migrate",
     "test": "mix ci"
   },
   "test": "mix test && mix credo --strict",
