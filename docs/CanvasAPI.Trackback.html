@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.1">
-    <title>CanvasAPI.Unfurl.Canvas – Canvas API v0.0.1</title>
+    <title>CanvasAPI.Trackback – Canvas API v0.0.1</title>
     <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -59,10 +59,12 @@
 
       <h1>
         <small class="visible-xs">Canvas API v0.0.1</small>
-        CanvasAPI.Unfurl.Canvas
+        CanvasAPI.Trackback
+        
+          <small>behaviour</small>
         
         
-          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/unfurl/canvas.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/trackback.ex#L1" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -70,7 +72,8 @@
 
       
         <section id="moduledoc">
-          <p>An unfurled canvas, providing summary and progress information.</p>
+          <p>A reference from some place (canvas, GitHub commit, Slack channel message) to
+a canvas.</p>
 
         </section>
       
@@ -86,36 +89,23 @@
           
 
           
-  <div class="summary-functions summary">
+
+          
+
+          
+  <div class="summary-callbacks summary">
     <h2>
-      <a href="#functions">Functions</a>
+      <a href="#callbacks">Callbacks</a>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#canvas_regex/0">canvas_regex()</a>
+    <a href="#c:add/2">add(map, arg1)</a>
   </div>
-  
-    <div class="summary-synopsis"><p>Get a regular expression that matches a canvas URL</p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#unfurl/2">unfurl(url, opts \\ [])</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Attempt to unfurl a URL pointing to a canvas into an <code class="inline">Unfurl</code> struct that
-contains a summary of the canvas</p>
-</div>
   
 </div>
 
   </div>
 
-
-          
-
-          
 
         </section>
       
@@ -123,21 +113,25 @@ contains a summary of the canvas</p>
       
 
       
-        <section id="functions" class="details-list">
+
+      
+
+      
+        <section id="callbacks" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#functions">
+            <a class="hover-link" href="#callbacks">
               <i class="icon-link"></i>
             </a>
-            Functions
+            Callbacks
           </h1>
-          <div class="detail" id="canvas_regex/0">
+          <div class="detail" id="c:add/2">
   <div class="detail-header">
-    <a href="#canvas_regex/0" class="detail-link" title="Link to this function">
+    <a href="#c:add/2" class="detail-link" title="Link to this callback">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">canvas_regex()</span>
+    <span class="signature">add(map, arg1)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/unfurl/canvas.ex#L28" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/trackback.ex#L7" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -145,52 +139,21 @@ contains a summary of the canvas</p>
     
       <div class="specs">
         
-          <pre>canvas_regex :: <a href="http://elixir-lang.org/docs/stable/elixir/Regex.html#t:t/0">Regex.t</a></pre>
+          <pre>add(map, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) ::
+  {:ok, %CanvasAPI.PulseEvent{__meta__: term, canvas: term, canvas_id: term, id: term, inserted_at: term, provider_name: term, provider_url: term, referencer: term, type: term, updated_at: term, url: term}} |
+  {:ok, [%CanvasAPI.PulseEvent{__meta__: term, canvas: term, canvas_id: term, id: term, inserted_at: term, provider_name: term, provider_url: term, referencer: term, type: term, updated_at: term, url: term}]} |
+  {:error, Ecto.Changeset.t} |
+  nil</pre>
         
       </div>
     
   </div>
   <section class="docstring">
-    <p>Get a regular expression that matches a canvas URL.</p>
-
-  </section>
-</div>
-<div class="detail" id="unfurl/2">
-  <div class="detail-header">
-    <a href="#unfurl/2" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">unfurl(url, opts \\ [])</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/unfurl/canvas.ex#L41" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
-    
-      <div class="specs">
-        
-          <pre>unfurl(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) :: <a href="CanvasAPI.Unfurl.html#t:t/0">CanvasAPI.Unfurl.t</a> | nil</pre>
-        
-      </div>
-    
-  </div>
-  <section class="docstring">
-    <p>Attempt to unfurl a URL pointing to a canvas into an <code class="inline">Unfurl</code> struct that
-contains a summary of the canvas.</p>
-<p>If the URL contains a <code class="inline">filter</code> query param, it will filter the canvas blocks
-and summarize them.</p>
-<p>If the URL contains a fragment, it will summarize only the canvas block
-whose ID matches the fragment (will return <code class="inline">nil</code> if no such block exists).</p>
-
   </section>
 </div>
 
         </section>
-      
-
-      
-
       
           <footer class="footer">
         <p>

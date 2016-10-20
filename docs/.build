@@ -29,6 +29,8 @@ CanvasAPI.ErrorHelpers.html
 CanvasAPI.ErrorView.html
 CanvasAPI.Gettext.html
 CanvasAPI.GitHubOAuthMediator.html
+CanvasAPI.GitHubTrackback.html
+CanvasAPI.GitHubWebhookPlug.html
 CanvasAPI.ImageMap.html
 CanvasAPI.JSONAPIView.html
 CanvasAPI.JSONEncoder.html
@@ -39,6 +41,7 @@ CanvasAPI.OAuthToken.html
 CanvasAPI.OriginCheckPlug.html
 CanvasAPI.PulseEvent.html
 CanvasAPI.PulseEventController.html
+CanvasAPI.PulseEventService.html
 CanvasAPI.PulseEventView.html
 CanvasAPI.Referencer.html
 CanvasAPI.Repo.html
@@ -52,11 +55,11 @@ CanvasAPI.SlackChannelNotifier.html
 CanvasAPI.SlackChannelNotifier.NotifyNewWorker.html
 CanvasAPI.SlackParser.html
 CanvasAPI.SlackTrackback.html
-CanvasAPI.SlackTrackback.AddWorker.html
 CanvasAPI.Team.html
 CanvasAPI.TeamController.html
 CanvasAPI.TeamPlug.html
 CanvasAPI.TeamView.html
+CanvasAPI.Trackback.html
 CanvasAPI.TrailingFormatPlug.html
 CanvasAPI.Unfurl.html
 CanvasAPI.Unfurl.Canvas.html
