@@ -22,6 +22,7 @@ defmodule CanvasAPI.Router do
 
     scope "/webhooks", Webhooks do
       post "/slack", SlackController, :handle
+      # post "/github", GitHubController, :handle # Handled by a plug
     end
 
     scope "/oauth", OAuth do
