@@ -57,7 +57,7 @@ defmodule CanvasAPI.SlackTrackback do
     end
   end
 
-  def add(_), do: nil
+  def add(_, _), do: nil
 
   def delay_add(params, team_id) do
     Exq.Enqueuer.enqueue(
