@@ -5,7 +5,7 @@
   ],
   "scripts": {
     "test-setup": "mix ecto.migrate",
-    "test": "mix test && mix credo --strict"
+    "test": "mix ci"
   },
   "test": "mix test && mix credo --strict",
   "buildpacks":[{
