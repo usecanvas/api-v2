@@ -4,10 +4,12 @@
     "heroku-redis"
   ],
   "scripts": {
+    "test-setup": "bin/addon-wait",
     "test": "mix test"
   },
-  "test": "mix test && mix credo --strict",
   "buildpacks":[{
+    "url": "https://github.com/heroku/heroku-buildpack-addon-wait.git"
+  }, {
     "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
   }],
   "env": {
