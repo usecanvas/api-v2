@@ -20,6 +20,8 @@ defmodule CanvasAPI.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  plug CanvasAPI.GitHubWebhookPlug, mount: ~w(webhooks github)
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
