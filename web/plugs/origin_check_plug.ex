@@ -13,12 +13,14 @@ defmodule CanvasAPI.OriginCheckPlug do
 
   def call(conn, _opts) do
     if @do_check do
+      IO.inspect "CHECKING ORIGIN"
       do_call(
         conn,
         [System.get_env("WEB_URL")] |> get_host,
         conn |> get_req_header("origin") |> get_host,
         conn |> get_req_header("referer") |> get_host)
     else
+      IO.inspect "NOT CHECKING ORIGIN"
       conn
     end
   end
