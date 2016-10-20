@@ -20,7 +20,7 @@ defmodule CanvasAPI.GitHubWebhookPlug do
     end
   end
 
-  defp verify_request(conn, opts) do
+  defp verify_request(conn, _opts) do
     {:ok, body, _} = read_body(conn)
 
     with ["sha1=" <> signature] <- get_req_header(conn, "x-hub-signature"),

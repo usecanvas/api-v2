@@ -11,8 +11,8 @@ defmodule CanvasAPI.Trackback do
 
   defmacro __using__(_opts) do
     quote do
-      alias CanvasAPI.{AvatarURL, Canvas, OAuthToken, PulseEvent, Repo, Team,
-                       User}
+      alias CanvasAPI.{AvatarURL, Canvas, OAuthToken, PulseEvent,
+                       PulseEventService, Repo, Team, User}
       import Ecto.Changeset, only: [put_assoc: 3]
       import Ecto.Query, only: [from: 2]
       import Ecto, only: [assoc: 2]

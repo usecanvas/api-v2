@@ -20,21 +20,19 @@ defmodule CanvasAPI.SlackTrackback do
          team = %Team{} <- get_team(team_id),
          user = %User{} <- get_user(team, user_id),
          token = %OAuthToken{} <- Team.get_token(team, "slack") do
-      %PulseEvent{}
-      |> PulseEvent.changeset(%{
-           provider_name: "Slack",
-           provider_url: "https://slack.com",
-           type: "mentioned",
-           url: message_url(team.domain, channel_id, message_ts, token.token),
-           referencer: %{
-             id: user.id,
-             avatar_url: AvatarURL.create(user.email),
-             email: user.email,
-             name: user.name,
-             url: "mailto:#{user.email}"
-           }})
-      |> put_assoc(:canvas, canvas)
-      |> Repo.insert!
+      PulseEventService.create(
+        %{provider_name: "Slack",
+          provider_url: "https://slack.com",
+          type: "mentioned",
+          url: message_url(team.domain, channel_id, message_ts, token.token),
+          referencer: %{
+            id: user.id,
+            avatar_url: AvatarURL.create(user.email),
+            email: user.email,
+            name: user.name,
+            url: "mailto:#{user.email}"
+           }},
+        canvas: canvas)
     end
   end
 
