@@ -69,7 +69,8 @@ defmodule CanvasAPI.Mixfile do
      {:mix_test_watch, "~> 0.2", only: [:dev]},
      {:ex_machina, "~> 1.0", only: [:test]},
      {:mock, "~> 0.2.0", only: [:test]},
-     {:ex_unit_notifier, "~> 0.1", only: [:test]}]
+     {:ex_unit_notifier, "~> 0.1", only: [:test]},
+     {:spout, "~> 1.0.0", only: [:test]}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
