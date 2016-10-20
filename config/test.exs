@@ -10,8 +10,16 @@ config :canvas_api, CanvasAPI.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
-config :canvas_api, CanvasAPI.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  database: "canvas_pro_api_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+if System.get_env("HEROKU_TEST_RUN_ID") do # Heroku CI
+  config :canvas_api, CanvasAPI.Repo,
+    adapter: Ecto.Adapters.Postgres,
+    url: {:system, "DATABASE_URL"},
+    loggers: [Appsignal.Ecto],
+    ssl: true
+else
+  config :canvas_api, CanvasAPI.Repo,
+    adapter: Ecto.Adapters.Postgres,
+    database: "canvas_pro_api_test",
+    hostname: "localhost",
+    pool: Ecto.Adapters.SQL.Sandbox
+end
