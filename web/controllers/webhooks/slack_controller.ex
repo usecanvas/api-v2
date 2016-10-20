@@ -7,8 +7,7 @@ defmodule CanvasAPI.Webhooks.SlackController do
 
   def handle(conn, %{
     "type" => "url_verification",
-    "challenge" => challenge,
-    "token" => @token}) do
+    "challenge" => challenge}) do
     render(conn, "verify.json", challenge: challenge)
   end
 
