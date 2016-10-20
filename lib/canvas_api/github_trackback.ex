@@ -52,7 +52,7 @@ defmodule CanvasAPI.GitHubTrackback do
       %{
         provider_name: @provider_name,
         provider_url: @provider_url,
-        type: "mentioned",
+        type: "reference_added",
         url: object["html_url"],
         referencer: referencer},
       canvas: canvas)
