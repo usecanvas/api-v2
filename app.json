@@ -3,8 +3,13 @@
     "heroku-postgresql",
     "heroku-redis"
   ],
-  "test": "mix test && mix credo --strict",
+  "scripts": {
+    "test-setup": "bin/addon-wait",
+    "test": "mix test"
+  },
   "buildpacks":[{
+    "url": "https://github.com/heroku/heroku-buildpack-addon-wait.git"
+  }, {
     "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
   }],
   "env": {
@@ -27,6 +32,10 @@
     },
     "EMBEDLY_API_KEY": {
       "description": "API key for Embedly",
+      "required": false
+    },
+    "CHECK_ORIGIN": {
+      "description": "Whether to check request origin",
       "required": false
     },
     "GITHUB_CLIENT_ID": {

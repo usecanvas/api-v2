@@ -29,8 +29,8 @@ defmodule CanvasAPI.GitHubOAuthMediatorTest do
         "https://github.com/login/oauth/access_token",
         "",
         [{"accept", "application/json"}],
-        params: [{"client_id", nil},
-                 {"client_secret", nil},
+        params: [{"client_id", System.get_env("GITHUB_CLIENT_ID")},
+                 {"client_secret", System.get_env("GITHUB_CLIENT_SECRET")},
                  {"code", "code"}]
       )
     end
