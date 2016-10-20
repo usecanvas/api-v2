@@ -4,7 +4,7 @@
     "heroku-redis"
   ],
   "scripts": {
-    "test": "mix ci"
+    "test": "mix test"
   },
   "test": "mix test && mix credo --strict",
   "buildpacks":[{
