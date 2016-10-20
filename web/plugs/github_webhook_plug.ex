@@ -29,8 +29,7 @@ defmodule CanvasAPI.GitHubWebhookPlug do
          ^signature <- hmac do
       conn = Plug.Conn.fetch_query_params(conn)
       params = Map.merge(conn.query_params, Poison.decode!(body))
-      # CanvasAPI.GitHubTrackback.delay_add(params, params["team.id"])
-      CanvasAPI.GitHubTrackback.add(params, params["team.id"])
+      CanvasAPI.GitHubTrackback.delay_add(params, params["team.id"])
       conn |> send_resp(:ok, "") |> halt
     else
       _ ->
