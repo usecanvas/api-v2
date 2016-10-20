@@ -34,6 +34,10 @@
       "description": "API key for Embedly",
       "required": false
     },
+    "CHECK_ORIGIN": {
+      "description": "Whether to check request origin",
+      "required": false
+    },
     "GITHUB_CLIENT_ID": {
       "description": "Client ID for a GitHub OAuth application"
     },

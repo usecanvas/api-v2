@@ -7,15 +7,20 @@ defmodule CanvasAPI.OriginCheckPlug do
   import Plug.Conn
 
   @behaviour Plug
+  @do_check System.get_env("CHECK_ORIGIN") == "true"
 
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    do_call(
-      conn,
-      [System.get_env("WEB_URL")] |> get_host,
-      conn |> get_req_header("origin") |> get_host,
-      conn |> get_req_header("referer") |> get_host)
+    if @do_check do
+      do_call(
+        conn,
+        [System.get_env("WEB_URL")] |> get_host,
+        conn |> get_req_header("origin") |> get_host,
+        conn |> get_req_header("referer") |> get_host)
+    else
+      conn
+    end
   end
 
   defp do_call(conn, origin, origin, origin), do: conn
