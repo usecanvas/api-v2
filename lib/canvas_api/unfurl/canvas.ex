@@ -42,9 +42,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
     uri = URI.parse(url)
     with id = extract_canvas_id(uri.path),
          canvas = %Canvas{} <- find_canvas(id),
-         filter = URI.decode_query(uri.query || "") |> Map.get("filter"),
+         query = URI.decode_query(uri.query || ""),
+         filter = Map.get(query, "filter"),
+         block_id = Map.get(query, "block"),
          blocks = canvas.blocks |> Enum.slice(1..-1) |> filter_blocks(filter),
-         unfurl = %Unfurl{} <- do_unfurl(blocks, uri) do
+         unfurl = %Unfurl{} <- do_unfurl(blocks, block_id: block_id) do
       unfurl
       |> Map.put(:id, url)
       |> Map.put(:provider_icon_url, @provider_icon_url)
@@ -75,9 +77,9 @@ defmodule CanvasAPI.Unfurl.Canvas do
     end
   end
 
-  @spec do_unfurl([%Block{}], URI.t) :: Unfurl.t |nil
-  defp do_unfurl(blocks, %URI{fragment: fragment}) when is_binary(fragment) do
-    with block = %Block{} <- find_block_by_id(blocks, fragment) do
+  @spec do_unfurl([%Block{}], Keyword.t) :: Unfurl.t |nil
+  defp do_unfurl(blocks, block_id: block_id) when is_binary(block_id) do
+    with block = %Block{} <- find_block_by_id(blocks, block_id) do
       do_fragment_unfurl(block, blocks)
     end
   end
