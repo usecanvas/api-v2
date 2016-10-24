@@ -3,7 +3,7 @@ defmodule CanvasAPI.SignInMediator do
   Handle a Slack sign in, creating teams, accounts, and users as needed.
   """
 
-  alias CanvasAPI.{Account, Repo, Team, User}
+  alias CanvasAPI.{Account, Repo, Team, User, UserService}
   alias CanvasAPI.WhitelistedSlackDomain, as: SlackDomain
   import Ecto.Query
 
@@ -31,7 +31,8 @@ defmodule CanvasAPI.SignInMediator do
     Repo.transaction(fn ->
       with {:ok, team} <- find_or_insert_team(team_info),
            {:ok, account} <- find_or_insert_account(account, user_info),
-           {:ok, _} <- find_or_insert_user(account, team, user_info, token) do
+           {:ok, _} <- find_or_insert_user(account, team, user_info, token),
+           {:ok, _} <- find_or_insert_personal_team(account) do
         account
       else
         {:error, error} -> Repo.rollback(error)
@@ -63,6 +64,30 @@ defmodule CanvasAPI.SignInMediator do
       Repo.insert(changeset)
     else
       user = %User{} -> {:ok, user.account}
+    end
+  end
+
+  # Find or insert an account's personal team.
+  @spec find_or_insert_personal_team(Account.t) :: {:ok, Team.t} | {:error, any}
+  defp find_or_insert_personal_team(account) do
+    find_team =
+      from(t in Ecto.assoc(account, :teams),
+           where: is_nil(t.slack_id))
+      |> Repo.one
+    team_params = %{domain: "~#{account.id}", name: account.id}
+    user_params =
+      %{email: "account-#{account.id}@usecanvas.com",
+        name: "account-#{account.id}"}
+
+    with nil <- find_team,
+         changeset = Team.changeset(%Team{}, team_params),
+         {:ok, team} <- Repo.insert(changeset),
+         {:ok, _}
+           <- UserService.insert(user_params, account: account, team: team) do
+      {:ok, team}
+    else
+      team = %Team{} -> {:ok, team}
+      error -> error
     end
   end
 
@@ -110,12 +135,8 @@ defmodule CanvasAPI.SignInMediator do
       |> Map.put("slack_id", user_info["id"])
       |> Map.put("identity_token", token)
 
-    with nil <- Repo.one(find_user),
-         changeset = %User{}
-                     |> User.changeset(user_params)
-                     |> Ecto.Changeset.put_assoc(:account, account)
-                     |> Ecto.Changeset.put_assoc(:team, team) do
-      Repo.insert(changeset)
+    with nil <- Repo.one(find_user) do
+      UserService.insert(user_params, account: account, team: team)
     else
       user = %User{} -> {:ok, user}
     end
