@@ -25,16 +25,20 @@ defmodule CanvasAPI.SignInMediatorTest do
     :ok
   end
 
-  test "creates a new account, team, and user" do
+  test "creates a new account, personal team, team, and user" do
     with_mock Slack.OAuth, [access: mock_access] do
       account =
         Mediator.sign_in("ABCDEFG", account: nil)
         |> elem(1)
         |> Repo.preload([:teams, :users])
 
-      [team] = account.teams
-      [user] = account.users |> Repo.preload([:team])
+      [team, personal_team] = account.teams
+      [user, personal_user] = Repo.preload(account.users, [:team])
 
+      assert personal_team.name == account.id
+      assert personal_team.domain == "~#{account.id}"
+      assert personal_user.email == "account-#{account.id}@usecanvas.com"
+      assert personal_user.name == "account-#{account.id}"
       assert team.name == "Test Team"
       assert user.identity_token == "access_token"
       assert user.team == team
