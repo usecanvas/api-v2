@@ -1,62 +1,81 @@
 defmodule CanvasAPI.TeamView do
   use CanvasAPI.Web, :view
 
+  alias CanvasAPI.UserView
+
   def render("index.json", %{teams: teams}) do
     %{
-      data: render_many(teams, CanvasAPI.TeamView, "team.json"),
-      included: Enum.map(teams, fn team ->
-        user = Enum.at(team.users, 0)
-        render_one(Map.put(user, :team, team), CanvasAPI.UserView, "user.json")
-      end)
+      data: render_many(teams, __MODULE__, "team.json"),
+      included: Enum.map(teams, &include_account_user/1) |> Enum.filter(& &1)
     }
   end
 
   def render("show.json", %{team: team}) do
-    user = Enum.at(team.users, 0)
-
     %{
       data: render_one(team, __MODULE__, "team.json"),
-      included: [
-        render_one(Map.put(user, :team, team), CanvasAPI.UserView, "user.json")
-      ]
+      included: [include_account_user(team)] |> Enum.filter(& &1)
     }
   end
 
   def render("team.json", %{team: team}) do
-    user = Enum.at(team.users, 0)
+    user = Map.get(team, :account_user)
 
     %{
       id: team.id,
       attributes: %{
         domain: team.domain,
         has_slack_token: Enum.any?(team.oauth_tokens),
-        images: team.images,
-        name: team.name,
-        slack_id: team.slack_id,
+        images: images(team, user),
+        name: name(team, user),
+        slack_id: slack_id(team, user),
         inserted_at: team.inserted_at,
         updated_at: team.updated_at
       },
-      relationships: %{
-        canvases: %{
-          links: %{
-            related: team_canvas_path(CanvasAPI.Endpoint, :index, team.id)
-          }
-        },
-        channels: %{
-          links: %{
-            related: team_channel_path(CanvasAPI.Endpoint, :index, team.id)
-          }
-        },
-        user: %{
-          data: %{
-            id: user.id, type: "user"
-          },
-          links: %{
-            related: team_user_path(CanvasAPI.Endpoint, :show, team.id)
-          }
-        }
-      },
+      relationships: relationships(team, user),
       type: "team"
     }
+  end
+
+  defp relationships(team, user) do
+    %{
+      canvases: %{
+        links: %{
+          related: team_canvas_path(CanvasAPI.Endpoint, :index, team.id)
+        }
+      },
+      channels: %{
+        links: %{
+          related: team_channel_path(CanvasAPI.Endpoint, :index, team.id)
+        }
+      }
+    }
+    |> Map.put_new_lazy(:user, fn ->
+         if user do
+            %{
+              data: %{
+                id: user.id, type: "user"
+              },
+              links: %{
+                related: team_user_path(CanvasAPI.Endpoint, :show, team.id)
+              }
+            }
+         else
+           nil
+         end
+       end)
+  end
+
+  defp images(_, nil), do: []
+  defp images(team, _), do: team.images
+
+  defp name(_, nil), do: nil
+  defp name(team, _), do: team.name
+
+  defp slack_id(_, nil), do: nil
+  defp slack_id(team, _), do: team.slack_id
+
+  defp include_account_user(%{account_user: nil}), do: nil
+  defp include_account_user(team = %{account_user: user}) do
+    render_one(Map.put(user, :team, team), UserView, "user.json")
   end
 end

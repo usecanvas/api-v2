@@ -1,29 +1,23 @@
 defmodule CanvasAPI.TeamController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.Team
+  alias CanvasAPI.{Team, TeamService}
 
   plug CanvasAPI.CurrentAccountPlug
 
   def index(conn, params, current_account) do
     teams =
-      from(assoc(current_account, :teams),
-           order_by: [:name],
-           preload: [{:users, ^assoc(current_account, :users)}, :oauth_tokens])
-      |> filter(params["filter"])
-      |> Repo.all
-
+      TeamService.list(current_account, filter: params["filter"])
+      |> Enum.map(& TeamService.add_account_user(&1, current_account))
     render(conn, "index.json", teams: teams)
   end
 
   def show(conn, %{"id" => id}, current_account) do
-    assoc(current_account, :teams)
-    |> preload([{:users, ^assoc(current_account, :users)}, :oauth_tokens])
-    |> Repo.get(id)
-    |> case do
-      team = %Team{} ->
-        render(conn, "show.json", team: team)
-      _ ->
+    with team = %Team{} <- TeamService.show(id),
+         team = TeamService.add_account_user(team, current_account) do
+      render(conn, "show.json", team: team)
+    else
+      nil ->
         not_found(conn)
     end
   end
@@ -33,7 +27,4 @@ defmodule CanvasAPI.TeamController do
                                           conn.params,
                                           conn.private.current_account])
   end
-
-  defp filter(query, %{"domain" => domain}), do: where(query, [domain: ^domain])
-  defp filter(query, _), do: query
 end
