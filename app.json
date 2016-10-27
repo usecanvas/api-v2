@@ -54,7 +54,7 @@
     },
     "INTERCOM_SECURE_SECRET": {
       "description": "The secret key for Canvas Pro on Intercom for secure mode",
-      "development_required": false
+      "required": false
     },
     "REDIRECT_ON_AUTH_URL": {
       "description": "The URL to redirect to on successful auth",
