@@ -52,6 +52,10 @@
       "description": "Hostname for this app",
       "development_required": false
     },
+    "INTERCOM_SECURE_SECRET": {
+      "description": "The secret key for Canvas Pro on Intercom for secure mode",
+      "required": false
+    },
     "REDIRECT_ON_AUTH_URL": {
       "description": "The URL to redirect to on successful auth",
       "development_value": "http://localhost:4200/post-auth"
