@@ -12,6 +12,7 @@ defmodule CanvasAPI.Canvas do
 
   schema "canvases" do
     field :is_template, :boolean, default: false
+    field :link_access, :string, default: "none"
     field :native_version, :string, default: "1.0.0"
     field :type, :string, default: "http://sharejs.org/types/JSONv0"
     field :version, :integer, default: 0
@@ -33,8 +34,9 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:is_template, :slack_channel_ids])
+    |> cast(params, [:is_template, :link_access, :slack_channel_ids])
     |> cast_embed(:blocks)
+    |> validate_inclusion(:link_access, ~w(none read edit))
     |> put_change(:edited_at, DateTime.utc_now)
     |> put_title_block
   end
@@ -44,7 +46,8 @@ defmodule CanvasAPI.Canvas do
   """
   def update_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:slack_channel_ids])
+    |> cast(params, [:link_access, :slack_channel_ids])
+    |> validate_inclusion(:link_access, ~w(none read edit))
   end
 
   @doc """

@@ -12,7 +12,7 @@ defmodule CanvasAPI.CanvasServiceTest do
   describe ".create" do
     test "creates a canvas with the given creator and team", %{user: user} do
       {:ok, canvas} =
-        %{"slack_channel_ids" => ["abcdef"]}
+        %{"slack_channel_ids" => ["abcdef"], "link_access" => "edit"}
         |> CanvasService.create(
           creator: user,
           team: user.team)

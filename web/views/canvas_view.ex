@@ -27,6 +27,7 @@ defmodule CanvasAPI.CanvasView do
       id: canvas.id,
       blocks: canvas.blocks,
       is_template: canvas.is_template,
+      link_access: canvas.link_access,
       native_version: canvas.native_version,
       slack_channel_ids: canvas.slack_channel_ids,
       type: canvas.type,
