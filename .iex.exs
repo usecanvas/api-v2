@@ -1,4 +1,5 @@
-import Ecto.Query, only: [from: 2]
+import Ecto
+import Ecto.Query
 
 alias CanvasAPI.Repo
 
