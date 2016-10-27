@@ -16,7 +16,8 @@ defmodule CanvasAPI.CurrentAccountPlug do
   def call(conn, opts) do
     with account_id when not is_nil(account_id) <-
            get_session(conn, :account_id),
-         account = %Account{} <- Repo.get(Account, account_id) do
+         account = %Account{}
+          <- Repo.get(Account, account_id) |> Repo.preload([:teams]) do
       put_private(conn, :current_account, account)
     else
       _ ->

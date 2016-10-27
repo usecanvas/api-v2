@@ -1,9 +1,10 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.CanvasService
+  alias CanvasAPI.{Canvas, CanvasService}
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
+  plug CanvasAPI.CurrentAccountPlug, [permit_none: true] when action in [:show]
   plug :ensure_team when not action in [:show]
   plug :ensure_user when not action in [:show]
   plug :ensure_canvas when action in [:update]
@@ -36,8 +37,10 @@ defmodule CanvasAPI.CanvasController do
   end
 
   def show(conn, params = %{"id" => id, "team_id" => team_id}) do
-    case CanvasService.show(id, team_id: team_id) do
-      canvas when canvas != nil ->
+    case CanvasService.show(id,
+                            account: conn.private.current_account,
+                            team_id: team_id) do
+      canvas = %Canvas{} ->
         render_show(conn, canvas, params["trailing_format"])
       nil ->
         not_found(conn)
@@ -57,7 +60,9 @@ defmodule CanvasAPI.CanvasController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id}) do
-    case CanvasService.delete(id, team_id: team_id) do
+    case CanvasService.delete(id,
+                              account: conn.private.current_account,
+                              team_id: team_id) do
       {:ok, _} ->
         send_resp(conn, :no_content, "")
       {:error, changeset} ->
@@ -68,7 +73,9 @@ defmodule CanvasAPI.CanvasController do
   end
 
   defp ensure_canvas(conn, _opts) do
-    CanvasService.show(conn.params["id"], team_id: conn.params["team_id"])
+    CanvasService.show(conn.params["id"],
+                       account: conn.private.current_account,
+                       team_id: conn.params["team_id"])
     |> case do
       canvas when canvas != nil -> put_private(conn, :canvas, canvas)
       nil -> not_found(conn, halt: true)

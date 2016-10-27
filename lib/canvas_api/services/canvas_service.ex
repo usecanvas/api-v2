@@ -4,7 +4,7 @@ defmodule CanvasAPI.CanvasService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.{Canvas, SlackChannelNotifier, Team, User}
+  alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
   import CanvasAPI.UUIDMatch
 
   @preload [:team, creator: [:team]]
@@ -86,20 +86,36 @@ defmodule CanvasAPI.CanvasService do
   @doc """
   Show a canvas.
 
+  The user must pass in an account and a team identity, which is either an ID
+  or a domain.
+
+  Options:
+
+  - `account`: `%Account{}` (**required**) The account requesting the canvas
+  - `team_id`: `String.t` (**required**) The team identity the canvas is in
+
   ## Examples
 
   ```elixir
   CanvasService.show(
-    "6ijSghOIflAjKVki5j0dpL", team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+    "6ijSghOIflAjKVki5j0dpL",
+    account: conn.private.current_account,
+    team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
   ```
   """
   @spec show(String.t, Keyword.t) :: %Canvas{} | nil
-  def show(id, team_id: team_id = match_uuid()) do
+  def show(id, opts) do
+    do_show(id, opts[:team_id])
+    |> verify_can_view(opts[:account])
+  end
+
+  @spec do_show(String.t, String.t) :: %Canvas{} | nil
+  defp do_show(id, team_id = match_uuid()) do
     from(Canvas, where: [team_id: ^team_id], preload: ^@preload)
     |> Repo.get(id)
   end
 
-  def show(id, team_id: domain) do
+  defp do_show(id, domain) do
     from(c in Canvas,
          join: t in Team, on: c.team_id == t.id,
          where: t.domain == ^domain,
@@ -147,8 +163,8 @@ defmodule CanvasAPI.CanvasService do
   ```
   """
   @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}} | nil | {:error, Ecto.Changeset.t}
-  def delete(id, team_id: team_id) do
-    case show(id, team_id: team_id) do
+  def delete(id, account: account, team_id: team_id) do
+    case show(id, account: account, team_id: team_id) do
       canvas = %Canvas{} -> Repo.delete(canvas)
       nil -> nil
     end
@@ -182,5 +198,22 @@ defmodule CanvasAPI.CanvasService do
     |> Enum.each(
       &SlackChannelNotifier.delay_notify_new(
         token, canvas.id, notifier.id, &1, opts))
+  end
+
+  @spec verify_can_view(%Canvas{} | nil, %Account{}) :: %Canvas{} | nil
+  defp verify_can_view(nil, _), do: nil
+
+  defp verify_can_view(canvas, account) do
+    case canvas.link_access do
+      "none" ->
+        case account do
+          nil -> nil
+          account ->
+            account = Repo.preload(account, [:teams])
+            if canvas.team in account.teams, do: canvas, else: nil
+        end
+      _ ->
+        canvas
+    end
   end
 end
