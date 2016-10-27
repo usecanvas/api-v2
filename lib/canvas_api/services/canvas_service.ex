@@ -84,7 +84,33 @@ defmodule CanvasAPI.CanvasService do
   end
 
   @doc """
-  Show a canvas.
+  Get a canvas that is in an account's teams.
+
+  The user must pass in an account and team ID.
+
+  Options:
+
+  - `account`: `%Account{}` (**required**) The account requesting the canvas
+  - `team_id`: `String.t` (**required**) The team ID the canvas is in
+
+  ## Examples
+
+  ```elixir
+  CanvasService.get(
+    "6ijSghOIflAjKVki5j0dpL",
+    account: conn.private.current_account,
+    team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+  ```
+  """
+  @spec get(String.t, Keyword.t) :: %Canvas{} | nil
+  def get(id, account: account, team_id: team_id) do
+    from(assoc(account, :canvases),
+         where: [team_id: ^team_id])
+    |> Repo.get(id)
+  end
+
+  @doc """
+  Show a canvas, verifying that the account has view access.
 
   The user must pass in an account and a team identity, which is either an ID
   or a domain.
@@ -106,7 +132,7 @@ defmodule CanvasAPI.CanvasService do
   @spec show(String.t, Keyword.t) :: %Canvas{} | nil
   def show(id, opts) do
     do_show(id, opts[:team_id])
-    |> verify_can_view(opts[:account])
+    |> verify_can_show(opts[:account])
   end
 
   @spec do_show(String.t, String.t) :: %Canvas{} | nil
@@ -132,7 +158,8 @@ defmodule CanvasAPI.CanvasService do
   CanvasService.update(canvas, %{"is_template" => false})
   ```
   """
-  @spec update(%Canvas{}, map, Keyword.t) :: {:ok, %Canvas{}} | {:error, Ecto.Changeset.t}
+  @spec update(%Canvas{}, map, Keyword.t) :: {:ok, %Canvas{}}
+                                           | {:error, Ecto.Changeset.t}
   def update(canvas, params, opts \\ []) do
     old_channel_ids = canvas.slack_channel_ids
 
@@ -162,19 +189,24 @@ defmodule CanvasAPI.CanvasService do
     "6ijSghOIflAjKVki5j0dpL", team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
   ```
   """
-  @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}} | nil | {:error, Ecto.Changeset.t}
+  @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}}
+                                     | {:error, Ecto.Changeset.t}
+                                     | nil
   def delete(id, account: account, team_id: team_id) do
-    case show(id, account: account, team_id: team_id) do
+    get(id, account: account, team_id: team_id)
+    |> case do
       canvas = %Canvas{} -> Repo.delete(canvas)
       nil -> nil
     end
   end
 
+  @spec merge_global_templates([%Canvas{}]) :: [%Canvas{}]
   defp merge_global_templates(team_templates) do
     do_merge_global_templates(
       team_templates, System.get_env("TEMPLATE_USER_ID"))
   end
 
+  @spec do_merge_global_templates([%Canvas{}], String.t | nil) :: [%Canvas{}]
   defp do_merge_global_templates(templates, nil), do: templates
   defp do_merge_global_templates(templates, ""), do: templates
   defp do_merge_global_templates(templates, id) do
@@ -200,10 +232,10 @@ defmodule CanvasAPI.CanvasService do
         token, canvas.id, notifier.id, &1, opts))
   end
 
-  @spec verify_can_view(%Canvas{} | nil, %Account{}) :: %Canvas{} | nil
-  defp verify_can_view(nil, _), do: nil
+  @spec verify_can_show(%Canvas{} | nil, %Account{}) :: %Canvas{} | nil
+  defp verify_can_show(nil, _), do: nil
 
-  defp verify_can_view(canvas, account) do
+  defp verify_can_show(canvas, account) do
     case canvas.link_access do
       "none" ->
         case account do

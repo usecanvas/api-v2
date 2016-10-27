@@ -40,6 +40,7 @@ defmodule CanvasAPI.CanvasView do
     }
   end
 
+  @lint {Credo.Check.Refactor.ABCSize, false}
   def render("canvas.json", %{canvas: canvas}) do
     %{
       id: canvas.id,

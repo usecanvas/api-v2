@@ -159,21 +159,20 @@ defmodule CanvasAPI.CanvasServiceTest do
   describe ".delete" do
     test "deletes a canvas" do
       canvas = insert(:canvas)
+      account = canvas.creator.account
+
       {:ok, canvas} =
-        CanvasService.delete(canvas.id,
-                             account: canvas.creator.account,
-                             team_id: canvas.team_id)
+        CanvasService.delete(
+          canvas.id, account: account, team_id: canvas.team_id)
       assert Repo.get(Canvas, canvas.id) == nil
     end
 
     test "returns nil for a not found canvas" do
       canvas = insert(:canvas)
-      CanvasService.delete(canvas.id,
-                           account: canvas.creator.account,
-                           team_id: canvas.team_id)
-      assert CanvasService.delete(canvas.id,
-                                  account: canvas.creator.account,
-                                  team_id: canvas.team_id) == nil
+      account = canvas.creator.account
+      CanvasService.delete(canvas.id, account: account, team_id: canvas.team_id)
+      assert CanvasService.delete(
+        canvas.id, account: account, team_id: canvas.team_id) == nil
     end
   end
 end

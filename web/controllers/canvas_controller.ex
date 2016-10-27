@@ -60,9 +60,8 @@ defmodule CanvasAPI.CanvasController do
   end
 
   def delete(conn, %{"id" => id, "team_id" => team_id}) do
-    case CanvasService.delete(id,
-                              account: conn.private.current_account,
-                              team_id: team_id) do
+    account = conn.private.current_account
+    case CanvasService.delete(id, account: account, team_id: team_id) do
       {:ok, _} ->
         send_resp(conn, :no_content, "")
       {:error, changeset} ->
@@ -73,9 +72,9 @@ defmodule CanvasAPI.CanvasController do
   end
 
   defp ensure_canvas(conn, _opts) do
-    CanvasService.show(conn.params["id"],
-                       account: conn.private.current_account,
-                       team_id: conn.params["team_id"])
+    CanvasService.get(conn.params["id"],
+                      account: conn.private.current_account,
+                      team_id: conn.params["team_id"])
     |> case do
       canvas when canvas != nil -> put_private(conn, :canvas, canvas)
       nil -> not_found(conn, halt: true)
