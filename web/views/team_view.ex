@@ -25,6 +25,7 @@ defmodule CanvasAPI.TeamView do
       attributes: %{
         domain: team.domain,
         has_slack_token: Enum.any?(team.oauth_tokens),
+        is_in_team: user != nil,
         images: (if user, do: team.images, else: %{}),
         name: (if user, do: team.name, else: nil),
         slack_id: (if user, do: team.slack_id, else: nil),
