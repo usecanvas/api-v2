@@ -5,6 +5,7 @@ defmodule CanvasAPI.CanvasService do
 
   use CanvasAPI.Web, :service
   alias CanvasAPI.{Canvas, SlackChannelNotifier, Team, User}
+  import CanvasAPI.UUIDMatch
 
   @preload [:team, creator: [:team]]
 
@@ -93,8 +94,16 @@ defmodule CanvasAPI.CanvasService do
   ```
   """
   @spec show(String.t, Keyword.t) :: %Canvas{} | nil
-  def show(id, team_id: team_id) do
+  def show(id, team_id: team_id = match_uuid()) do
     from(Canvas, where: [team_id: ^team_id], preload: ^@preload)
+    |> Repo.get(id)
+  end
+
+  def show(id, team_id: domain) do
+    from(c in Canvas,
+         join: t in Team, on: c.team_id == t.id,
+         where: t.domain == ^domain,
+         preload: ^@preload)
     |> Repo.get(id)
   end
 

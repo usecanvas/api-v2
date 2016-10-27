@@ -103,9 +103,15 @@ defmodule CanvasAPI.CanvasServiceTest do
   end
 
   describe ".show" do
-    test "finds a canvas with an ID in a given team" do
+    test "finds a canvas with an ID in a given team by team ID" do
       canvas = insert(:canvas)
       assert CanvasService.show(canvas.id, team_id: canvas.team_id) ==
+        Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
+    end
+
+    test "finds a canvas with an ID in a given team by team domain" do
+      canvas = insert(:canvas)
+      assert CanvasService.show(canvas.id, team_id: canvas.team.domain) ==
         Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
     end
   end
