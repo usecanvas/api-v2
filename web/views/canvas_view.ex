@@ -40,12 +40,14 @@ defmodule CanvasAPI.CanvasView do
     }
   end
 
+  @lint {Credo.Check.Refactor.ABCSize, false}
   def render("canvas.json", %{canvas: canvas}) do
     %{
       id: canvas.id,
       attributes: %{
         blocks: canvas.blocks,
         is_template: canvas.is_template,
+        link_access: canvas.link_access,
         native_version: canvas.native_version,
         slack_channel_ids: canvas.slack_channel_ids,
         type: canvas.type,

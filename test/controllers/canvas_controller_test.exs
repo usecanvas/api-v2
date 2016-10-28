@@ -42,4 +42,18 @@ defmodule CanvasAPI.CanvasControllerTest do
       assert id == canvas.id
     end
   end
+
+  describe "GET :show" do
+    test "is found when account is in team", %{conn: conn} do
+      canvas = insert(:canvas, link_access: "none")
+      account = canvas.creator.account |> Repo.preload([:teams])
+
+      conn =
+        conn
+        |> put_private(:current_account, account)
+        |> get(team_canvas_path(conn, :show, canvas.team, canvas.id))
+
+      assert conn.status == 200
+    end
+  end
 end

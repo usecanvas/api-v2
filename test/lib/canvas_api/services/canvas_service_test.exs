@@ -105,13 +105,17 @@ defmodule CanvasAPI.CanvasServiceTest do
   describe ".show" do
     test "finds a canvas with an ID in a given team by team ID" do
       canvas = insert(:canvas)
-      assert CanvasService.show(canvas.id, team_id: canvas.team_id) ==
+      assert CanvasService.show(canvas.id,
+                                account: canvas.creator.account,
+                                team_id: canvas.team_id) ==
         Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
     end
 
     test "finds a canvas with an ID in a given team by team domain" do
       canvas = insert(:canvas)
-      assert CanvasService.show(canvas.id, team_id: canvas.team.domain) ==
+      assert CanvasService.show(canvas.id,
+                                account: canvas.creator.account,
+                                team_id: canvas.team.domain) ==
         Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
     end
   end
@@ -155,14 +159,20 @@ defmodule CanvasAPI.CanvasServiceTest do
   describe ".delete" do
     test "deletes a canvas" do
       canvas = insert(:canvas)
-      {:ok, canvas} = CanvasService.delete(canvas.id, team_id: canvas.team_id)
+      account = canvas.creator.account
+
+      {:ok, canvas} =
+        CanvasService.delete(
+          canvas.id, account: account, team_id: canvas.team_id)
       assert Repo.get(Canvas, canvas.id) == nil
     end
 
     test "returns nil for a not found canvas" do
       canvas = insert(:canvas)
-      CanvasService.delete(canvas.id, team_id: canvas.team_id)
-      assert CanvasService.delete(canvas.id, team_id: canvas.team_id) == nil
+      account = canvas.creator.account
+      CanvasService.delete(canvas.id, account: account, team_id: canvas.team_id)
+      assert CanvasService.delete(
+        canvas.id, account: account, team_id: canvas.team_id) == nil
     end
   end
 end
