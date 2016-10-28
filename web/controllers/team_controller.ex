@@ -3,7 +3,7 @@ defmodule CanvasAPI.TeamController do
 
   alias CanvasAPI.{Team, TeamService}
 
-  plug CanvasAPI.CurrentAccountPlug
+  plug CanvasAPI.CurrentAccountPlug when not action in [:show]
 
   def index(conn, params, current_account) do
     teams =
@@ -25,6 +25,6 @@ defmodule CanvasAPI.TeamController do
   def action(conn, _) do
     apply(__MODULE__, action_name(conn), [conn,
                                           conn.params,
-                                          conn.private.current_account])
+                                          conn.private[:current_account]])
   end
 end
