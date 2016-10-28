@@ -22,7 +22,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
     else
       _ ->
         if opts[:permit_none] do
-          conn
+          put_private(conn, :current_account, nil)
         else
           unauthorized(conn, halt: true)
         end
