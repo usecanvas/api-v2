@@ -4,6 +4,7 @@ defmodule CanvasAPI.TeamController do
   alias CanvasAPI.{Team, TeamService}
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
+  plug CanvasAPI.CurrentAccountPlug, [permit_none: true] when action in [:show]
 
   def index(conn, params, current_account) do
     teams =
