@@ -32,7 +32,8 @@ defmodule CanvasAPI.TeamService do
     |> Repo.one
   end
 
-  @spec add_account_user(%Team{}, %Account{}) :: %Team{}
+  @spec add_account_user(%Team{}, %Account{} | nil) :: %Team{}
+  def add_account_user(team, nil), do: team
   def add_account_user(team, account) do
     user =
       from(assoc(account, :users),
