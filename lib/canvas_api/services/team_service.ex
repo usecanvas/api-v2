@@ -33,7 +33,7 @@ defmodule CanvasAPI.TeamService do
   end
 
   @spec add_account_user(%Team{}, %Account{} | nil) :: %Team{}
-  def add_account_user(team, nil), do: team
+  def add_account_user(team, nil), do: Map.put(team, :account_user, nil)
   def add_account_user(team, account) do
     user =
       from(assoc(account, :users),
