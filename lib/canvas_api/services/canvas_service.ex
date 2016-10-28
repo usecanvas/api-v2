@@ -105,7 +105,8 @@ defmodule CanvasAPI.CanvasService do
   @spec get(String.t, Keyword.t) :: %Canvas{} | nil
   def get(id, account: account, team_id: team_id) do
     from(assoc(account, :canvases),
-         where: [team_id: ^team_id])
+         where: [team_id: ^team_id],
+         preload: ^@preload)
     |> Repo.get(id)
   end
 
