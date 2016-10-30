@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.14.1">
-    <title>CanvasAPI.OriginCheckPlug – Canvas API v0.0.1</title>
+    <title>CanvasAPI.UUIDMatch – Canvas API v0.0.1</title>
     <link rel="stylesheet" href="dist/app-23e810f3fe.css" />
     
     <script src="dist/sidebar_items.js"></script>
@@ -59,10 +59,10 @@
 
       <h1>
         <small class="visible-xs">Canvas API v0.0.1</small>
-        CanvasAPI.OriginCheckPlug
+        CanvasAPI.UUIDMatch
         
         
-          <a href="https://github.com/usecanvas/pro-api/blob/master/web/plugs/origin_check_plug.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/uuid_match.ex#L1" title="View Source" class="view-source" rel="help">
             <i class="icon-code"></i>
           </a>
         
@@ -70,7 +70,7 @@
 
       
         <section id="moduledoc">
-          <p>A plug for ensuring that the origin/referer headers are valid when present.</p>
+          <p>Provides a pattern match for v4 UUIDs.</p>
 
         </section>
       
@@ -86,33 +86,21 @@
           
 
           
-  <div class="summary-functions summary">
+
+          
+  <div class="summary-macros summary">
     <h2>
-      <a href="#functions">Functions</a>
+      <a href="#macros">Macros</a>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#call/2">call(conn, opts)</a>
+    <a href="#match_uuid/0">match_uuid()</a>
   </div>
-  
-    <div class="summary-synopsis"><p>Callback implementation for <code class="inline">c:Plug.call/2</code></p>
-</div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#init/1">init(opts)</a>
-  </div>
-  
-    <div class="summary-synopsis"><p>Callback implementation for <code class="inline">c:Plug.init/1</code></p>
-</div>
   
 </div>
 
   </div>
 
-
-          
 
           
 
@@ -122,21 +110,23 @@
       
 
       
-        <section id="functions" class="details-list">
+
+      
+        <section id="macros" class="details-list">
           <h1 class="section-heading">
-            <a class="hover-link" href="#functions">
+            <a class="hover-link" href="#macros">
               <i class="icon-link"></i>
             </a>
-            Functions
+            Macros
           </h1>
-          <div class="detail" id="call/2">
+          <div class="detail" id="match_uuid/0">
   <div class="detail-header">
-    <a href="#call/2" class="detail-link" title="Link to this function">
+    <a href="#match_uuid/0" class="detail-link" title="Link to this macro">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">call(conn, opts)</span>
+    <span class="signature">match_uuid()</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/web/plugs/origin_check_plug.ex#L14" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/uuid_match.ex#L6" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -144,33 +134,11 @@
     
   </div>
   <section class="docstring">
-    <p>Callback implementation for <code class="inline">c:Plug.call/2</code>.</p>
-
-  </section>
-</div>
-<div class="detail" id="init/1">
-  <div class="detail-header">
-    <a href="#init/1" class="detail-link" title="Link to this function">
-      <i class="icon-link"></i>
-    </a>
-    <span class="signature">init(opts)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/web/plugs/origin_check_plug.ex#L12" class="view-source" rel="help" title="View Source">
-       <i class="icon-code"></i>
-     </a>
-    
-    
-    
-  </div>
-  <section class="docstring">
-    <p>Callback implementation for <code class="inline">c:Plug.init/1</code>.</p>
-
   </section>
 </div>
 
         </section>
-      
-
       
 
       

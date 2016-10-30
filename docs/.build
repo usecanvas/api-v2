@@ -58,9 +58,11 @@ CanvasAPI.SlackTrackback.html
 CanvasAPI.Team.html
 CanvasAPI.TeamController.html
 CanvasAPI.TeamPlug.html
+CanvasAPI.TeamService.html
 CanvasAPI.TeamView.html
 CanvasAPI.Trackback.html
 CanvasAPI.TrailingFormatPlug.html
+CanvasAPI.UUIDMatch.html
 CanvasAPI.Unfurl.html
 CanvasAPI.Unfurl.Canvas.html
 CanvasAPI.Unfurl.Embedly.html

@@ -110,6 +110,15 @@
 </div>
 <div class="summary-row">
   <div class="summary-signature">
+    <a href="#get/2">get(id, list)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Get a canvas that is in an account’s teams</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
     <a href="#list/1">list(list)</a>
   </div>
   
@@ -119,10 +128,10 @@
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#show/2">show(id, list)</a>
+    <a href="#show/2">show(id, opts)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Show a canvas</p>
+    <div class="summary-synopsis"><p>Show a canvas, verifying that the account has view access</p>
 </div>
   
 </div>
@@ -163,7 +172,7 @@
     </a>
     <span class="signature">create(params, opts)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L35" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L36" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -172,7 +181,7 @@
       <div class="specs">
         
           <pre>create(map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   {:error, Ecto.Changeset.t}</pre>
         
       </div>
@@ -212,7 +221,7 @@ template.</p>
     </a>
     <span class="signature">delete(id, list)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L141" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L196" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -221,9 +230,9 @@ template.</p>
       <div class="specs">
         
           <pre>delete(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
-  nil |
-  {:error, Ecto.Changeset.t}</pre>
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:error, Ecto.Changeset.t} |
+  nil</pre>
         
       </div>
     
@@ -242,6 +251,50 @@ template.</p>
 
   </section>
 </div>
+<div class="detail" id="get/2">
+  <div class="detail-header">
+    <a href="#get/2" class="detail-link" title="Link to this function">
+      <i class="icon-link"></i>
+    </a>
+    <span class="signature">get(id, list)</span>
+    
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L106" class="view-source" rel="help" title="View Source">
+       <i class="icon-code"></i>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>get(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
+  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
+  nil</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Get a canvas that is in an account’s teams.</p>
+<p>The user must pass in an account and team ID.</p>
+<p>Options:</p>
+<ul>
+<li><code class="inline">account</code>: <code class="inline">%Account{}</code> (<strong>required</strong>) The account requesting the canvas
+</li>
+<li><code class="inline">team_id</code>: <code class="inline">String.t</code> (<strong>required</strong>) The team ID the canvas is in
+</li>
+</ul>
+<h2 id="get/2-examples" class="section-heading">
+  <a href="#get/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
+<pre><code class="elixir">CanvasService.get(
+  &quot;6ijSghOIflAjKVki5j0dpL&quot;,
+  account: conn.private.current_account,
+  team_id: &quot;87ee9199-e2fa-49e6-9d99-16988af57fd5&quot;)</code></pre>
+
+  </section>
+</div>
 <div class="detail" id="list/1">
   <div class="detail-header">
     <a href="#list/1" class="detail-link" title="Link to this function">
@@ -249,7 +302,7 @@ template.</p>
     </a>
     <span class="signature">list(list)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L68" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L69" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -258,7 +311,7 @@ template.</p>
       <div class="specs">
         
           <pre>list(<a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  [%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}] |
+  [%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}] |
   []</pre>
         
       </div>
@@ -288,9 +341,9 @@ template.</p>
     <a href="#show/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">show(id, list)</span>
+    <span class="signature">show(id, opts)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L96" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L134" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -299,21 +352,32 @@ template.</p>
       <div class="specs">
         
           <pre>show(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
+  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
   nil</pre>
         
       </div>
     
   </div>
   <section class="docstring">
-    <p>Show a canvas.</p>
+    <p>Show a canvas, verifying that the account has view access.</p>
+<p>The user must pass in an account and a team identity, which is either an ID
+or a domain.</p>
+<p>Options:</p>
+<ul>
+<li><code class="inline">account</code>: <code class="inline">%Account{}</code> (<strong>required</strong>) The account requesting the canvas
+</li>
+<li><code class="inline">team_id</code>: <code class="inline">String.t</code> (<strong>required</strong>) The team identity the canvas is in
+</li>
+</ul>
 <h2 id="show/2-examples" class="section-heading">
   <a href="#show/2-examples" class="hover-link"><i class="icon-link"></i></a>
   Examples
 </h2>
 
 <pre><code class="elixir">CanvasService.show(
-  &quot;6ijSghOIflAjKVki5j0dpL&quot;, team_id: &quot;87ee9199-e2fa-49e6-9d99-16988af57fd5&quot;)</code></pre>
+  &quot;6ijSghOIflAjKVki5j0dpL&quot;,
+  account: conn.private.current_account,
+  team_id: &quot;87ee9199-e2fa-49e6-9d99-16988af57fd5&quot;)</code></pre>
 
   </section>
 </div>
@@ -324,7 +388,7 @@ template.</p>
     </a>
     <span class="signature">update(canvas, params, opts \\ [])</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L111" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L164" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -332,8 +396,8 @@ template.</p>
     
       <div class="specs">
         
-          <pre>update(%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}, map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+          <pre>update(%CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}, map, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   {:error, Ecto.Changeset.t}</pre>
         
       </div>
