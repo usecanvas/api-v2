@@ -24,7 +24,7 @@ defmodule CanvasAPI.OriginCheckPlug do
   end
 
   defp do_call(conn, origin, origin, origin), do: conn
-  defp do_call(conn, origin, nil, nil), do: conn
+  defp do_call(conn, _origin, nil, nil), do: conn
   defp do_call(conn, origin, nil, origin), do: conn
   defp do_call(conn, _, _, _) do
     bad_request(conn, halt: true)
