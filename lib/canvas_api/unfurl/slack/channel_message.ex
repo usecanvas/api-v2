@@ -14,6 +14,10 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
 
   def match, do: @match
 
+  @doc """
+  Unfurl a Slack channel message URL.
+  """
+  @spec unfurl(url::String.t, options::Keyword.t) :: Unfurl.t | nil
   def unfurl(url, account: account) do
     with %{channel: channel, domain: domain, timestamp: timestamp}
            <- parse_url(url),
