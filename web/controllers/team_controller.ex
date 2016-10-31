@@ -18,7 +18,7 @@ defmodule CanvasAPI.TeamController do
          team = TeamService.add_account_user(team, current_account) do
       render(conn, "show.json", team: team)
     else
-      nil ->
+      {:error, :not_found} ->
         not_found(conn)
     end
   end
