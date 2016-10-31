@@ -10,6 +10,11 @@ defmodule CanvasAPI.AddToSlackMediator do
   alias CanvasAPI.{OAuthToken, Repo, Team}
   import Ecto.Query
 
+  @doc """
+  Complete the "Add to Slack" flow by persisting OAuth token and bot info to
+  a Slack team.
+  """
+  @spec add(String.t) :: {:ok, %OAuthToken{}} | {:error, any}
   def add(code) do
     with {:ok, %{"access_token" => token, "bot" => bot, "team_id" => team_id}}
       <- exchange_code(code) do
