@@ -18,7 +18,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   \\z
   """, "x")
 
-  alias CanvasAPI.{Block, Canvas, Repo, Unfurl}
+  alias CanvasAPI.{Block, Canvas, CanvasService, Unfurl}
   alias Unfurl.Field
 
   @doc """
@@ -38,10 +38,11 @@ defmodule CanvasAPI.Unfurl.Canvas do
   whose ID matches the fragment (will return `nil` if no such block exists).
   """
   @spec unfurl(String.t, Keyword.t) :: Unfurl.t | nil
-  def unfurl(url, _opts \\ []) do
+  def unfurl(url, account: account) do
     uri = URI.parse(url)
-    with id = extract_canvas_id(uri.path),
-         canvas = %Canvas{} <- find_canvas(id),
+    with {team_id, id} = extract_canvas_info(uri.path),
+         canvas = %Canvas{} <-
+           CanvasService.show(id, account: account, team_id: team_id),
          query = URI.decode_query(uri.query || ""),
          filter = Map.get(query, "filter"),
          block_id = Map.get(query, "block"),
@@ -129,9 +130,12 @@ defmodule CanvasAPI.Unfurl.Canvas do
     end)
   end
 
-  @spec extract_canvas_id(String.t) :: String.t
-  defp extract_canvas_id(path) do
-    path |> String.split("/") |> List.last
+  @spec extract_canvas_info(String.t) :: {String.t, String.t}
+  defp extract_canvas_info(path) do
+    path
+    |> String.split("/")
+    |> Enum.slice(-2..-1)
+    |> List.to_tuple
   end
 
   @spec filter_blocks([%Block{}], String.t | nil, [%Block{}]) :: [%Block{}]
@@ -162,11 +166,6 @@ defmodule CanvasAPI.Unfurl.Canvas do
       block = %Block{type: "list"} -> find_block_by_id(block.blocks, id)
       _ -> nil
     end)
-  end
-
-  @spec find_canvas(String.t) :: %Canvas{} | nil
-  defp find_canvas(id) do
-    Repo.get(Canvas, id) |> Repo.preload([:team])
   end
 
   @spec get_fragment_blocks(%Block{}, [%Block{}]) :: [%Block{}]

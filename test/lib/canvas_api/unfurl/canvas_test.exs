@@ -13,7 +13,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
       build(:block, content: "Foo"),
       build(:block, content: "Bar")])
     url = Canvas.web_url(canvas) <> "?filter=bar"
-    unfurl = UnfurlCanvas.unfurl(url)
+    unfurl = UnfurlCanvas.unfurl(url, account: canvas.creator.account)
     assert unfurl.title == "Title"
     assert unfurl.text == "Bar"
   end
@@ -32,7 +32,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
     list = List.last(canvas.blocks)
 
     url = Canvas.web_url(canvas) <> "?block=#{list.id}"
-    unfurl = UnfurlCanvas.unfurl(url)
+    unfurl = UnfurlCanvas.unfurl(url, account: canvas.creator.account)
     assert unfurl.title == "Title"
     assert unfurl.text == "UL Item"
     assert unfurl.fields == [
@@ -54,7 +54,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
     list = List.last(canvas.blocks)
 
     url = Canvas.web_url(canvas) <> "?filter=UL" <> "&block=#{list.id}"
-    unfurl = UnfurlCanvas.unfurl(url)
+    unfurl = UnfurlCanvas.unfurl(url, account: canvas.creator.account)
     assert unfurl.title == "Title"
     assert unfurl.text == "UL Item"
     assert unfurl.fields == [
@@ -84,7 +84,8 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
 
     heading = Enum.at(canvas.blocks, 2)
     unfurl =
-      Canvas.web_url(canvas) <> "?block=#{heading.id}" |> UnfurlCanvas.unfurl
+      Canvas.web_url(canvas) <> "?block=#{heading.id}"
+      |> UnfurlCanvas.unfurl(account: canvas.creator.account)
     assert unfurl.title == "Section 1"
     assert unfurl.text == "Section Paragraph"
     assert unfurl.fields == [
@@ -114,7 +115,7 @@ defmodule CanvasAPI.Unfurl.CanvasTest do
     heading = Enum.at(canvas.blocks, 2)
     unfurl =
       Canvas.web_url(canvas) <> "?filter=UL" <> "&block=#{heading.id}"
-      |> UnfurlCanvas.unfurl
+      |> UnfurlCanvas.unfurl(account: canvas.creator.account)
     assert unfurl.title == "UL Section 1"
     assert unfurl.text == "UL Item"
     assert unfurl.fields == [

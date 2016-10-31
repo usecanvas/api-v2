@@ -3,7 +3,7 @@ defmodule CanvasAPI.UnfurlController do
 
   alias CanvasAPI.Unfurl
 
-  plug CanvasAPI.CurrentAccountPlug
+  plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
   def index(conn, %{"url" => url}, current_account) do
     unfurl = Unfurl.unfurl(url, account: current_account)
