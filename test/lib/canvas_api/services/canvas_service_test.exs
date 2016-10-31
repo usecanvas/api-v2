@@ -102,13 +102,32 @@ defmodule CanvasAPI.CanvasServiceTest do
     end
   end
 
+  describe ".get" do
+    test "finds a canvas amongst an account's accessible canvases" do
+      canvas = insert(:canvas)
+      assert CanvasService.get(canvas.id,
+                               account: canvas.creator.account,
+                               team_id: canvas.team_id) ==
+      {:ok,
+       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+    end
+
+    test "returns a not found error if no canvas is found" do
+      canvas = insert(:canvas)
+      assert CanvasService.get(canvas.id,
+                               account: insert(:account),
+                               team_id: canvas.team_id) == {:error, :not_found}
+    end
+  end
+
   describe ".show" do
     test "finds a canvas with an ID in a given team by team ID" do
       canvas = insert(:canvas)
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team_id) ==
-        Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
+      {:ok,
+       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
     end
 
     test "finds a canvas with an ID in a given team by team domain" do
@@ -116,7 +135,8 @@ defmodule CanvasAPI.CanvasServiceTest do
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team.domain) ==
-        Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])
+      {:ok,
+       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
     end
   end
 
@@ -167,12 +187,13 @@ defmodule CanvasAPI.CanvasServiceTest do
       assert Repo.get(Canvas, canvas.id) == nil
     end
 
-    test "returns nil for a not found canvas" do
+    test "returns not_found for a not found canvas" do
       canvas = insert(:canvas)
       account = canvas.creator.account
       CanvasService.delete(canvas.id, account: account, team_id: canvas.team_id)
       assert CanvasService.delete(
-        canvas.id, account: account, team_id: canvas.team_id) == nil
+        canvas.id, account: account, team_id: canvas.team_id) ==
+          {:error, :not_found}
     end
   end
 end

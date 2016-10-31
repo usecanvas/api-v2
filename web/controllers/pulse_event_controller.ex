@@ -22,8 +22,8 @@ defmodule CanvasAPI.PulseEventController do
                       account: conn.private.current_account,
                       team_id: conn.params["team_id"])
     |> case do
-      canvas when canvas != nil -> put_private(conn, :canvas, canvas)
-      nil -> not_found(conn, halt: true)
+      {:ok, canvas} -> put_private(conn, :canvas, canvas)
+      {:error, :not_found} -> not_found(conn, halt: true)
     end
   end
 end

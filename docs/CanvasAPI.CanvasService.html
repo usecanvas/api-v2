@@ -221,7 +221,7 @@ template.</p>
     </a>
     <span class="signature">delete(id, list)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L196" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L200" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -232,7 +232,7 @@ template.</p>
           <pre>delete(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
   {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
   {:error, Ecto.Changeset.t} |
-  nil</pre>
+  {:error, :not_found}</pre>
         
       </div>
     
@@ -267,8 +267,8 @@ template.</p>
       <div class="specs">
         
           <pre>get(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
-  nil</pre>
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:error, :not_found}</pre>
         
       </div>
     
@@ -343,7 +343,7 @@ template.</p>
     </a>
     <span class="signature">show(id, opts)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L134" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L138" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -352,8 +352,8 @@ template.</p>
       <div class="specs">
         
           <pre>show(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>, <a href="http://elixir-lang.org/docs/stable/elixir/Keyword.html#t:t/0">Keyword.t</a>) ::
-  %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term} |
-  nil</pre>
+  {:ok, %CanvasAPI.Canvas{__meta__: term, blocks: term, creator: term, creator_id: term, edited_at: term, id: term, inserted_at: term, is_template: term, link_access: term, native_version: term, pulse_events: term, slack_channel_ids: term, team: term, team_id: term, template: term, template_id: term, type: term, updated_at: term, version: term}} |
+  {:error, :not_found}</pre>
         
       </div>
     
@@ -388,7 +388,7 @@ or a domain.</p>
     </a>
     <span class="signature">update(canvas, params, opts \\ [])</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L164" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/canvas_service.ex#L168" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     

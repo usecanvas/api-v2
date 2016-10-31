@@ -102,12 +102,16 @@ defmodule CanvasAPI.CanvasService do
     team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
   ```
   """
-  @spec get(String.t, Keyword.t) :: %Canvas{} | nil
+  @spec get(String.t, Keyword.t) :: {:ok, %Canvas{}} | {:error, :not_found}
   def get(id, account: account, team_id: team_id) do
     from(assoc(account, :canvases),
          where: [team_id: ^team_id],
          preload: ^@preload)
     |> Repo.get(id)
+    |> case do
+      nil -> {:error, :not_found}
+      canvas -> {:ok, canvas}
+    end
   end
 
   @doc """
@@ -130,7 +134,7 @@ defmodule CanvasAPI.CanvasService do
     team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
   ```
   """
-  @spec show(String.t, Keyword.t) :: %Canvas{} | nil
+  @spec show(String.t, Keyword.t) :: {:ok, %Canvas{}} | {:error, :not_found}
   def show(id, opts) do
     do_show(id, opts[:team_id])
     |> verify_can_show(opts[:account])
@@ -192,12 +196,12 @@ defmodule CanvasAPI.CanvasService do
   """
   @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}}
                                      | {:error, Ecto.Changeset.t}
-                                     | nil
+                                     | {:error, :not_found}
   def delete(id, account: account, team_id: team_id) do
     get(id, account: account, team_id: team_id)
     |> case do
-      canvas = %Canvas{} -> Repo.delete(canvas)
-      nil -> nil
+      {:ok, canvas} -> Repo.delete(canvas)
+      {:error, :not_found} -> {:error, :not_found}
     end
   end
 
@@ -233,20 +237,22 @@ defmodule CanvasAPI.CanvasService do
         token, canvas.id, notifier.id, &1, opts))
   end
 
-  @spec verify_can_show(%Canvas{} | nil, %Account{}) :: %Canvas{} | nil
-  defp verify_can_show(nil, _), do: nil
+  @spec verify_can_show(%Canvas{} | nil, %Account{}) :: {:ok, %Canvas{}}
+                                                      | {:error, :not_found}
+  defp verify_can_show(nil, _), do: {:error, :not_found}
 
   defp verify_can_show(canvas, account) do
+    not_found = {:error, :not_found}
     case canvas.link_access do
       "none" ->
         case account do
-          nil -> nil
+          nil -> not_found
           account ->
             account = Repo.preload(account, [:teams])
-            if canvas.team in account.teams, do: canvas, else: nil
+            if canvas.team in account.teams, do: {:ok, canvas}, else: not_found
         end
       _ ->
-        canvas
+        {:ok, canvas}
     end
   end
 end

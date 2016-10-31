@@ -1,7 +1,7 @@
 defmodule CanvasAPI.CanvasController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Canvas, CanvasService}
+  alias CanvasAPI.CanvasService
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug CanvasAPI.CurrentAccountPlug, [permit_none: true] when action in [:show]
@@ -40,9 +40,9 @@ defmodule CanvasAPI.CanvasController do
     case CanvasService.show(id,
                             account: conn.private.current_account,
                             team_id: team_id) do
-      canvas = %Canvas{} ->
+      {:ok, canvas} ->
         render_show(conn, canvas, params["trailing_format"])
-      nil ->
+      {:error, :not_found} ->
         not_found(conn)
     end
   end
@@ -76,8 +76,8 @@ defmodule CanvasAPI.CanvasController do
                       account: conn.private.current_account,
                       team_id: conn.params["team_id"])
     |> case do
-      canvas when canvas != nil -> put_private(conn, :canvas, canvas)
-      nil -> not_found(conn, halt: true)
+      {:ok, canvas} -> put_private(conn, :canvas, canvas)
+      {:error, :not_found} -> not_found(conn, halt: true)
     end
   end
 

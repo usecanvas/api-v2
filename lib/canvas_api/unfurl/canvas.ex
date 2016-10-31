@@ -18,7 +18,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   \\z
   """, "x")
 
-  alias CanvasAPI.{Block, Canvas, CanvasService, Unfurl}
+  alias CanvasAPI.{Block, CanvasService, Unfurl}
   alias Unfurl.Field
 
   @doc """
@@ -41,7 +41,7 @@ defmodule CanvasAPI.Unfurl.Canvas do
   def unfurl(url, account: account) do
     uri = URI.parse(url)
     with {team_id, id} = extract_canvas_info(uri.path),
-         canvas = %Canvas{} <-
+         {:ok, canvas} <-
            CanvasService.show(id, account: account, team_id: team_id),
          query = URI.decode_query(uri.query || ""),
          filter = Map.get(query, "filter"),
