@@ -18,8 +18,9 @@ defmodule CanvasAPI.PulseEventController do
   end
 
   defp ensure_canvas(conn, _opts) do
-    CanvasService.show(
-      conn.params["canvas_id"], team_id: conn.params["team_id"])
+    CanvasService.get(conn.params["canvas_id"],
+                      account: conn.private.current_account,
+                      team_id: conn.params["team_id"])
     |> case do
       canvas when canvas != nil -> put_private(conn, :canvas, canvas)
       nil -> not_found(conn, halt: true)
