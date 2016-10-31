@@ -25,6 +25,8 @@ defmodule CanvasAPI.UserService do
     team: current_team)
   ```
   """
+  @spec insert(params::map, options::Keyword.t) :: %User{}
+                                                 | {:error, Ecto.Changeset.t}
   def insert(params, opts) do
     %User{}
     |> User.changeset(params)
