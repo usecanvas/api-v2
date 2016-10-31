@@ -77,7 +77,7 @@ defmodule CanvasAPI.SignInMediator do
     team_params = %{domain: "~#{account.id}", name: account.id}
     user_params =
       %{email: "account-#{account.id}@usecanvas.com",
-        name: "account-#{account.id}"}
+        name: "A Canvas user"}
 
     with nil <- find_team,
          changeset = Team.changeset(%Team{}, team_params),
