@@ -13,7 +13,6 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessageTest do
     {:ok, user: user}
   end
 
-  @tag :focus
   test "unfurls a Slack channel message", %{user: user} do
     url = "https://#{user.team.domain}.slack.com/archives/general/p00000000"
 
