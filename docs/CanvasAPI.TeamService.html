@@ -95,17 +95,27 @@
     <a href="#add_account_user/2">add_account_user(team, account)</a>
   </div>
   
+    <div class="summary-synopsis"><p>Find the user associated with <code class="inline">team</code> for <code class="inline">account</code> and add it to <code class="inline">team</code> as
+<code class="inline">account_user</code></p>
+</div>
+  
 </div>
 <div class="summary-row">
   <div class="summary-signature">
     <a href="#list/2">list(account, opts)</a>
   </div>
   
+    <div class="summary-synopsis"><p>List teams for a given account</p>
+</div>
+  
 </div>
 <div class="summary-row">
   <div class="summary-signature">
     <a href="#show/1">show(id)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Show a specific team by ID or domain</p>
+</div>
   
 </div>
 
@@ -136,7 +146,7 @@
     </a>
     <span class="signature">add_account_user(team, account)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L36" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L81" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -150,7 +160,15 @@
     
   </div>
   <section class="docstring">
-    
+    <p>Find the user associated with <code class="inline">team</code> for <code class="inline">account</code> and add it to <code class="inline">team</code> as
+<code class="inline">account_user</code>.</p>
+<h2 id="add_account_user/2-examples" class="section-heading">
+  <a href="#add_account_user/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
+<pre><code class="elixir">TeamService.add_account_user(team, account)</code></pre>
+
   </section>
 </div>
 <div class="detail" id="list/2">
@@ -160,7 +178,7 @@
     </a>
     <span class="signature">list(account, opts)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L13" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L27" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -174,7 +192,21 @@
     
   </div>
   <section class="docstring">
-    
+    <p>List teams for a given account.</p>
+<p>Options:</p>
+<ul>
+<li><code class="inline">filter</code>: <code class="inline">map</code> A string-keyed filter map
+</li>
+<li><code class="inline">domain</code>: <code class="inline">String.t</code> A domain to filter teams by
+</li>
+</ul>
+<h2 id="list/2-examples" class="section-heading">
+  <a href="#list/2-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
+<pre><code class="elixir">TeamService.list(account, filter: %{&quot;domain&quot; =&gt; &quot;usecanvas&quot;})</code></pre>
+
   </section>
 </div>
 <div class="detail" id="show/1">
@@ -184,7 +216,7 @@
     </a>
     <span class="signature">show(id)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L22" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/services/team_service.ex#L45" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
@@ -193,14 +225,21 @@
       <div class="specs">
         
           <pre>show(<a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a>) ::
-  %CanvasAPI.Team{__meta__: term, accounts: term, canvases: term, domain: term, id: term, images: term, inserted_at: term, name: term, oauth_tokens: term, slack_id: term, updated_at: term, users: term} |
-  nil</pre>
+  {:ok, %CanvasAPI.Team{__meta__: term, accounts: term, canvases: term, domain: term, id: term, images: term, inserted_at: term, name: term, oauth_tokens: term, slack_id: term, updated_at: term, users: term}} |
+  {:error, :not_found}</pre>
         
       </div>
     
   </div>
   <section class="docstring">
-    
+    <p>Show a specific team by ID or domain.</p>
+<h2 id="show/1-examples" class="section-heading">
+  <a href="#show/1-examples" class="hover-link"><i class="icon-link"></i></a>
+  Examples
+</h2>
+
+<pre><code class="elixir">TeamService.show(&quot;usecanvas&quot;)</code></pre>
+
   </section>
 </div>
 

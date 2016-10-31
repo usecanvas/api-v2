@@ -9,6 +9,20 @@ defmodule CanvasAPI.TeamService do
 
   @preload [:oauth_tokens]
 
+  @doc """
+  List teams for a given account.
+
+  Options:
+
+  - `filter`: `map` A string-keyed filter map
+    - `domain`: `String.t` A domain to filter teams by
+
+  ## Examples
+
+  ```elixir
+  TeamService.list(account, filter: %{"domain" => "usecanvas"})
+  ```
+  """
   @spec list(%Account{}, Keyword.t) :: [%Team{}]
   def list(account, opts) do
     from(assoc(account, :teams),
@@ -18,20 +32,51 @@ defmodule CanvasAPI.TeamService do
     |> Repo.all
   end
 
-  @spec show(String.t) :: %Team{} | nil
+  @doc """
+  Show a specific team by ID or domain.
+
+  ## Examples
+
+  ```elixir
+  TeamService.show("usecanvas")
+  ```
+  """
+  @spec show(String.t) :: {:ok, %Team{}} | {:error, :not_found}
   def show(id) do
     from(Team, preload: ^@preload)
     |> do_get(id)
   end
 
-  @spec do_get(Ecto.Queryable.t, String.t) :: %Team{} | nil
-  defp do_get(queryable, id = match_uuid()), do: Repo.get(queryable, id)
+  @spec do_get(Ecto.Queryable.t, String.t) :: {:ok, %Team{}}
+                                            | {:error, :not_found}
+  defp do_get(queryable, id = match_uuid()) do
+    Repo.get(queryable, id)
+    |> case do
+      nil -> {:error, :not_found}
+      team -> {:ok, team}
+    end
+  end
+
   defp do_get(queryable, domain) do
     queryable
     |> where(domain: ^domain)
     |> Repo.one
+    |> case do
+      nil -> {:error, :not_found}
+      team -> {:ok, team}
+    end
   end
 
+  @doc """
+  Find the user associated with `team` for `account` and add it to `team` as
+  `account_user`.
+
+  ## Examples
+
+  ```elixir
+  TeamService.add_account_user(team, account)
+  ```
+  """
   @spec add_account_user(%Team{}, %Account{} | nil) :: %Team{}
   def add_account_user(team, nil), do: Map.put(team, :account_user, nil)
   def add_account_user(team, account) do

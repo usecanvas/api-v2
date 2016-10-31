@@ -1,7 +1,7 @@
 defmodule CanvasAPI.TeamController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{Team, TeamService}
+  alias CanvasAPI.TeamService
 
   plug CanvasAPI.CurrentAccountPlug when not action in [:show]
   plug CanvasAPI.CurrentAccountPlug, [permit_none: true] when action in [:show]
@@ -14,7 +14,7 @@ defmodule CanvasAPI.TeamController do
   end
 
   def show(conn, %{"id" => id}, current_account) do
-    with team = %Team{} <- TeamService.show(id),
+    with {:ok, team} <- TeamService.show(id),
          team = TeamService.add_account_user(team, current_account) do
       render(conn, "show.json", team: team)
     else
