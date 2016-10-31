@@ -12,6 +12,10 @@ defmodule CanvasAPI.Unfurl.GitHub.Issue do
 
   def match, do: @match
 
+  @doc """
+  Unfurl a GitHub issue URL.
+  """
+  @spec unfurl(url::String.t, options::Keyword.t) :: Unfurl.t | nil
   def unfurl(url, account: account) do
     with {:ok, %{body: body, status_code: 200}} <- do_get(account, url) do
       unfurl_from_body(url, body)
