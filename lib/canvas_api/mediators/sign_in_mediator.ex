@@ -74,10 +74,10 @@ defmodule CanvasAPI.SignInMediator do
       from(t in Ecto.assoc(account, :teams),
            where: is_nil(t.slack_id))
       |> Repo.one
-    team_params = %{domain: "~#{account.id}", name: account.id}
+    team_params = %{domain: "~#{account.id}", name: "Notes"}
     user_params =
       %{email: "account-#{account.id}@usecanvas.com",
-        name: "A Canvas user"}
+        name: "Canvas User"}
 
     with nil <- find_team,
          changeset = Team.changeset(%Team{}, team_params),
