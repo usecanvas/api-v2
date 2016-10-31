@@ -5,6 +5,10 @@ defmodule CanvasAPI.Unfurl.Embedly do
 
   @embedly_key System.get_env("EMBEDLY_API_KEY")
 
+  @doc """
+  Unfurl a GitHub repo URL.
+  """
+  @spec unfurl(url::String.t, options::Keyword.t) :: Unfurl.t | nil
   def unfurl(url, _opts \\ []) do
     with {:ok, extracted} <- extract(url) do
       unfurl_from_body(extracted, url)
