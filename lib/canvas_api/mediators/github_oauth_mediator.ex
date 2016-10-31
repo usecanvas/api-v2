@@ -9,6 +9,9 @@ defmodule CanvasAPI.GitHubOAuthMediator do
   @client_id System.get_env("GITHUB_CLIENT_ID")
   @client_secret System.get_env("GITHUB_CLIENT_SECRET")
 
+  @doc """
+  Persist a GitHub token for `account` by exchanging `code` for a token.
+  """
   @spec persist_token(String.t, Keyword.t) :: :ok | {:error, any}
   def persist_token(code, account: account) do
     with {:ok, access_token} <- exchange_code(code) do
