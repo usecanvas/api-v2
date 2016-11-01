@@ -9,6 +9,9 @@ config :canvas_api, CanvasAPI.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :canvas_api, CanvasAPI.UploadSignature,
+  url: "https://u:p@canvas-files-prod.s3.amazonaws.com"
+
 # Configure your database
 if System.get_env("HEROKU_TEST_RUN_ID") do # Heroku CI
   config :canvas_api, CanvasAPI.Repo,

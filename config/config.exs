@@ -10,6 +10,9 @@ config :canvas_api,
   namespace: CanvasAPI,
   ecto_repos: [CanvasAPI.Repo]
 
+config :canvas_api, CanvasAPI.UploadSignature,
+  url: System.get_env("FILE_UPLOAD_URL")
+
 # Configures the endpoint
 config :canvas_api, CanvasAPI.Endpoint,
   url: [host: "localhost"],

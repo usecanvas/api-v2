@@ -3,8 +3,7 @@ defmodule CanvasAPI.UploadSignature do
   A signature used for uploading content to an Amazon S3 bucket.
   """
 
-  @upload_url    System.get_env("FILE_UPLOAD_URL") ||
-                 "https://u:p@canvas-files-prod.s3.amazonaws.com" # Default
+  @upload_url    Application.get_env(:canvas_api, __MODULE__)[:url]
   @url           URI.parse(@upload_url)
   @bucket        @url.host |> String.split(".") |> List.first
   @query         (@url.query || "") |> URI.decode_query
