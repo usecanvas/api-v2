@@ -3,11 +3,13 @@ defmodule CanvasAPI.UploadSignature do
   A signature used for uploading content to an Amazon S3 bucket.
   """
 
-  @url           "FILE_UPLOAD_URL" |> System.get_env |> URI.parse
+  @upload_url    System.get_env("FILE_UPLOAD_URL") ||
+                 "https://u:p@canvas-files-prod.s3.amazonaws.com" # Default
+  @url           URI.parse(@upload_url)
   @bucket        @url.host |> String.split(".") |> List.first
-  @query         @url.query |> URI.decode_query
+  @query         (@url.query || "") |> URI.decode_query
   @acl           @query["acl"]
-  @max_size      @query |> Map.get("maxSize", "15_000_000") |> String.to_integer
+  @max_size      @query |> Map.get("maxSize", "15000000") |> String.to_integer
   @access_key_id @url.userinfo |> String.split(":") |> List.first
   @upload_url    "#{@url.scheme}://#{@url.host}"
   @expiration    @query |> Map.get("expiration", "30") |> String.to_integer
