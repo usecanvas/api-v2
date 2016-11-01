@@ -1,14 +1,14 @@
 defmodule CanvasAPI.Unfurl.Embedly do
   @moduledoc """
-  An unfurled page using data from Open Graph HTML tags.
+  An unfurled page using the Embedly extract API.
   """
 
   @embedly_key System.get_env("EMBEDLY_API_KEY")
 
   @doc """
-  Unfurl a GitHub repo URL.
+  Unfurl a URL using Embedly's extract API.
   """
-  @spec unfurl(url::String.t, options::Keyword.t) :: Unfurl.t | nil
+  @spec unfurl(url :: String.t, opts :: Keyword.t) :: Unfurl.t | nil
   def unfurl(url, _opts \\ []) do
     with {:ok, extracted} <- extract(url) do
       unfurl_from_body(extracted, url)
