@@ -33,10 +33,12 @@ defmodule CanvasAPI.UploadSignature do
   """
   @spec generate() :: t
   def generate do
+    policy = generate_policy() |> Poison.encode! |> Base.encode64
+
     %__MODULE__{
-      policy: generate_policy() |> Poison.encode! |> Base.encode64
+      policy: policy,
+      signature: generate_signature(policy)
     }
-    |> add_signature
   end
 
   @spec generate_policy() :: map
@@ -53,13 +55,7 @@ defmodule CanvasAPI.UploadSignature do
     }
   end
 
-  @spec add_signature(t) :: t
-  defp add_signature(signature) do
-    signature
-    |> Map.put(:signature, generate_signature(signature.policy))
-  end
-
-  @spec generate_signature(map) :: String.t
+  @spec generate_signature(encoded_policy :: map) :: String.t
   defp generate_signature(policy) do
     :crypto.hmac(:sha, @secret, policy)
     |> Base.encode64
