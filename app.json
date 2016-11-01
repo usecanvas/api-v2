@@ -34,6 +34,9 @@
       "description": "API key for Embedly",
       "required": false
     },
+    "FILE_UPLOAD_URL": {
+      "description": "A URL for uploading to Amazon S3"
+    },
     "CHECK_ORIGIN": {
       "description": "Whether to check request origin",
       "required": false

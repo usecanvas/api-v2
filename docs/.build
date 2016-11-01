@@ -79,6 +79,9 @@ CanvasAPI.Unfurl.Slack.html
 CanvasAPI.Unfurl.Slack.ChannelMessage.html
 CanvasAPI.UnfurlController.html
 CanvasAPI.UnfurlView.html
+CanvasAPI.UploadSignature.html
+CanvasAPI.UploadSignatureController.html
+CanvasAPI.UploadSignatureView.html
 CanvasAPI.User.html
 CanvasAPI.UserController.html
 CanvasAPI.UserSocket.html
