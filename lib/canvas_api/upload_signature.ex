@@ -34,13 +34,13 @@ defmodule CanvasAPI.UploadSignature do
   @spec generate() :: t
   def generate do
     %__MODULE__{
-      policy: policy() |> Poison.encode! |> Base.encode64
+      policy: generate_policy() |> Poison.encode! |> Base.encode64
     }
     |> add_signature
   end
 
-  @spec policy() :: map
-  defp policy do
+  @spec generate_policy() :: map
+  defp generate_policy do
     %{
       expiration: policy_expiration(),
       conditions: [
