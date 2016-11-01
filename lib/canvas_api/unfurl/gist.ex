@@ -12,8 +12,11 @@ defmodule CanvasAPI.Unfurl.Gist do
   @spec gist_regex() :: Regex.t
   def gist_regex, do: @gist_regex
 
-  @spec unfurl(String.t, Keyword.t) :: Unfurl.t | nil
-  def unfurl(url, _) do
+  @doc """
+  Unfurl a GitHub Gist URL.
+  """
+  @spec unfurl(url :: String.t, opts :: Keyword.t) :: Unfurl.t | nil
+  def unfurl(url, _opts \\ []) do
     if String.ends_with?(url, ".json") do
       do_unfurl(url)
     else

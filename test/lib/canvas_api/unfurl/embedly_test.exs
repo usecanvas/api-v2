@@ -1,5 +1,5 @@
 defmodule CanvasAPI.Unfurl.EmbedlyTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   @embedly_key nil
   @embedly_url "https://api.embedly.com/1/extract"
