@@ -13,6 +13,10 @@ config :canvas_api, CanvasAPI.Endpoint,
   check_origin: false,
   watchers: []
 
+config :canvas_api, CanvasAPI.UploadSignature,
+  url: System.get_env("FILE_UPLOAD_URL") ||
+         "https://u:p@canvas-files-prod.s3.amazonaws.com"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

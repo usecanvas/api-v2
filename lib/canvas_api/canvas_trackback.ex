@@ -1,6 +1,7 @@
 defmodule CanvasAPI.CanvasTrackback do
   @moduledoc """
-  A reference from one canvas to another.
+  A "canvas trackback" is an event where a reference to a canvas was either
+  added to or removed from another canvas.
   """
 
   alias CanvasAPI.{Account, AvatarURL, Canvas, PulseEvent, Repo, User}
@@ -27,8 +28,13 @@ defmodule CanvasAPI.CanvasTrackback do
     end
   end
 
+  @doc """
+  Create an "added" reference event, where the account user added a reference to
+  the target canvas to the source canvas.
+  """
+  @spec add(String.t, String.t, String.t) :: %PulseEvent{} | no_return
   def add(target_id, source_id, acct_id) do
-    with [target, source, user] <- get_models(target_id, source_id, acct_id) do
+    with {target, source, user} <- get_models(target_id, source_id, acct_id) do
       %PulseEvent{}
       |> PulseEvent.changeset(%{
           provider_name: "Canvas",
@@ -48,8 +54,13 @@ defmodule CanvasAPI.CanvasTrackback do
     end
   end
 
+  @doc """
+  Create a "removed" reference event, where the account user removed a reference
+  to the target canvas from the source canvas.
+  """
+  @spec remove(String.t, String.t, String.t) :: %PulseEvent{} | no_return
   def remove(target_id, source_id, acct_id) do
-    with [target, source, user] <- get_models(target_id, source_id, acct_id) do
+    with {target, source, user} <- get_models(target_id, source_id, acct_id) do
       %PulseEvent{}
       |> PulseEvent.changeset(%{
           provider_name: "Canvas",
@@ -69,16 +80,19 @@ defmodule CanvasAPI.CanvasTrackback do
     end
   end
 
+  @spec get_models(String.t, String.t, String.t) ::
+        {%Canvas{}, %Canvas{}, %User{}}
   defp get_models(target_id, source_id, acct_id) do
     with target = %Canvas{} <- Repo.get(Canvas, target_id),
          source = %Canvas{} <-
            Repo.get(Canvas, source_id) |> Repo.preload([:team]),
          account = %Account{} <- Repo.get(Account, acct_id),
          user = %User{} <- get_user(account, source.team_id) do
-      [target, source, user]
+      {target, source, user}
     end
   end
 
+  @spec get_user(%Account{}, String.t) :: %User{} | nil
   defp get_user(account, team_id) do
     from(assoc(account, :users), where: [team_id: ^team_id]) |> Repo.one
   end
