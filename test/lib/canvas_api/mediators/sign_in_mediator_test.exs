@@ -35,10 +35,10 @@ defmodule CanvasAPI.SignInMediatorTest do
       [team, personal_team] = account.teams
       [user, personal_user] = Repo.preload(account.users, [:team])
 
-      assert personal_team.name == account.id
+      assert personal_team.name == "Notes"
       assert personal_team.domain == "~#{account.id}"
       assert personal_user.email == "account-#{account.id}@usecanvas.com"
-      assert personal_user.name == "account-#{account.id}"
+      assert personal_user.name == "Canvas User"
       assert team.name == "Test Team"
       assert user.identity_token == "access_token"
       assert user.team == team
