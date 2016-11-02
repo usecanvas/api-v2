@@ -4,10 +4,36 @@ defmodule CanvasAPI.TeamService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.{Account, Team}
+  alias CanvasAPI.{Account, WhitelistedSlackDomain, Team}
   import CanvasAPI.UUIDMatch
 
   @preload [:oauth_tokens]
+
+  @doc """
+  Insert a team.
+
+  ## Examples
+
+  ```elixir
+  TeamService.insert(params, type: :personal)
+  ```
+  """
+  @spec insert(map, Keyword.t) :: {:ok, %Team{}} | {:error, Ecto.Changeset.t}
+  def insert(params, type: :personal) do
+    %Team{}
+    |> Team.create_changeset(params, type: :personal)
+    |> Repo.insert
+  end
+
+  def insert(params, type: :slack) do
+    if domain_whitelisted?(params["domain"]) do
+      %Team{}
+      |> Team.create_changeset(params, type: :slack)
+      |> Repo.insert
+    else
+      {:error, :domain_not_whitelisted}
+    end
+  end
 
   @doc """
   List teams for a given account.
@@ -69,7 +95,7 @@ defmodule CanvasAPI.TeamService do
   @spec update(%Team{}, map) :: {:ok, %Team{}} | {:error, Ecto.Changeset.t}
   def update(team, params) do
     team
-    |> Team.change_domain(params)
+    |> Team.update_changeset(params)
     |> Repo.update
   end
 
@@ -117,4 +143,16 @@ defmodule CanvasAPI.TeamService do
   defp filter(queryable, %{"domain" => domain}),
     do: where(queryable, domain: ^domain)
   defp filter(queryable, _), do: queryable
+
+  @spec domain_whitelisted?(String.t | nil) :: boolean
+  defp domain_whitelisted?(nil), do: false
+  defp domain_whitelisted?(domain) do
+    from(WhitelistedSlackDomain, where: [domain: ^domain])
+    |> Repo.one
+    |> case do
+      nil -> false
+      _ -> true
+    end
+  end
+
 end

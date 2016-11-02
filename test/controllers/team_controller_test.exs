@@ -1,7 +1,7 @@
 defmodule CanvasAPI.TeamControllerTest do
   use CanvasAPI.ConnCase
 
-  alias CanvasAPI.{Account, Repo, Team}
+  alias CanvasAPI.{Account, Repo}
   import CanvasAPI.Factory
 
   @valid_attrs %{}
@@ -29,14 +29,13 @@ defmodule CanvasAPI.TeamControllerTest do
       team = insert(:team, name: "", domain: "", slack_id: nil)
       %{account: account, team: team} = insert(:user, team: team)
 
-      conn =
-        conn
-        |> put_private(:current_account, account)
-        |> patch(team_path(conn, :update, team), %{
-             "data" => %{
-               "attributes" => %{"domain" => "foo-domain"}
-             }
-           })
+      conn
+      |> put_private(:current_account, account)
+      |> patch(team_path(conn, :update, team), %{
+           "data" => %{
+             "attributes" => %{"domain" => "foo-domain"}
+           }
+         })
 
       assert Repo.reload(team).domain == "~foo-domain"
     end

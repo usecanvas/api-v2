@@ -3,9 +3,7 @@ defmodule CanvasAPI.SignInMediator do
   Handle a Slack sign in, creating teams, accounts, and users as needed.
   """
 
-  alias CanvasAPI.{Account, Repo, Team, User, UserService}
-  alias CanvasAPI.WhitelistedSlackDomain, as: SlackDomain
-  import Ecto.Changeset
+  alias CanvasAPI.{Account, Repo, Team, TeamService, User, UserService}
   import Ecto.Query
 
   @client_id System.get_env("SLACK_CLIENT_ID")
@@ -75,16 +73,13 @@ defmodule CanvasAPI.SignInMediator do
       from(t in Ecto.assoc(account, :teams),
            where: is_nil(t.slack_id))
       |> Repo.one
-    team_params = %{domain: "", name: ""}
+
     user_params =
       %{email: "account-#{account.id}@usecanvas.com",
         name: "Canvas User"}
 
     with nil <- find_team,
-         changeset = Team.changeset(%Team{}, team_params)
-                     |> put_change(:domain, "")
-                     |> put_change(:name, ""),
-         {:ok, team} <- Repo.insert(changeset),
+         {:ok, team} <- TeamService.insert(%{}, type: :personal),
          {:ok, _}
            <- UserService.insert(user_params, account: account, team: team) do
       {:ok, team}
@@ -100,27 +95,10 @@ defmodule CanvasAPI.SignInMediator do
     find_team = from(t in Team, where: t.slack_id == ^team_info["id"])
     team_params = team_info |> Map.put("slack_id", team_info["id"])
 
-    with :ok <- check_domain_whitelist(team_info["domain"]),
-         nil <- Repo.one(find_team),
-         changeset = Team.changeset(%Team{}, team_params) do
-      Repo.insert(changeset)
+    if team = Repo.one(find_team) do
+      {:ok, team}
     else
-      team = %Team{} -> {:ok, team}
-      error -> error
-    end
-  end
-
-  # Check a domain against the whitelist.
-  @spec check_domain_whitelist(String.t) :: :ok | {:error, String.t}
-  defp check_domain_whitelist(nil), do: {:error, "No domain provided"}
-  defp check_domain_whitelist(domain) do
-    from(d in SlackDomain, where: d.domain == ^domain)
-    |> Repo.one
-    |> case do
-      nil ->
-        {:error, "Domain not whitelisted"}
-      _ ->
-        :ok
+      TeamService.insert(team_params, type: :slack)
     end
   end
 

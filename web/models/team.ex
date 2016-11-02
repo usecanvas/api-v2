@@ -22,24 +22,32 @@ defmodule CanvasAPI.Team do
   end
 
   @doc """
-  Builds a changeset based on the `struct` and `params`.
+  Builds a creation changeset based on the `struct` and `params`.
   """
-  def changeset(struct, params \\ %{}) do
+  @spec create_changeset(%__MODULE__{}, map, Keyword.t) :: Ecto.Changeset.t
+  def create_changeset(struct, params, type: :slack) do
     struct
     |> cast(params, [:domain, :name, :slack_id])
-    |> if_slack(&validate_required(&1, [:domain, :name]))
-    |> if_slack(&prevent_domain_change(&1))
+    |> validate_required([:domain, :name, :slack_id])
+    |> prevent_domain_change
     |> unique_constraint(:domain)
     |> put_change(:images, ImageMap.image_map(params))
   end
 
+  def create_changeset(struct, params, type: :personal) do
+    struct
+    |> cast(params, [])
+    |> put_change(:name, "Notes")
+  end
+
   @doc """
-  Builds a changeset for changing a team domain.
+  Builds a changeset for updating a team (only domain, only personal).
   """
-  def change_domain(struct, params \\ %{}) do
+  @spec update_changeset(%__MODULE__{}, map) :: Ecto.Changeset.t
+  def update_changeset(struct, params) do
     struct
     |> cast(params, [:domain])
-    |> if_slack(&prevent_domain_change(&1))
+    |> if_slack(&prevent_domain_change/1)
     |> validate_required([:domain])
     |> prefix_domain
     |> unique_constraint(:domain)

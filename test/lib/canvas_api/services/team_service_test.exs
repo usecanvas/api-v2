@@ -55,6 +55,19 @@ defmodule CanvasAPI.TeamServiceTest do
     end
   end
 
+  describe ".insert" do
+    test "inserts a Slack team" do
+      insert(:whitelisted_domain, domain: "domain")
+      {:ok, _team} = Service.insert(
+        %{"name" => "name", "slack_id" => "abc", "domain" => "domain"},
+        type: :slack)
+    end
+
+    test "inserts a personal team" do
+      {:ok, _team} = Service.insert(%{}, type: :personal)
+    end
+  end
+
   describe ".update" do
     test "updates the team when valid" do
       team = insert(:team, slack_id: nil)
