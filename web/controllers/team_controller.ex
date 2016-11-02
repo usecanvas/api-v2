@@ -27,7 +27,7 @@ defmodule CanvasAPI.TeamController do
     end
   end
 
-  def update(conn, params = %{"id" => id, "data" => data}) do
+  def update(conn, %{"id" => id, "data" => data}) do
     current_account = conn.private.current_account
 
     with {:ok, team} <- TeamService.show(id, account: current_account),
