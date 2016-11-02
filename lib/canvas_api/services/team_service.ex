@@ -35,16 +35,42 @@ defmodule CanvasAPI.TeamService do
   @doc """
   Show a specific team by ID or domain.
 
+  Options:
+
+  - `account`: `%Account{}` An account to scope the team find to
+
   ## Examples
 
   ```elixir
   TeamService.show("usecanvas")
   ```
   """
-  @spec show(String.t) :: {:ok, %Team{}} | {:error, :not_found}
-  def show(id) do
+  @spec show(String.t, Keyword.t) :: {:ok, %Team{}} | {:error, :not_found}
+  def show(id, opts \\ [])
+
+  def show(id, account: account) do
+    from(assoc(account, :teams), preload: ^@preload)
+    |> do_get(id)
+  end
+
+  def show(id, _opts) do
     from(Team, preload: ^@preload)
     |> do_get(id)
+  end
+
+  @doc """
+  Update a team (currently only allows changing domain of personal teams).
+
+  ## Examples
+  ```elixir
+  TeamService.update(team, %{"domain" => "my-domain"})
+  ```
+  """
+  @spec update(%Team{}, map) :: {:ok, %Team{}} | {:error, Ecto.Changeset.t}
+  def update(team, params) do
+    team
+    |> Team.change_domain(params)
+    |> Repo.update
   end
 
   @spec do_get(Ecto.Queryable.t, String.t) :: {:ok, %Team{}}

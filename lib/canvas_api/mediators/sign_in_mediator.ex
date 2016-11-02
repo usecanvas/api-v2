@@ -5,6 +5,7 @@ defmodule CanvasAPI.SignInMediator do
 
   alias CanvasAPI.{Account, Repo, Team, User, UserService}
   alias CanvasAPI.WhitelistedSlackDomain, as: SlackDomain
+  import Ecto.Changeset
   import Ecto.Query
 
   @client_id System.get_env("SLACK_CLIENT_ID")
@@ -74,13 +75,15 @@ defmodule CanvasAPI.SignInMediator do
       from(t in Ecto.assoc(account, :teams),
            where: is_nil(t.slack_id))
       |> Repo.one
-    team_params = %{domain: "~#{account.id}", name: "Notes"}
+    team_params = %{domain: "", name: ""}
     user_params =
       %{email: "account-#{account.id}@usecanvas.com",
         name: "Canvas User"}
 
     with nil <- find_team,
-         changeset = Team.changeset(%Team{}, team_params),
+         changeset = Team.changeset(%Team{}, team_params)
+                     |> put_change(:domain, "")
+                     |> put_change(:name, ""),
          {:ok, team} <- Repo.insert(changeset),
          {:ok, _}
            <- UserService.insert(user_params, account: account, team: team) do

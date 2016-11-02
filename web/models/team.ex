@@ -27,9 +27,22 @@ defmodule CanvasAPI.Team do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:domain, :name, :slack_id])
-    |> validate_required([:domain, :name])
+    |> if_slack(&validate_required(&1, [:domain, :name]))
+    |> if_slack(&prevent_domain_change(&1))
     |> unique_constraint(:domain)
     |> put_change(:images, ImageMap.image_map(params))
+  end
+
+  @doc """
+  Builds a changeset for changing a team domain.
+  """
+  def change_domain(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:domain])
+    |> if_slack(&prevent_domain_change(&1))
+    |> validate_required([:domain])
+    |> prefix_domain
+    |> unique_constraint(:domain)
   end
 
   @doc """
@@ -39,5 +52,27 @@ defmodule CanvasAPI.Team do
     from(assoc(team, :oauth_tokens), where: [provider: ^provider])
     |> first
     |> Repo.one
+  end
+
+  defp if_slack(changeset, func) do
+    if changeset.data.slack_id || get_change(changeset, :slack_id) do
+      func.(changeset)
+    else
+      changeset
+    end
+  end
+
+  defp prevent_domain_change(changeset) do
+    if changeset.data.slack_id do
+      changeset
+      |> add_error(:domain, "can not be changed for Slack teams")
+    else
+      changeset
+    end
+  end
+
+  defp prefix_domain(changeset) do
+    domain = "~#{get_change(changeset, :domain)}"
+    put_change(changeset, :domain, domain)
   end
 end

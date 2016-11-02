@@ -23,6 +23,20 @@ defmodule CanvasAPI.TeamController do
     end
   end
 
+  def update(conn, params, account) do
+    with {:ok, team} <- TeamService.show(params["id"], account: account),
+         {:ok, team} <-
+           TeamService.update(team, get_in(params, ~w(data attributes))),
+         team = TeamService.add_account_user(team, account) do
+      render(conn, "show.json", team: team)
+    else
+      {:error, changeset = %Ecto.Changeset{}} ->
+        unprocessable_entity(conn, changeset)
+      {:error, :not_found} ->
+        not_found(conn)
+    end
+  end
+
   def action(conn, _) do
     apply(__MODULE__, action_name(conn), [conn,
                                           conn.params,
