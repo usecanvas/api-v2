@@ -92,7 +92,7 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#add/2">add(arg1, arg2)</a>
+    <a href="#add/2">add(params, team_id \\ nil)</a>
   </div>
   
     <div class="summary-synopsis"><p>Adds a GitHub trackback to a canvas</p>
@@ -137,13 +137,21 @@
     <a href="#add/2" class="detail-link" title="Link to this function">
       <i class="icon-link"></i>
     </a>
-    <span class="signature">add(arg1, arg2)</span>
+    <span class="signature">add(params, team_id \\ nil)</span>
     
-      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/github_trackback.ex#L15" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/usecanvas/pro-api/blob/master/lib/canvas_api/github_trackback.ex#L16" class="view-source" rel="help" title="View Source">
        <i class="icon-code"></i>
      </a>
     
     
+    
+      <div class="specs">
+        
+          <pre>add(map, <a href="http://elixir-lang.org/docs/stable/elixir/String.html#t:t/0">String.t</a> | nil) ::
+  {:ok, %CanvasAPI.PulseEvent{__meta__: term, canvas: term, canvas_id: term, id: term, inserted_at: term, provider_name: term, provider_url: term, referencer: term, type: term, updated_at: term, url: term}} |
+  :ok</pre>
+        
+      </div>
     
   </div>
   <section class="docstring">

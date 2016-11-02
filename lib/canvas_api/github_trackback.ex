@@ -4,7 +4,7 @@ defmodule CanvasAPI.GitHubTrackback do
   """
 
   use CanvasAPI.Trackback
-  alias CanvasAPI.PulseEventService
+  alias CanvasAPI.{PulseEvent, PulseEventService}
 
   @provider_name "GitHub"
   @provider_url "https://github.com"
@@ -12,6 +12,9 @@ defmodule CanvasAPI.GitHubTrackback do
   @doc """
   Adds a GitHub trackback to a canvas.
   """
+  @spec add(map, String.t | nil) :: {:ok, %PulseEvent{}} | :ok
+  def add(params, team_id \\ nil)
+
   def add(%{"action" => "created", "comment" => comment}, _team_id) do
     with canvas = %Canvas{} <- get_canvas(comment["body"]) do
       github_object_pulse_event(comment, canvas)
@@ -80,13 +83,13 @@ defmodule CanvasAPI.GitHubTrackback do
           provider_name: @provider_name,
           provider_url: @provider_url,
           type: "mentioned",
-           url: commit["url"],
-           referencer: %{
-             id: author["email"],
-             avatar_url: AvatarURL.create(author["email"]),
-             email: author["email"],
-             name: author["name"],
-             url: "mailto:#{author["email"]}"}},
+          url: commit["url"],
+          referencer: %{
+            id: author["email"],
+            avatar_url: AvatarURL.create(author["email"]),
+            email: author["email"],
+            name: author["name"],
+            url: "mailto:#{author["email"]}"}},
         canvas: canvas)
     end
   end
