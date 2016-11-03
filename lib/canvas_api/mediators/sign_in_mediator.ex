@@ -3,8 +3,7 @@ defmodule CanvasAPI.SignInMediator do
   Handle a Slack sign in, creating teams, accounts, and users as needed.
   """
 
-  alias CanvasAPI.{Account, Repo, Team, User}
-  alias CanvasAPI.WhitelistedSlackDomain, as: SlackDomain
+  alias CanvasAPI.{Account, Repo, Team, TeamService, User, UserService}
   import Ecto.Query
 
   @client_id System.get_env("SLACK_CLIENT_ID")
@@ -31,7 +30,8 @@ defmodule CanvasAPI.SignInMediator do
     Repo.transaction(fn ->
       with {:ok, team} <- find_or_insert_team(team_info),
            {:ok, account} <- find_or_insert_account(account, user_info),
-           {:ok, _} <- find_or_insert_user(account, team, user_info, token) do
+           {:ok, _} <- find_or_insert_user(account, team, user_info, token),
+           {:ok, _} <- find_or_insert_personal_team(account) do
         account
       else
         {:error, error} -> Repo.rollback(error)
@@ -66,33 +66,39 @@ defmodule CanvasAPI.SignInMediator do
     end
   end
 
-  # Find or insert a team from team info.
-  @spec find_or_insert_team(map) :: {:ok, Team.t} | {:error, any}
-  defp find_or_insert_team(team_info) do
-    find_team = from(t in Team, where: t.slack_id == ^team_info["id"])
-    team_params = team_info |> Map.put("slack_id", team_info["id"])
+  # Find or insert an account's personal team.
+  @spec find_or_insert_personal_team(Account.t) :: {:ok, Team.t} | {:error, any}
+  defp find_or_insert_personal_team(account) do
+    find_team =
+      from(t in Ecto.assoc(account, :teams),
+           where: is_nil(t.slack_id))
+      |> Repo.one
 
-    with :ok <- check_domain_whitelist(team_info["domain"]),
-         nil <- Repo.one(find_team),
-         changeset = Team.changeset(%Team{}, team_params) do
-      Repo.insert(changeset)
+    user_params =
+      %{email: "account-#{account.id}@usecanvas.com",
+        name: "Canvas User"}
+
+    with nil <- find_team,
+         {:ok, team} <- TeamService.insert(%{}, type: :personal),
+         {:ok, _}
+           <- UserService.insert(user_params, account: account, team: team) do
+      {:ok, team}
     else
       team = %Team{} -> {:ok, team}
       error -> error
     end
   end
 
-  # Check a domain against the whitelist.
-  @spec check_domain_whitelist(String.t) :: :ok | {:error, String.t}
-  defp check_domain_whitelist(nil), do: {:error, "No domain provided"}
-  defp check_domain_whitelist(domain) do
-    from(d in SlackDomain, where: d.domain == ^domain)
-    |> Repo.one
-    |> case do
-      nil ->
-        {:error, "Domain not whitelisted"}
-      _ ->
-        :ok
+  # Find or insert a team from team info.
+  @spec find_or_insert_team(map) :: {:ok, Team.t} | {:error, any}
+  defp find_or_insert_team(team_info) do
+    find_team = from(t in Team, where: t.slack_id == ^team_info["id"])
+    team_params = team_info |> Map.put("slack_id", team_info["id"])
+
+    if team = Repo.one(find_team) do
+      {:ok, team}
+    else
+      TeamService.insert(team_params, type: :slack)
     end
   end
 
@@ -110,12 +116,8 @@ defmodule CanvasAPI.SignInMediator do
       |> Map.put("slack_id", user_info["id"])
       |> Map.put("identity_token", token)
 
-    with nil <- Repo.one(find_user),
-         changeset = %User{}
-                     |> User.changeset(user_params)
-                     |> Ecto.Changeset.put_assoc(:account, account)
-                     |> Ecto.Changeset.put_assoc(:team, team) do
-      Repo.insert(changeset)
+    with nil <- Repo.one(find_user) do
+      UserService.insert(user_params, account: account, team: team)
     else
       user = %User{} -> {:ok, user}
     end

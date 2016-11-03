@@ -34,6 +34,12 @@ defmodule CanvasAPI.TeamServiceTest do
       assert Service.show(team.id) == {:ok, Repo.preload(team, [:oauth_tokens])}
     end
 
+    test "returns nil if no team exists for a given account" do
+      account = insert(:account)
+      team = insert(:team)
+      assert Service.show(team.id, account: account) == {:error, :not_found}
+    end
+
     test "returns the team by domain when found" do
       team = insert(:team)
       assert Service.show(team.domain) ==
@@ -46,6 +52,34 @@ defmodule CanvasAPI.TeamServiceTest do
 
     test "returns not_found when not found by domain" do
       assert Service.show("foo") == {:error, :not_found}
+    end
+  end
+
+  describe ".insert" do
+    test "inserts a Slack team" do
+      insert(:whitelisted_domain, domain: "domain")
+      {:ok, _team} = Service.insert(
+        %{"name" => "name", "slack_id" => "abc", "domain" => "domain"},
+        type: :slack)
+    end
+
+    test "inserts a personal team" do
+      {:ok, _team} = Service.insert(%{}, type: :personal)
+    end
+  end
+
+  describe ".update" do
+    test "updates the team when valid" do
+      team = insert(:team, slack_id: nil)
+      {:ok, team} = Service.update(team, %{"domain" => "FOO"})
+      assert team.domain == "~foo"
+    end
+
+    test "returns a changeset when invalid" do
+      team = insert(:team)
+      {:error, changeset} = Service.update(team, %{"domain" => "FOO"})
+      assert({:domain, {"can not be changed for Slack teams", []}}
+             in changeset.errors)
     end
   end
 

@@ -4,10 +4,36 @@ defmodule CanvasAPI.TeamService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.{Account, Team}
+  alias CanvasAPI.{Account, WhitelistedSlackDomain, Team}
   import CanvasAPI.UUIDMatch
 
   @preload [:oauth_tokens]
+
+  @doc """
+  Insert a team.
+
+  ## Examples
+
+  ```elixir
+  TeamService.insert(params, type: :personal)
+  ```
+  """
+  @spec insert(map, Keyword.t) :: {:ok, %Team{}} | {:error, Ecto.Changeset.t}
+  def insert(params, type: :personal) do
+    %Team{}
+    |> Team.create_changeset(params, type: :personal)
+    |> Repo.insert
+  end
+
+  def insert(params, type: :slack) do
+    if domain_whitelisted?(params["domain"]) do
+      %Team{}
+      |> Team.create_changeset(params, type: :slack)
+      |> Repo.insert
+    else
+      {:error, :domain_not_whitelisted}
+    end
+  end
 
   @doc """
   List teams for a given account.
@@ -26,7 +52,7 @@ defmodule CanvasAPI.TeamService do
   @spec list(%Account{}, Keyword.t) :: [%Team{}]
   def list(account, opts) do
     from(assoc(account, :teams),
-         order_by: [:name],
+         order_by: [fragment("slack_id NULLS FIRST"), :name],
          preload: ^@preload)
     |> filter(opts[:filter])
     |> Repo.all
@@ -35,16 +61,42 @@ defmodule CanvasAPI.TeamService do
   @doc """
   Show a specific team by ID or domain.
 
+  Options:
+
+  - `account`: `%Account{}` An account to scope the team find to
+
   ## Examples
 
   ```elixir
   TeamService.show("usecanvas")
   ```
   """
-  @spec show(String.t) :: {:ok, %Team{}} | {:error, :not_found}
-  def show(id) do
+  @spec show(String.t, Keyword.t) :: {:ok, %Team{}} | {:error, :not_found}
+  def show(id, opts \\ [])
+
+  def show(id, account: account) do
+    from(assoc(account, :teams), preload: ^@preload)
+    |> do_get(id)
+  end
+
+  def show(id, _opts) do
     from(Team, preload: ^@preload)
     |> do_get(id)
+  end
+
+  @doc """
+  Update a team (currently only allows changing domain of personal teams).
+
+  ## Examples
+  ```elixir
+  TeamService.update(team, %{"domain" => "my-domain"})
+  ```
+  """
+  @spec update(%Team{}, map) :: {:ok, %Team{}} | {:error, Ecto.Changeset.t}
+  def update(team, params) do
+    team
+    |> Team.update_changeset(params)
+    |> Repo.update
   end
 
   @spec do_get(Ecto.Queryable.t, String.t) :: {:ok, %Team{}}
@@ -91,4 +143,16 @@ defmodule CanvasAPI.TeamService do
   defp filter(queryable, %{"domain" => domain}),
     do: where(queryable, domain: ^domain)
   defp filter(queryable, _), do: queryable
+
+  @spec domain_whitelisted?(String.t | nil) :: boolean
+  defp domain_whitelisted?(nil), do: false
+  defp domain_whitelisted?(domain) do
+    from(WhitelistedSlackDomain, where: [domain: ^domain])
+    |> Repo.one
+    |> case do
+      nil -> false
+      _ -> true
+    end
+  end
+
 end

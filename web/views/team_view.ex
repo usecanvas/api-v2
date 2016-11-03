@@ -2,6 +2,7 @@ defmodule CanvasAPI.TeamView do
   use CanvasAPI.Web, :view
 
   alias CanvasAPI.UserView
+  alias CanvasAPI.Team
 
   def render("index.json", %{teams: teams}) do
     %{
@@ -24,7 +25,7 @@ defmodule CanvasAPI.TeamView do
       id: team.id,
       attributes: %{
         domain: team.domain,
-        has_slack_token: Enum.any?(team.oauth_tokens),
+        needs_slack_token: needs_slack_token(team),
         is_in_team: user != nil,
         images: (if user, do: team.images, else: %{}),
         name: (if user, do: team.name, else: nil),
@@ -70,4 +71,7 @@ defmodule CanvasAPI.TeamView do
   defp include_account_user(team = %{account_user: user}) do
     render_one(Map.put(user, :team, team), UserView, "user.json")
   end
+
+  defp needs_slack_token(%Team{slack_id: nil}), do: false
+  defp needs_slack_token(team), do: !Enum.any?(team.oauth_tokens)
 end

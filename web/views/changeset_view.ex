@@ -12,8 +12,22 @@ defmodule CanvasAPI.ChangesetView do
   end
 
   def render("error.json", %{changeset: changeset}) do
-    # When encoded, the changeset returns its errors
-    # as a JSON object. So we just pass it forward.
-    %{errors: translate_errors(changeset)}
+    changeset
+    |> translate_errors
+    |> Enum.flat_map(&build_error/1)
+    |> json_object(:errors)
+  end
+
+  defp build_error({key, errors}) do
+    errors
+    |> Enum.map(fn error ->
+      %{
+        code: "unprocessable_entity",
+        detail: "#{key |> to_string |> String.capitalize} #{error}.",
+        source: %{pointer: "/data/attributes/#{key}"},
+        status: Plug.Conn.Status.code(:unprocessable_entity) |> to_string,
+        title: error
+      }
+    end)
   end
 end

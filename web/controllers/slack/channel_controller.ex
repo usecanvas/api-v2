@@ -1,7 +1,7 @@
 defmodule CanvasAPI.Slack.ChannelController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.Repo
+  alias CanvasAPI.{Repo, Team}
 
   plug CanvasAPI.CurrentAccountPlug
   plug :ensure_team
@@ -13,6 +13,8 @@ defmodule CanvasAPI.Slack.ChannelController do
       render(conn, "index.json", channels: channels)
     end
   end
+
+  defp get_slack_channels(nil, %Team{slack_id: nil}), do: []
 
   defp get_slack_channels(token, team) do
     token
@@ -28,6 +30,9 @@ defmodule CanvasAPI.Slack.ChannelController do
     from(assoc(conn.private.current_team, :oauth_tokens),
          where: [provider: "slack"])
     |> Repo.one
-    |> Map.get(:token)
+    |> case do
+      nil -> nil
+      token -> Map.get(token, :token)
+    end
   end
 end

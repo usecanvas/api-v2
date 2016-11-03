@@ -10,12 +10,14 @@ defmodule CanvasAPI.CanvasController do
   plug :ensure_canvas when action in [:update]
 
   def create(conn, params) do
+    %{current_user: current_user, current_team: current_team} = conn.private
+
     case CanvasService.create(
       get_in(params, ~w(data attributes)),
-      creator: conn.private.current_user,
-      team: conn.private.current_team,
+      creator: current_user,
+      team: current_team,
       template: get_in(params, ~w(data relationships template data)),
-      notify: conn.private.current_user) do
+      notify: current_team.slack_id && current_user) do
         {:ok, canvas} ->
           conn
           |> put_status(:created)
@@ -48,10 +50,12 @@ defmodule CanvasAPI.CanvasController do
   end
 
   def update(conn, params) do
+    %{current_user: current_user, current_team: current_team} = conn.private
+
     case CanvasService.update(
       conn.private.canvas,
       get_in(params, ~w(data attributes)),
-      notify: conn.private.current_user) do
+      notify: current_team.slack_id && current_user) do
         {:ok, canvas} ->
           render_show(conn, canvas)
         {:error, changeset} ->
