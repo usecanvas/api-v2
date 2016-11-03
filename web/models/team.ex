@@ -49,6 +49,8 @@ defmodule CanvasAPI.Team do
     |> cast(params, [:domain])
     |> if_slack(&prevent_domain_change/1)
     |> validate_required([:domain])
+    |> lowercase_domain
+    |> validate_domain_format
     |> prefix_domain
     |> unique_constraint(:domain)
   end
@@ -82,5 +84,22 @@ defmodule CanvasAPI.Team do
   defp prefix_domain(changeset) do
     domain = "~#{get_change(changeset, :domain)}"
     put_change(changeset, :domain, domain)
+  end
+
+  defp lowercase_domain(changeset) do
+    case get_change(changeset, :domain) do
+      "" <> domain -> put_change(changeset, :domain, String.downcase(domain))
+      _ -> changeset
+    end
+  end
+
+  defp validate_domain_format(changeset) do
+    changeset
+    |> validate_format(:domain, ~r/\A[a-z0-9][a-z0-9-]{0,34}[a-z0-9]\z/,
+         message: """
+                  must be between 2 and 36 characters, contain only letters, \
+                  numbers, and dashes, and begin and end with a letter or \
+                  number\
+                  """)
   end
 end
