@@ -72,7 +72,7 @@ defmodule CanvasAPI.TeamServiceTest do
     test "updates the team when valid" do
       team = insert(:team, slack_id: nil)
       {:ok, team} = Service.update(team, %{"domain" => "FOO"})
-      assert team.domain == "~FOO"
+      assert team.domain == "~foo"
     end
 
     test "returns a changeset when invalid" do
