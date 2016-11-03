@@ -23,7 +23,7 @@ defmodule CanvasAPI.ChangesetView do
     |> Enum.map(fn error ->
       %{
         code: "unprocessable_entity",
-        detail: "#{key |> to_string |> String.capitalize} #{error}",
+        detail: "#{key |> to_string |> String.capitalize} #{error}.",
         source: %{pointer: "/data/attributes/#{key}"},
         status: Plug.Conn.Status.code(:unprocessable_entity) |> to_string,
         title: error
