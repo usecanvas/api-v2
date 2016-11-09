@@ -21,7 +21,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
                            max_age: 604_800 * 2, # 2 weeks (expires with logout)
                            http_only: false)
         |> put_session(:account_id, account.id)
-        |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
+        |> send_resp_or_redirect()
       {:error, _error} ->
         bad_request(conn)
     end
@@ -38,6 +38,18 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
       _ ->
         bad_request(conn)
+    end
+  end
+
+  @spec send_resp_or_redirect(Plug.Conn.t) :: Plug.Conn.t
+  defp send_resp_or_redirect(conn) do
+    [user_agent | []] = get_req_header(conn, "user-agent")
+
+    cond do
+      String.contains?(user_agent, "Electron") ->
+        send_resp(conn, :ok, "")
+      true ->
+        redirect(conn, external: System.get_env("REDIRECT_ON_LOGIN_URL"))
     end
   end
 end
