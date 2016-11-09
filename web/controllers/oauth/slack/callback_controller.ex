@@ -43,7 +43,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
 
   @spec send_resp_or_redirect(Plug.Conn.t) :: Plug.Conn.t
   defp send_resp_or_redirect(conn) do
-    [user_agent | []] = get_req_header(conn, "user-agent")
+    [user_agent | _] = get_req_header(conn, "user-agent")
 
     cond do
       String.contains?(user_agent, "Electron") ->
