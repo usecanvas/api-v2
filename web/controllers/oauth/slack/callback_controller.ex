@@ -35,7 +35,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
     case AddToSlackMediator.add(code) do
       {:ok, _token} ->
         conn
-        |> redirect(external: System.get_env("REDIRECT_ON_LOGIN_URL"))
+        |> send_resp_or_redirect()
       _ ->
         bad_request(conn)
     end
