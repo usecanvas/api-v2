@@ -51,8 +51,8 @@ defmodule CanvasAPI.TeamService do
   """
   @spec list(%Account{}, Keyword.t) :: [%Team{}]
   def list(account, opts) do
-    from(assoc(account, :teams),
-         order_by: [fragment("slack_id NULLS FIRST"), :name],
+    from(t in assoc(account, :teams),
+         order_by: [desc: is_nil(t.slack_id), asc: :name],
          preload: ^@preload)
     |> filter(opts[:filter])
     |> Repo.all
