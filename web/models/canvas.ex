@@ -44,15 +44,6 @@ defmodule CanvasAPI.Canvas do
     |> put_title_block
   end
 
-  defp parse_markdown(changeset) do
-    if markdown = get_change(changeset, :markdown) do
-      blocks = CanvasAPI.Markdown.parse(markdown)
-      Map.put(changeset, :params, Map.put(changeset.params, "blocks", blocks))
-    else
-      changeset
-    end
-  end
-
   @doc """
   Builds a changeset for updating a canvas.
   """
@@ -150,5 +141,16 @@ defmodule CanvasAPI.Canvas do
   @spec title_changeset :: Ecto.Changeset.t
   defp title_changeset do
     Block.changeset(%Block{}, %{type: "title"})
+  end
+
+  # Parse a Markdown change into a blocks param
+  @spec parse_markdown(Ecto.Changeset.t) :: Ecto.Changeset.t
+  defp parse_markdown(changeset) do
+    if markdown = get_change(changeset, :markdown) do
+      blocks = CanvasAPI.Markdown.parse(markdown)
+      Map.put(changeset, :params, Map.put(changeset.params, "blocks", blocks))
+    else
+      changeset
+    end
   end
 end
