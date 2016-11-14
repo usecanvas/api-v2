@@ -166,6 +166,18 @@ defmodule CanvasAPI.MarkdownTest do
       }]
   end
 
+  test "parses tab-indented code" do
+    assert Markdown.parse("	foo\n	  bar\n	baz\nqux") ==
+      [%{
+        type: "code",
+        content: "foo\n  bar\nbaz",
+        meta: %{language: nil}
+      }, %{
+        type: "paragraph",
+        content: "qux"
+      }]
+  end
+
   test "parses a complex Markdown document" do
     parsed = Markdown.parse """
     # Title
@@ -183,6 +195,14 @@ defmodule CanvasAPI.MarkdownTest do
       @type t :: %__MODULE__{}
     end
     ```
+
+    \tdefmodule Foo do
+    \t  @type t :: %__MODULE__{}
+    \tend
+
+        defmodule Foo do
+          @type t :: %__MODULE__{}
+        end
 
     ---
 
@@ -225,6 +245,22 @@ defmodule CanvasAPI.MarkdownTest do
       end\
       """,
       meta: %{language: "elixir"}
+    }, %{
+      type: "code",
+      content: """
+      defmodule Foo do
+        @type t :: %__MODULE__{}
+      end\
+      """,
+      meta: %{language: nil}
+    }, %{
+      type: "code",
+      content: """
+      defmodule Foo do
+        @type t :: %__MODULE__{}
+      end\
+      """,
+      meta: %{language: nil}
     }, %{
       type: "horizontal-rule"
     }, %{

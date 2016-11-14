@@ -48,26 +48,42 @@ defmodule CanvasAPI.Markdown do
     {parsed, new_state} =
       cond do
         parsed = match_heading(line) ->
-          {parsed, :garbage}
+          {parsed, state: :garbage}
         match = Regex.match?(@horizontal_rule, line) ->
-          {%{type: "horizontal-rule"}, :garbage}
+          {%{type: "horizontal-rule"}, state: :garbage}
         match = match_code_fence(line) ->
           {%{type: "code", content: "", meta: %{language: elem(match, 1)}},
-           :code}
+           state: :code}
+        stripped_line = match_indented_code(line, "\t") ->
+          {%{type: "code", content: stripped_line, meta: %{language: nil}},
+           state: :code, indent: "\t"}
+        stripped_line = match_indented_code(line, "    ") ->
+          {%{type: "code", content: stripped_line, meta: %{language: nil}},
+           state: :code, indent: "    "}
         parsed = match_list_item(line) ->
-          {%{type: "list", blocks: [parsed]}, :list}
+          {%{type: "list", blocks: [parsed]}, state: :list}
         Regex.match?(@image, line) ->
-          {%{type: "image", meta: %{url: line}}, :garbage}
+          {%{type: "image", meta: %{url: line}}, state: :garbage}
         Regex.match?(@url, line) ->
-          {%{type: "url", meta: %{url: line}}, :garbage}
+          {%{type: "url", meta: %{url: line}}, state: :garbage}
         true ->
-          {%{type: "paragraph", content: line}, :garbage}
+          {%{type: "paragraph", content: line}, state: :garbage}
       end
 
-    do_parse(tail, [parsed | result], state: new_state)
+    do_parse(tail, [parsed | result], new_state)
   end
 
   # Code state
+  defp do_parse([line | tail] = lines, [code | result_tail] = result, state: :code, indent: indent) do
+    if line = match_indented_code(line, indent) do
+      content = "#{code[:content]}\n#{line}"
+      code = Map.put(code, :content, content)
+      do_parse(tail, [code | result_tail], state: :code, indent: indent)
+    else
+      do_parse(lines, result, state: :garbage)
+    end
+  end
+
   defp do_parse([line | tail], [code | result_tail] = result, state: :code) do
     if match_code_fence(line) do
       do_parse(tail, result, state: :garbage)
@@ -91,6 +107,15 @@ defmodule CanvasAPI.Markdown do
       do_parse(tail, [list | result_tail], state: :list)
     else
       do_parse(lines, result, state: :garbage)
+    end
+  end
+
+  @spec match_indented_code(String.t, String.t) :: String.t | nil
+  defp match_indented_code(line, indent) do
+    if String.starts_with?(line, indent) do
+      String.replace_prefix(line, indent, "")
+    else
+      nil
     end
   end
 
