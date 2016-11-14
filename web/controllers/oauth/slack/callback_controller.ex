@@ -45,11 +45,10 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
   defp send_resp_or_redirect(conn) do
     [user_agent | _] = get_req_header(conn, "user-agent")
 
-    cond do
-      String.contains?(user_agent, "Electron") ->
-        send_resp(conn, :ok, "")
-      true ->
-        redirect(conn, external: System.get_env("REDIRECT_ON_LOGIN_URL"))
+    if String.contains?(user_agent, "Electron") do
+      send_resp(conn, :ok, "")
+    else
+      redirect(conn, external: System.get_env("REDIRECT_ON_LOGIN_URL"))
     end
   end
 end

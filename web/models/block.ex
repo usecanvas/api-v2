@@ -5,6 +5,8 @@ defmodule CanvasAPI.Block do
 
   use CanvasAPI.Web, :model
 
+  @type t :: %__MODULE__{}
+
   @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}
 
   embedded_schema do
