@@ -1,24 +1,18 @@
 defmodule CanvasAPI.UserController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.Team
+  alias CanvasAPI.UserService
 
   plug CanvasAPI.CurrentAccountPlug
 
-  def show(conn, %{"team_id" => team_id}, current_account) do
-    user =
-      from(u in assoc(current_account, :users),
-           join: t in Team, on: t.id == u.team_id,
-           where: t.id == ^team_id,
-           preload: [:team])
-      |> Repo.one!
-
-    render(conn, "show.json", user: user)
-  end
-
-  def action(conn, _) do
-    apply(__MODULE__, action_name(conn), [conn,
-                                          conn.params,
-                                          conn.private.current_account])
+  @spec show(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def show(conn, %{"team_id" => team_id}) do
+    UserService.find_by_team(conn.private.current_account, team_id: team_id)
+    |> case do
+      {:ok, user} ->
+        render(conn, "show.json", user: user)
+      {:error, :not_found} ->
+        not_found(conn)
+    end
   end
 end

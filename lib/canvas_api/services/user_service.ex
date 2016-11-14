@@ -4,7 +4,7 @@ defmodule CanvasAPI.UserService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.User
+  alias CanvasAPI.{Account, Team, User}
 
   @doc """
   Insert a new user from the given params.
@@ -25,7 +25,7 @@ defmodule CanvasAPI.UserService do
     team: current_team)
   ```
   """
-  @spec insert(params::map, options::Keyword.t) :: %User{}
+  @spec insert(params::map, options::Keyword.t) :: User.t
                                                  | {:error, Ecto.Changeset.t}
   def insert(params, opts) do
     %User{}
@@ -33,5 +33,30 @@ defmodule CanvasAPI.UserService do
     |> put_assoc(:account, opts[:account])
     |> put_assoc(:team, opts[:team])
     |> Repo.insert
+  end
+
+  @doc """
+  Find a user for a given account and team ID.
+
+
+  ## Examples
+
+  ```elixir
+  UserService.find_by_team(
+    account, team_id: team.id)
+  ```
+  """
+  @spec find_by_team(Account.t, Keyword.t) :: {:ok, User.t}
+                                            | {:error, :not_found}
+  def find_by_team(account, team_id: team_id) do
+    from(u in assoc(account, :users),
+         join: t in Team, on: t.id == u.team_id,
+         where: t.id == ^team_id,
+         preload: [:team])
+    |> Repo.one
+    |> case do
+      nil ->  {:error, :not_found}
+      user -> {:ok, user}
+    end
   end
 end

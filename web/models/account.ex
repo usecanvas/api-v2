@@ -5,6 +5,8 @@ defmodule CanvasAPI.Account do
 
   use CanvasAPI.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "accounts" do
     many_to_many :teams, CanvasAPI.Team, join_through: "users"
     has_many :oauth_tokens, CanvasAPI.OAuthToken

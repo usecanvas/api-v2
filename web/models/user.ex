@@ -7,6 +7,8 @@ defmodule CanvasAPI.User do
 
   alias CanvasAPI.ImageMap
 
+  @type t :: %__MODULE__{}
+
   schema "users" do
     field :email, :string
     field :identity_token, CanvasAPI.EncryptedField
