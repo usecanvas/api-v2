@@ -19,6 +19,8 @@ defmodule CanvasAPI.Canvas do
     field :slack_channel_ids, {:array, :string}, default: []
     field :edited_at, Calecto.DateTimeUTC
 
+    field :markdown, :string, virtual: true
+
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas, type: :string
@@ -34,11 +36,21 @@ defmodule CanvasAPI.Canvas do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:is_template, :link_access, :slack_channel_ids])
+    |> cast(params, [:is_template, :link_access, :markdown, :slack_channel_ids])
+    |> parse_markdown
     |> cast_embed(:blocks)
     |> validate_inclusion(:link_access, ~w(none read edit))
     |> put_change(:edited_at, DateTime.utc_now)
     |> put_title_block
+  end
+
+  defp parse_markdown(changeset) do
+    if markdown = get_change(changeset, :markdown) do
+      blocks = CanvasAPI.Markdown.parse(markdown)
+      Map.put(changeset, :params, Map.put(changeset.params, "blocks", blocks))
+    else
+      changeset
+    end
   end
 
   @doc """

@@ -11,6 +11,56 @@ defmodule CanvasAPI.CanvasControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  describe "POST :create" do
+    test "creates a canvas with blocks", %{conn: conn} do
+      team = insert(:team, slack_id: nil)
+      user = insert(:user, team: team)
+      account = user.account
+
+      data = %{
+        "data" => %{
+          "attributes" => %{
+            "blocks" => [%{"type" => "paragraph", "content" => "Foo"}]
+          }
+        }
+      }
+
+      conn =
+        conn
+        |> put_private(:current_account, account)
+        |> post(team_canvas_path(conn, :create, team), data)
+
+      assert(
+        json_response(conn, 201)["data"]["attributes"]["blocks"]
+        |> Enum.at(1)
+        |> Map.get("content") == "Foo")
+    end
+
+    test "creates a canvas with markdown", %{conn: conn} do
+      team = insert(:team, slack_id: nil)
+      user = insert(:user, team: team)
+      account = user.account
+
+      data = %{
+        "data" => %{
+          "attributes" => %{
+            "markdown" => "# Foo"
+          }
+        }
+      }
+
+      conn =
+        conn
+        |> put_private(:current_account, account)
+        |> post(team_canvas_path(conn, :create, team), data)
+
+      assert(
+        json_response(conn, 201)["data"]["attributes"]["blocks"]
+        |> Enum.at(0)
+        |> Map.get("content") == "Foo")
+    end
+  end
+
   describe "GET :index" do
     test "lists all canvases", %{conn: conn} do
       canvas = insert(:canvas)
