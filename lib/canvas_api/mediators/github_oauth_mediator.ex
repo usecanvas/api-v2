@@ -12,15 +12,15 @@ defmodule CanvasAPI.GitHubOAuthMediator do
   @doc """
   Persist a GitHub token for `account` by exchanging `code` for a token.
   """
-  @spec persist_token(String.t, Keyword.t) :: :ok | {:error, any}
+  @spec persist_token(String.t, Keyword.t) :: {:ok, OAuthToken.t}
+                                            | {:error, any}
   def persist_token(code, account: account) do
     with {:ok, access_token} <- exchange_code(code) do
       persist_oauth_token(access_token, account)
     end
   end
 
-  @spec exchange_code(String.t) ::
-        {:ok, String.t} | {:error, any}
+  @spec exchange_code(String.t) :: {:ok, String.t} | {:error, any}
   defp exchange_code(code) do
     GitHubAPI.post("https://github.com/login/oauth/access_token",
       "",
@@ -38,8 +38,8 @@ defmodule CanvasAPI.GitHubOAuthMediator do
    end
   end
 
-  @spec persist_oauth_token(String.t, %Account{}) ::
-        {:ok, %OAuthToken{}} | {:error, any}
+  @spec persist_oauth_token(String.t, Account.t) :: {:ok, OAuthToken.t}
+                                                  | {:error, Ecto.Changeset.t}
   defp persist_oauth_token(access_token, account) do
     changeset =
       %OAuthToken{}

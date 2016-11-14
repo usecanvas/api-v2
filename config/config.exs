@@ -8,7 +8,8 @@ use Mix.Config
 # General application configuration
 config :canvas_api,
   namespace: CanvasAPI,
-  ecto_repos: [CanvasAPI.Repo]
+  ecto_repos: [CanvasAPI.Repo],
+  redirect_on_auth_url: System.get_env("REDIRECT_ON_AUTH_URL")
 
 config :canvas_api, CanvasAPI.UploadSignature,
   url: System.get_env("FILE_UPLOAD_URL")

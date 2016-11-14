@@ -1,5 +1,8 @@
 use Mix.Config
 
+config :canvas_api,
+  redirect_on_auth_url: "http://localhost.test/redirect_on_auth_url"
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :canvas_api, CanvasAPI.Endpoint,

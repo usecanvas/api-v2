@@ -5,6 +5,8 @@ defmodule CanvasAPI.OAuthToken do
 
   use CanvasAPI.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "oauth_tokens" do
     field :token, CanvasAPI.EncryptedField
     field :provider, :string
