@@ -33,6 +33,8 @@ defmodule CanvasAPI.Canvas.FormatterTest do
             meta: %{"level" => 2, "checked" => true}
           }]
         }, %Block{
+          type: "horizontal-rule"
+        }, %Block{
           type: "heading",
           content: "Smaller Heading",
           meta: %{"level" => 3}
@@ -62,6 +64,8 @@ defmodule CanvasAPI.Canvas.FormatterTest do
       - Bar
         - [ ] Baz
         - [x] Qux
+
+      ---
 
       ### Smaller Heading
 

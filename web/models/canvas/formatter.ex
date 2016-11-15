@@ -21,6 +21,10 @@ defmodule CanvasAPI.Canvas.Formatter do
     "#{md}#{block.content}\n\n"
   end
 
+  defp block_to_markdown(block = %Block{type: "horizontal-rule"}, md) do
+    "#{md}---\n\n"
+  end
+
   defp block_to_markdown(block = %Block{type: "heading"}, md) do
     "#{md}#{leading_hashes(block)} #{block.content}\n\n"
   end
