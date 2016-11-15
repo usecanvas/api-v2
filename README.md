@@ -18,6 +18,11 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
 
+## Documentation
+
+- [Internal documentation](https://usecanvas.github.io/pro-api)
+- [API documentation](https://github.com/usecanvas/pro-api/blob/master/api.md)
+
 ## Tasks
 
 ### Importing/Updating Templates
