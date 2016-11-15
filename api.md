@@ -5,28 +5,41 @@
 Currently, authentication is done through cookies. Except on endpoints that are
 not authenticated, command-line access to Canvas is not easily possible.
 
-## Resources
-
-### Canvas
+## Canvas
 
 A canvas is a JSON-backed collaboratively-edited document.
 
-#### Show Canvas
+### Attributes
+
+| Name                | Type            | Example | Description |
+| ------------------- | --------------- | ------- | ----------- |
+| `blocks`            | `Array<Block>`  | `[]` | The list of blocks that the canvas comprises
+| `is_template`       | `boolean`       | `true` | Whether the canvas is a template
+| `link_access`       | `string`        | `"none"` | `"none"`, `"read"`, or `"edit"`: Policy for what having the link to this canvas allows
+| `native_version`    | `string`        | `"1.0.0"` | The version of the Canvas JSON format this canvas uses
+| `slack_channel_ids` | `Array<string>` | `["C39F39FHH"]` | An array of Slack channel IDs this Canvas is linked to
+| `type`              | `string`        | `http://sharejs.org/types/JSONv0` | The OT type this canvas uses
+| `version`           | `number`        | `108` | The OT version of this canvas
+| `edited_at`         | `datetime`      | `"2016-11-14T18:30:47.226471Z"` | The time the canvas contents were last edited
+| `inserted_at`       | `datetime`      | `"2016-11-14T18:30:47.226471Z"` | The time the canvas was originally created
+| `updated_at`        | `datetime`      | `"2016-11-14T18:30:47.226471Z"` | The time the canvas (not content) was last updated
+
+### Show Canvas
 
 View an individual canvas.
 
-##### Example
+#### Example
 
 Requesting a canvas URL will return a detailed JSON view of the requested
 canvas.
 
-###### Request
+##### Request
 
 ```curl
 curl -v https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdyPbPjGoQo
 ```
 
-###### Response
+##### Response
 
 <details>
   <summary>Click to Expand</summary>
@@ -123,18 +136,18 @@ curl -v https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdy
 ```
 </details>
 
-##### Markdown Example
+#### Markdown Example
 
 Appending a Markdown extension (for example, ".md" or ".txt) will return the
 contents of the canvas, formatted as Markdown.
 
-###### Request
+##### Request
 
 ```curl
 curl https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdyPbPjGoQo.md
 ```
 
-###### Response
+##### Response
 
 ```curl
 < HTTP/1.1 200 OK
@@ -144,3 +157,16 @@ curl https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdyPbP
 
 Hello, world!
 ```
+
+## Block
+
+A block is a chunk of content in a canvas.
+
+### Attributes
+
+| Name      | Type             | Example | Description |
+| --------- | ---------------- | ------- | ----------- |
+| `type`    | `string`         | `"title"` | The type of block this block is
+| `meta`    | `map`            | `{ "level": 1 }` | A map of metadata about the block, such as indentation level
+| `content` | `string` | `nil` | `"Hello, World"` | The text content of the block
+| `blocks`  | `Array<Block>`   | `[]` | Blocks nested inside of this block
