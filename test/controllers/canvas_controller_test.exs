@@ -105,5 +105,18 @@ defmodule CanvasAPI.CanvasControllerTest do
 
       assert conn.status == 200
     end
+
+    test "renders a canvas as markdown", %{conn: conn} do
+      canvas = insert(
+        :canvas, blocks: [%Block{type: "title", content: "Title"}])
+      account = canvas.creator.account |> Repo.preload([:teams])
+
+      conn =
+        conn
+        |> put_private(:current_account, account)
+        |> get(team_canvas_path(conn, :show, canvas.team, canvas.id) <> ".md")
+
+      assert text_response(conn, 200) == "# Title"
+    end
   end
 end

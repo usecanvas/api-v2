@@ -9,6 +9,8 @@ defmodule CanvasAPI.CanvasController do
   plug :ensure_user when not action in [:show]
   plug :ensure_canvas when action in [:update]
 
+  @md_extensions ~w(markdown md mdown text txt)
+
   def create(conn, params) do
     %{current_user: current_user, current_team: current_team} = conn.private
 
@@ -89,8 +91,14 @@ defmodule CanvasAPI.CanvasController do
 
   defp render_show(conn, canvas, "canvas") do
     conn
-    |> put_resp_header("content-type", "application/octet-stream")
+    |> put_resp_content_type("application/octet-stream")
     |> render("canvas.json", canvas: canvas, json_api: false)
+  end
+
+  defp render_show(conn, canvas, format) when format in @md_extensions do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> render("canvas.md", canvas: canvas)
   end
 
   defp render_show(conn, canvas, _) do

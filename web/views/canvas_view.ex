@@ -2,6 +2,7 @@ defmodule CanvasAPI.CanvasView do
   use CanvasAPI.Web, :view
 
   alias CanvasAPI.{Endpoint, UserView}
+  alias CanvasAPI.Canvas.Formatter, as: CanvasFormatter
 
   def render("index.json", %{canvases: canvases}) do
     %{
@@ -75,5 +76,9 @@ defmodule CanvasAPI.CanvasView do
       },
       type: "canvas"
     }
+  end
+
+  def render("canvas.md", %{canvas: canvas}) do
+    CanvasFormatter.to_markdown(canvas)
   end
 end
