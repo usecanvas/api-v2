@@ -43,10 +43,13 @@ curl -v https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdy
 
 <details>
   <summary>Click to Expand</summary>
-```curl
-< HTTP/1.1 200 OK
-< Content-Type: application/json; charset=utf-8
-<
+
+| Attribute/Header | Value |
+| ---------------- | ----- |
+| Status | 200 OK
+| Content-Type | application/json; charset=utf-8
+
+```json
 {
   "data": {
     "id": "4IuudUOzvCrVdyPbPjGoQo",
@@ -149,14 +152,20 @@ curl https://pro-api.usecanvas.com/v1/teams/usecanvas/canvases/4IuudUOzvCrVdyPbP
 
 ##### Response
 
-```curl
-< HTTP/1.1 200 OK
-< Content-Type: text/plain; charset=utf-8
-<
+<details>
+  <summary>Click to Expand</summary>
+
+| Attribute/Header | Value |
+| ---------------- | ----- |
+| Status | 200 OK
+| Content-Type | text/plain; charset=utf-8
+
+```markdown
 # TBTS: The Canvas JSON API
 
 Hello, world!
 ```
+</details>
 
 ## Block
 
