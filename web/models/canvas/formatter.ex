@@ -61,4 +61,6 @@ defmodule CanvasAPI.Canvas.Formatter do
   defp leading_spaces(%Block{meta: %{"level" => level}}) do
     String.duplicate("  ", level - 1)
   end
+
+  defp leading_spaces(_), do: ""
 end
