@@ -13,7 +13,7 @@ defmodule CanvasAPI.Canvas.Formatter do
   end
 
   @spec block_to_markdown(Block.t, String.t) :: String.t
-  defp block_to_markdown(block = %Block{type: "title"}, md) do
+  defp block_to_markdown(block = %Block{type: "title"}, _md) do
     "# #{block.content}\n\n"
   end
 
