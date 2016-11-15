@@ -44,6 +44,7 @@ defmodule CanvasAPI.Markdown do
   end
 
   # Garbage state
+  @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   defp do_parse([line | tail], result, state: :garbage) do
     {parsed, new_state} =
       cond do
