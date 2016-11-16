@@ -49,7 +49,7 @@ defmodule CanvasAPI.Canvas do
   """
   def update_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:link_access, :slack_channel_ids])
+    |> cast(params, [:is_template, :link_access, :slack_channel_ids])
     |> validate_inclusion(:link_access, ~w(none read edit))
   end
 
