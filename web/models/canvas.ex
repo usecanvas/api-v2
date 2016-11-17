@@ -42,6 +42,7 @@ defmodule CanvasAPI.Canvas do
     |> validate_inclusion(:link_access, ~w(none read edit))
     |> put_change(:edited_at, DateTime.utc_now)
     |> put_title_block
+    |> put_paragraph_block
   end
 
   @doc """
@@ -134,6 +135,17 @@ defmodule CanvasAPI.Canvas do
         put_embed(changeset, :blocks, [title_changeset | blocks_changeset])
       nil ->
         put_embed(changeset, :blocks, [title_changeset])
+    end
+  end
+
+  @spec put_paragraph_block(Ecto.Changeset.t) :: Ecto.Changeset.t
+  defp put_paragraph_block(changeset) do
+    blocks = get_change(changeset, :blocks)
+    if Enum.count(blocks) == 1 do
+      blocks = blocks ++ [Block.changeset(%Block{}, %{type: "paragraph"})]
+      put_embed(changeset, :blocks, blocks)
+    else
+      changeset
     end
   end
 
