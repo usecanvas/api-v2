@@ -37,6 +37,7 @@ defmodule CanvasAPI.Unfurl do
       _ ->
         %__MODULE__{
           id: url,
+          fetched: false,
           title: url,
           url: url}
     end
