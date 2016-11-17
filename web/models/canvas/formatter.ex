@@ -21,7 +21,7 @@ defmodule CanvasAPI.Canvas.Formatter do
     "#{md}#{block.content}\n\n"
   end
 
-  defp block_to_markdown(block = %Block{type: "horizontal-rule"}, md) do
+  defp block_to_markdown(%Block{type: "horizontal-rule"}, md) do
     "#{md}---\n\n"
   end
 
