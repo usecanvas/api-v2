@@ -1,8 +1,8 @@
 defmodule CanvasAPI.ErrorView do
   use CanvasAPI.Web, :view
 
-  def render("400.json", _assigns) do
-    render("error.json", detail: "Bad request")
+  def render("400.json", assigns) do
+    render("error.json", detail: assigns[:detail] || "Bad request")
   end
 
   def render("401.json", _assigns) do

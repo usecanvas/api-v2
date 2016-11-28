@@ -12,7 +12,7 @@ defmodule CanvasAPI.CommonRenders do
     conn
     |> maybe_halt(opts[:halt])
     |> put_status(:bad_request)
-    |> render(ErrorView, "400.json")
+    |> render(ErrorView, "400.json", %{detail: opts[:detail]})
   end
 
   def not_found(conn, opts \\ []) do

@@ -9,21 +9,32 @@ defmodule CanvasAPI.Slack.ChannelController do
 
   def index(conn, _params) do
     with token <- get_slack_token(conn),
-         channels <- get_slack_channels(token, conn.private.current_team) do
+         {:ok, channels} <- get_channels(token, conn.private.current_team) do
       render(conn, "index.json", channels: channels)
+    else
+      {:error, detail} ->
+        bad_request(conn, detail: detail)
     end
   end
 
-  defp get_slack_channels(nil, %Team{slack_id: nil}), do: []
+  defp get_channels(nil, %Team{slack_id: nil}), do: []
 
-  defp get_slack_channels(token, team) do
+  defp get_channels(token, team) do
     token
     |> Slack.client
     |> Slack.Channel.list(exclude_archived: 1)
-    |> elem(1)
-    |> Map.get("channels")
-    |> Enum.map(fn token -> Map.put(token, "team", team) end)
-    |> Enum.sort_by(&(&1["name"]))
+    |> case do
+      {:ok, response} ->
+        response
+        |> Map.get("channels")
+        |> Enum.map(fn token -> Map.put(token, "team", team) end)
+        |> Enum.sort_by(&(&1["name"]))
+        |> fn channels -> {:ok, channels} end.()
+      {:error, %HTTPoison.Response{body: %{"error" => "token_revoked"}}} ->
+        {:error, gettext("Slack token revoked")}
+      {:error, _} ->
+        {:error, nil}
+    end
   end
 
   defp get_slack_token(conn) do
