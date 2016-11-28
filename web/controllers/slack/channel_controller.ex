@@ -25,11 +25,7 @@ defmodule CanvasAPI.Slack.ChannelController do
     |> Slack.Channel.list(exclude_archived: 1)
     |> case do
       {:ok, response} ->
-        response
-        |> Map.get("channels")
-        |> Enum.map(fn token -> Map.put(token, "team", team) end)
-        |> Enum.sort_by(&(&1["name"]))
-        |> fn channels -> {:ok, channels} end.()
+        {:ok, process_channels(response["channels"], team)}
       {:error, %HTTPoison.Response{body: %{"error" => "token_revoked"}}} ->
         {:error, gettext("Slack token revoked")}
       {:error, _} ->
@@ -45,5 +41,11 @@ defmodule CanvasAPI.Slack.ChannelController do
       nil -> nil
       token -> Map.get(token, :token)
     end
+  end
+
+  defp process_channels(channels, team) do
+    channels
+    |> Enum.map(& Map.put(&1, "team", team))
+    |> Enum.sort_by(& &1["name"])
   end
 end
