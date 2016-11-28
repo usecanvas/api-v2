@@ -17,7 +17,7 @@ defmodule CanvasAPI.Slack.ChannelController do
     end
   end
 
-  defp get_channels(nil, %Team{slack_id: nil}), do: []
+  defp get_channels(nil, %Team{slack_id: nil}), do: {:ok, []}
 
   defp get_channels(token, team) do
     token
