@@ -17,7 +17,6 @@ defmodule CanvasAPI.Unfurl.Youtube do
   """
   @spec unfurl(url :: String.t, opts :: Keyword.t) :: Unfurl.t | nil
   def unfurl(url, _opts \\ []) do
-    IO.puts "Hello World"
     if id = youtube_id(url) do
       unfurl_from_body(id, url)
     end
