@@ -54,6 +54,8 @@ defmodule CanvasAPI.Unfurl do
         CanvasAPI.Unfurl.Youtube
       Regex.match?(CanvasAPI.Unfurl.Framer.framer_regex, url) ->
         CanvasAPI.Unfurl.Framer
+      Regex.match?(CanvasAPI.Unfurl.Vimeo.vimeo_regex, url) ->
+        CanvasAPI.Unfurl.Vimeo
       Regex.match?(~r|\Ahttps?://(?:www\.)?github\.com/|, url) ->
         CanvasAPI.Unfurl.GitHub
       Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->
