@@ -29,7 +29,8 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
         id: url,
         title: "Message from @#{response[:user]["name"]}",
         text: SlackParser.to_text(response[:message]["text"]),
-        thumbnail_url: response[:user]["profile"]["image_original"]
+        thumbnail_url: response[:user]["profile"]["image_original"],
+        attachments: response[:attachments]
       }
     end
   end
@@ -38,11 +39,59 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
     with client = Slack.client(token),
          {:ok, %{"channels" => channels}} <- get_channels(client),
          channel when not is_nil(channel) <- find_channel(channels, name),
-         {:ok, %{"messages" => [message]}} <-
-           get_message(client, channel, timestamp),
+         {:ok, %{"messages" => messages}} <-
+           get_messages(client, channel, timestamp),
+         message = List.last(messages),
+         history = Enum.slice(messages, 0..-2),
          {:ok, %{"user" => user}} <- get_user(client, message["user"]) do
-      %{channel: channel, message: message, user: user}
+      %{channel: channel,
+        message: message,
+        attachments: make_attachments(client, history),
+        user: user}
     end
+  end
+
+  defp make_attachments(client, messages) do
+    messages =
+      messages
+      |> Enum.reject(& !(&1["user"] && &1["text"]))
+      |> Enum.reverse
+
+    users =
+      messages
+      |> Enum.map(& &1["user"])
+      |> Enum.uniq
+      |> Enum.map(&Task.async(fn ->
+        with {:ok, user} <- get_user(client, &1) do
+          Map.get(user, "user")
+        else
+          _ -> nil
+        end
+      end))
+      |> Enum.map(&Task.await/1)
+      |> Enum.reject(& !&1)
+
+    messages
+    |> Enum.map(fn message ->
+      formatted =
+        %{
+          author: nil,
+          timestamp: message["ts"],
+          text: SlackParser.to_text(message["text"]),
+          thumbnail_url: nil
+        }
+
+      if message["user"] do
+        user = Enum.find(users, & &1["id"] == message["user"])
+
+        Map.merge(formatted, %{
+          author: "@#{user |> Map.get("name")}",
+          thumbnail_url: user |> get_in(~w(profile image_original))
+        })
+      else
+        formatted
+      end
+    end)
   end
 
   defp get_channels(client) do
@@ -54,9 +103,9 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
     |> Repo.one
   end
 
-  defp get_message(client, channel, timestamp) do
+  defp get_messages(client, channel, timestamp) do
     Channel.history(client,
-      channel: channel["id"], oldest: timestamp, inclusive: 1, count: 1)
+      channel: channel["id"], oldest: timestamp, inclusive: 1, count: 50)
   end
 
   defp get_user(client, user_id) do
