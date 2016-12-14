@@ -7,7 +7,7 @@ defmodule CanvasAPI.CanvasService do
   alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
   import CanvasAPI.UUIDMatch
 
-  @preload [:team, creator: [:team]]
+  @preload [:team, :template, creator: [:team]]
 
   @doc """
   Create a new canvas from the given params.
@@ -170,6 +170,7 @@ defmodule CanvasAPI.CanvasService do
 
     canvas
     |> Canvas.update_changeset(params)
+    |> Canvas.put_template(opts[:template], ignore_blocks: true)
     |> Repo.update
     |> case do
       {:ok, canvas} ->

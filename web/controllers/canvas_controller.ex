@@ -62,6 +62,7 @@ defmodule CanvasAPI.CanvasController do
     case CanvasService.update(
       conn.private.canvas,
       get_in(params, ~w(data attributes)),
+      template: get_in(params, ~w(data relationships template data)),
       notify: current_team.slack_id && current_user) do
         {:ok, canvas} ->
           render_show(conn, canvas)

@@ -75,20 +75,27 @@ defmodule CanvasAPI.Canvas do
   TODO: This currently allows finding a canvas by ID only (not requiring to be
   in the team).
   """
-  @spec put_template(Ecto.Changeset.t, map | nil) :: Ecto.Changeset.t
-  def put_template(changeset, %{"id" => id, "type" => "canvases"}) do
+  @spec put_template(Ecto.Changeset.t, map | nil, Keyword.t) :: Ecto.Changeset.t
+  def put_template(changeset, data, opts \\ [])
+
+  def put_template(changeset, %{"id" => id, "type" => "canvas"}, opts) do
     case Repo.get(__MODULE__, id) do
       nil ->
         changeset
       template = %__MODULE__{blocks: blocks} ->
-        changeset
-        |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
-        |> cast_embed(:blocks)
-        |> put_assoc(:template, template)
+        changeset =
+          if opts[:ignore_blocks] do
+            changeset
+          else
+            changeset
+            |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
+            |> cast_embed(:blocks)
+          end
+          |> put_assoc(:template, template)
     end
   end
 
-  def put_template(changeset, _), do: changeset
+  def put_template(changeset, _, _), do: changeset
 
   @doc """
   Get the summary of a canvas.

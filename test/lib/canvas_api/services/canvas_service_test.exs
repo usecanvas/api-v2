@@ -1,7 +1,7 @@
 defmodule CanvasAPI.CanvasServiceTest do
   use CanvasAPI.ModelCase
 
-  alias CanvasAPI.{Canvas, CanvasService}
+  alias CanvasAPI.{Block, Canvas, CanvasService}
   import CanvasAPI.Factory
   import Mock
 
@@ -35,7 +35,7 @@ defmodule CanvasAPI.CanvasServiceTest do
         |> CanvasService.create(
           creator: user,
           team: user.team,
-          template: %{"id" => template.id, "type" => "canvases"})
+          template: %{"id" => template.id, "type" => "canvas"})
 
       assert canvas.template_id == template.id
       assert Enum.map(canvas.blocks, & &1.content) == ["Template Title"]
@@ -104,12 +104,13 @@ defmodule CanvasAPI.CanvasServiceTest do
 
   describe ".get" do
     test "finds a canvas amongst an account's accessible canvases" do
-      canvas = insert(:canvas)
+      canvas = Repo.preload(insert(:canvas), [:template])
       assert CanvasService.get(canvas.id,
                                account: canvas.creator.account,
                                team_id: canvas.team_id) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
 
     test "returns a not found error if no canvas is found" do
@@ -121,30 +122,39 @@ defmodule CanvasAPI.CanvasServiceTest do
   end
 
   describe ".show" do
-    test "finds a canvas with an ID in a given team by team ID" do
-      canvas = insert(:canvas)
+    setup do
+      {:ok, canvas: Repo.preload(insert(:canvas), [:template])}
+    end
+
+    test "finds a canvas with an ID in a given team by team ID", context do
+      canvas = context.canvas
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team_id) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
 
-    test "finds a canvas with an ID in a given team by team domain" do
-      canvas = insert(:canvas)
+    test "finds a canvas with an ID in a given team by team domain", context do
+      canvas = context.canvas
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team.domain) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
   end
 
   describe ".update" do
     setup context do
       canvas =
-        insert(:canvas, creator: context[:user], team: context[:user].team)
-      {:ok, canvas: canvas}
+        insert(:canvas,
+               blocks: [%Block{type: "title", content: "Title"}],
+               creator: context[:user],
+               team: context[:user].team)
+      {:ok, canvas: canvas |> Repo.preload([:template])}
     end
 
     test "updates a canvas", %{canvas: canvas} do
@@ -154,6 +164,19 @@ defmodule CanvasAPI.CanvasServiceTest do
 
       assert updated_canvas.id === canvas.id
       assert updated_canvas.slack_channel_ids == ["abc"]
+    end
+
+    test "updates the canvas template", %{canvas: canvas} do
+      template =
+        insert(:canvas, is_template: true, team: canvas.team, blocks: [])
+      template_rel_object = %{"type" => "canvas", "id" => template.id}
+
+      {:ok, updated_canvas} =
+        canvas
+        |> CanvasService.update(%{}, template: template_rel_object)
+
+      assert updated_canvas.template_id == template.id
+      assert updated_canvas.blocks == canvas.blocks
     end
 
     test "sends notifications when specified", %{canvas: canvas, user: user} do
