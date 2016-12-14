@@ -44,4 +44,15 @@ defmodule CanvasAPI.SlackParser do
 
   def to_text(<<char::binary-size(1), tail::binary>>, result, state: :bracket, rem: rem),
     do: tail |> to_text(result, state: :bracket, rem: rem <> char)
+
+  def username_replace(text, users) do
+    Regex.replace(~r/(?:@(U\S+))/, text, fn (_, uid) ->
+      user = Enum.find(users, & &1["id"] == uid)
+      if user do
+        "**@#{user["name"]}**"
+      else
+        "@#{uid}"
+      end
+    end)
+  end
 end

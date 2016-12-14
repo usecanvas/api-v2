@@ -42,11 +42,10 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
          {:ok, %{"messages" => messages}} <-
            get_messages(client, channel, timestamp),
          message = List.last(messages),
-         history = Enum.slice(messages, 0..-2),
          {:ok, %{"user" => user}} <- get_user(client, message["user"]) do
       %{channel: channel,
         message: message,
-        attachments: make_attachments(client, history),
+        attachments: make_attachments(client, messages),
         user: user}
     end
   end
@@ -54,43 +53,25 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   defp make_attachments(client, messages) do
     messages =
       messages
-      |> Enum.reject(& !(&1["user"] && &1["text"]))
+      |> Enum.filter(& (&1["user"] && &1["text"]))
       |> Enum.reverse
 
     users =
-      messages
-      |> Enum.map(& &1["user"])
-      |> Enum.uniq
-      |> Enum.map(&Task.async(fn ->
-        with {:ok, user} <- get_user(client, &1) do
-          Map.get(user, "user")
-        else
-          _ -> nil
-        end
-      end))
-      |> Enum.map(&Task.await/1)
-      |> Enum.reject(& !&1)
+      User.list(client)
+      |> elem(1)
+      |> Map.get("members")
 
     messages
     |> Enum.map(fn message ->
-      formatted =
-        %{
-          author: nil,
-          timestamp: message["ts"],
-          text: SlackParser.to_text(message["text"]),
-          thumbnail_url: nil
-        }
+      user = Enum.find(users, & &1["id"] == message["user"])
 
-      if message["user"] do
-        user = Enum.find(users, & &1["id"] == message["user"])
-
-        Map.merge(formatted, %{
-          author: "@#{user |> Map.get("name")}",
-          thumbnail_url: user |> get_in(~w(profile image_original))
-        })
-      else
-        formatted
-      end
+      %{
+        author: "@#{user |> Map.get("name")}",
+        timestamp: message["ts"],
+        text: SlackParser.to_text(message["text"])
+              |> SlackParser.username_replace(users),
+        thumbnail_url: user |> get_in(~w(profile image_original))
+      }
     end)
   end
 
