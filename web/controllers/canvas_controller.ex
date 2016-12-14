@@ -11,6 +11,7 @@ defmodule CanvasAPI.CanvasController do
 
   @md_extensions ~w(markdown md mdown text txt)
 
+  @spec create(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def create(conn, params) do
     %{current_user: current_user, current_team: current_team} = conn.private
 
@@ -29,17 +30,20 @@ defmodule CanvasAPI.CanvasController do
       end
   end
 
+  @spec index(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def index(conn, _params) do
     canvases = CanvasService.list(user: conn.private.current_user)
     render(conn, "index.json", canvases: canvases)
   end
 
+  @spec index_templates(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def index_templates(conn, _params) do
     templates =
       CanvasService.list(user: conn.private.current_user, only_templates: true)
     render(conn, "index.json", canvases: templates)
   end
 
+  @spec show(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def show(conn, params = %{"id" => id, "team_id" => team_id}) do
     case CanvasService.show(id,
                             account: conn.private.current_account,
@@ -51,12 +55,14 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  @spec update(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def update(conn, params) do
     %{current_user: current_user, current_team: current_team} = conn.private
 
     case CanvasService.update(
       conn.private.canvas,
       get_in(params, ~w(data attributes)),
+      template: get_in(params, ~w(data relationships template data)),
       notify: current_team.slack_id && current_user) do
         {:ok, canvas} ->
           render_show(conn, canvas)
@@ -65,6 +71,7 @@ defmodule CanvasAPI.CanvasController do
       end
   end
 
+  @spec delete(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def delete(conn, %{"id" => id, "team_id" => team_id}) do
     account = conn.private.current_account
     case CanvasService.delete(id, account: account, team_id: team_id) do
@@ -77,6 +84,7 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  @spec ensure_canvas(Plug.Conn.t, map) :: Plug.Conn.t
   defp ensure_canvas(conn, _opts) do
     CanvasService.get(conn.params["id"],
                       account: conn.private.current_account,
@@ -87,6 +95,7 @@ defmodule CanvasAPI.CanvasController do
     end
   end
 
+  @spec render_show(Plug.Conn.t, CanvasAPI.Canvas.t, String.t) :: Plug.Conn.t
   defp render_show(conn, canvas, format \\ "json")
 
   defp render_show(conn, canvas, "canvas") do
