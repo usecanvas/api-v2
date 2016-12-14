@@ -9,6 +9,7 @@ defmodule CanvasAPI.Canvas do
   alias CanvasAPI.Block
 
   @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}
+  @type t :: %__MODULE__{}
 
   schema "canvases" do
     field :is_template, :boolean, default: false
