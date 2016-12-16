@@ -52,6 +52,7 @@ defmodule CanvasAPI.Router do
       end
 
       resources "/canvases", CanvasController do
+        resources "/ops", OpController, only: [:index]
         resources "/pulse-events", PulseEventController, only: [:index]
       end
 

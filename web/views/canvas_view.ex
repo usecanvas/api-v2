@@ -61,6 +61,12 @@ defmodule CanvasAPI.CanvasView do
         creator: %{
           data: %{id: canvas.creator_id, type: "user"}
         },
+        ops: %{
+          links: %{
+            related: team_canvas_op_path(
+              Endpoint, :index, canvas.team_id, canvas.id)
+          }
+        },
         pulse_events: %{
           links: %{
             related: team_canvas_pulse_event_path(
