@@ -7,6 +7,8 @@ defmodule CanvasAPI.Team do
 
   alias CanvasAPI.ImageMap
 
+  @type t :: %__MODULE__{}
+
   schema "teams" do
     field :domain, :string
     field :images, :map, default: %{}
