@@ -27,8 +27,9 @@ config :phoenix, :format_encoders,
 
 # Configures Elixir's Logger
 config :logger, :console,
-  format: "time=$dateT$timeZ level=$level $metadata $message\n",
-  metadata: [:request_id]
+  format: "time=$dateT$timeZ level=$level $metadata$message\n",
+  metadata: [:request_id],
+  utc_log: true
 
 # Configure exq
 config :exq,
