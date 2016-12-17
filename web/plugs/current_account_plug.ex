@@ -18,6 +18,7 @@ defmodule CanvasAPI.CurrentAccountPlug do
            get_session(conn, :account_id),
          account = %Account{}
           <- Repo.get(Account, account_id) |> Repo.preload([:teams]) do
+      Sentry.Context.set_user_context(%{id: account.id})
       put_private(conn, :current_account, account)
     else
       _ ->
