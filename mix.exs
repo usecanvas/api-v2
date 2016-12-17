@@ -64,7 +64,7 @@ defmodule CanvasAPI.Mixfile do
      {:appsignal, "~> 0.4.0"},
      {:exq, github: "akira/exq", ref: "84e05ff"},
      {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
-     {:sentry, "~> 1.0"},
+     {:sentry, "~> 2.0"},
      {:logfmt, "~> 3.2.0"},
      {:credo, "~> 0.4", only: [:dev, :test]},
      {:ex_doc, "~> 0.14", only: [:dev]},
