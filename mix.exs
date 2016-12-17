@@ -36,7 +36,8 @@ defmodule CanvasAPI.Mixfile do
 
   defp applications do
     [:phoenix, :phoenix_pubsub, :cowboy, :logger, :gettext, :phoenix_ecto,
-     :postgrex, :calecto, :slack, :base62, :httpoison, :timex, :floki]
+     :postgrex, :calecto, :slack, :base62, :httpoison, :timex, :floki,
+     :logfmt]
   end
 
   # Specifies which paths to compile per environment.
@@ -64,6 +65,7 @@ defmodule CanvasAPI.Mixfile do
      {:exq, github: "akira/exq", ref: "84e05ff"},
      {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
      {:sentry, "~> 1.0"},
+     {:logfmt, "~> 3.2.0"},
      {:credo, "~> 0.4", only: [:dev, :test]},
      {:ex_doc, "~> 0.14", only: [:dev]},
      {:mix_test_watch, "~> 0.2", only: [:dev]},

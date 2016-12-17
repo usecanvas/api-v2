@@ -18,7 +18,7 @@ defmodule CanvasAPI.Endpoint do
   end
 
   plug Plug.RequestId
-  plug Plug.Logger
+  plug CanvasAPI.LogfmtPlug
 
   plug CanvasAPI.GitHubWebhookPlug, mount: ~w(webhooks github)
 
