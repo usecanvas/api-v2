@@ -38,7 +38,7 @@ config :appsignal, :config,
 # Configure Sentry
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
-  environment_name: to_string(Mix.env),
+  environment_name: Mix.env,
   included_environments: [:prod],
   use_error_logger: true,
   release: System.get_env("HEROKU_SLUG_COMMIT")
