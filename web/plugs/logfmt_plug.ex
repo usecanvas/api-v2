@@ -49,7 +49,7 @@ defmodule CanvasAPI.LogfmtPlug do
     |> Enum.at(0)
   end
 
-  defp phoenix_info(conn = %{private: private}) do
+  defp phoenix_info(%{private: private}) do
     []
     |> Keyword.put(:controller, private[:phoenix_controller] |> Atom.to_string)
   end
