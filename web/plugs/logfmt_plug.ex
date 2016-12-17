@@ -31,6 +31,7 @@ defmodule CanvasAPI.LogfmtPlug do
         |> Keyword.merge(phoenix_info(conn))
         |> Keyword.put(:path, conn.request_path)
         |> Keyword.put(:method, conn.method)
+        |> Keyword.put(:request_id, header(conn, "x-request-id"))
         |> Logfmt.encode
       end
 
