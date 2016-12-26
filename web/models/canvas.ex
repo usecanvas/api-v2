@@ -84,15 +84,14 @@ defmodule CanvasAPI.Canvas do
       nil ->
         changeset
       template = %__MODULE__{blocks: blocks} ->
-        changeset =
-          if opts[:ignore_blocks] do
-            changeset
-          else
-            changeset
-            |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
-            |> cast_embed(:blocks)
-          end
-          |> put_assoc(:template, template)
+        if opts[:ignore_blocks] do
+          changeset
+        else
+          changeset
+          |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
+          |> cast_embed(:blocks)
+        end
+        |> put_assoc(:template, template)
     end
   end
 

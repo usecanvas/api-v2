@@ -5,8 +5,6 @@ defmodule CanvasAPI.CurrentAccountPlug do
 
   alias CanvasAPI.{Account, PersonalAccessToken, Repo}
   import CanvasAPI.CommonRenders
-  import CanvasAPI.Encryption, only: [decrypt: 1]
-  import Ecto.Query, only: [from: 2]
   import Plug.Conn
 
   @behaviour Plug
