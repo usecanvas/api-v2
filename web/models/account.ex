@@ -9,9 +9,10 @@ defmodule CanvasAPI.Account do
 
   schema "accounts" do
     many_to_many :teams, CanvasAPI.Team, join_through: "users"
-    has_many :oauth_tokens, CanvasAPI.OAuthToken
     has_many :users, CanvasAPI.User
     has_many :canvases, through: [:users, :canvases]
+    has_many :oauth_tokens, CanvasAPI.OAuthToken
+    has_many :personal_access_tokens, CanvasAPI.PersonalAccessToken
 
     timestamps
   end
