@@ -16,20 +16,34 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
   import Ecto.Changeset, only: [put_assoc: 3]
   alias CanvasAPI.{PersonalAccessToken, Repo, Team, User}
 
-  def run([domain, email]) do
+  def run([domain = "~" <> _]) do
     Mix.Task.run("app.start", [])
-    generate_token(domain, email)
+    get_account_from_personal_domain(domain)
+    |> generate_token
   end
 
-  defp generate_token(domain, email) do
-    account = get_account(domain, email)
+  def run([domain, email]) do
+    Mix.Task.run("app.start", [])
+    get_account(domain, email)
+    |> generate_token
+  end
 
+  defp generate_token(account) do
     %PersonalAccessToken{}
     |> PersonalAccessToken.changeset
     |> put_assoc(:account, account)
     |> Repo.insert!
     |> format
     |> IO.puts
+  end
+
+  defp get_account_from_personal_domain(domain) do
+    from(u in User,
+         join: t in Team, on: t.id == u.team_id,
+         where: t.domain == ^domain,
+         preload: [:account])
+    |> Repo.one!
+    |> Map.get(:account)
   end
 
   defp get_account(domain, email) do
