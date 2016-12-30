@@ -1,7 +1,7 @@
 defmodule CanvasAPI.OpController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.CanvasService
+  alias CanvasAPI.{CanvasService, OpService}
 
   plug CanvasAPI.CurrentAccountPlug
   plug :ensure_team
@@ -9,11 +9,7 @@ defmodule CanvasAPI.OpController do
   plug :ensure_canvas
 
   def index(conn, _params) do
-    ops =
-      from(assoc(conn.private.canvas, :ops),
-        order_by: [asc: :version],
-        preload: [:canvas])
-    |> Repo.all
+    ops = OpService.list(canvas: conn.private.canvas)
     render(conn, "index.json", ops: ops)
   end
 
