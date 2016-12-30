@@ -71,6 +71,17 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def op_factory do
+    %CanvasAPI.Op{
+      canvas: build(:canvas),
+      components: [],
+      meta: %{},
+      seq: 0,
+      source: "source",
+      version: sequence(:version, &(&1))
+    }
+  end
+
   def team_factory do
     %CanvasAPI.Team{
       domain: sequence(:domain, &"domain-#{&1}"),
