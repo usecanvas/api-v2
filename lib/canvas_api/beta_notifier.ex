@@ -7,7 +7,7 @@ defmodule CanvasAPI.BetaNotifier do
   import Ecto.Query, only: [from: 2]
 
   @canvas_domain "usecanvas"
-  @notify_user "jonathan"
+  @notify_user "oren"
 
   defmodule NotifyWorker do
     @moduledoc """
