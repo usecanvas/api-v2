@@ -1,10 +1,11 @@
 defmodule CanvasAPI.OAuth.Slack.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{AddToSlackMediator, SignInMediator}
+  alias CanvasAPI.{AddToSlackMediator, BetaNotifier, SignInMediator}
 
   plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
+  @beta_redirect_uri System.get_env("BETA_REDIRECT_URI")
 
   @doc """
   Respond to a Slack OAuth callback by creating a new user and team.
@@ -22,6 +23,9 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
                            http_only: false)
         |> put_session(:account_id, account.id)
         |> send_resp_or_redirect()
+      {:error, {:domain_not_whitelisted, domain}} ->
+        BetaNotifier.delay_notify(domain)
+        redirect(conn, external: @beta_redirect_uri)
       {:error, _error} ->
         bad_request(conn)
     end

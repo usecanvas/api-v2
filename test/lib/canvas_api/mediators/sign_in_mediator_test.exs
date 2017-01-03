@@ -75,7 +75,7 @@ defmodule CanvasAPI.SignInMediatorTest do
 
     with_mock Slack.OAuth, [access: mock_access(team: mock_team)] do
       {:error, error} = Mediator.sign_in("ABCDEFG", account: nil)
-      assert error == :domain_not_whitelisted
+      assert error == {:domain_not_whitelisted, mock_team["domain"]}
     end
   end
 

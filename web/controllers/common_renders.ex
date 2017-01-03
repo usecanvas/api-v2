@@ -15,6 +15,13 @@ defmodule CanvasAPI.CommonRenders do
     |> render(ErrorView, "400.json", %{detail: opts[:detail]})
   end
 
+  def forbidden(conn, opts \\ []) do
+    conn
+    |> maybe_halt(opts[:halt])
+    |> put_status(:forbidden)
+    |> render(ErrorView, "403.json", %{detail: opts[:detail]})
+  end
+
   def not_found(conn, opts \\ []) do
     conn
     |> put_status(:not_found)
