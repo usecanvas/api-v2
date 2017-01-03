@@ -21,6 +21,10 @@
       "description": "An API key for pushing to Appsignal",
       "required": false
     },
+    "BETA_REDIRECT_URI": {
+      "description": "The redirect URI for a non-whitelisted Slack domain",
+      "development_value": "http://localhost:4200/beta"
+    },
     "COOKIE_DOMAIN": {
       "description": "Domain for the cookie",
       "development_value": "localhost",

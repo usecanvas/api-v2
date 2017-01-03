@@ -9,6 +9,10 @@ defmodule CanvasAPI.ErrorView do
     render("error.json", detail: "Unauthorized")
   end
 
+  def render("403.json", assigns) do
+    render("error.json", detail: assigns[:detail] || "Forbidden")
+  end
+
   def render("404.json", _assigns) do
     render("error.json", detail: "Page not found")
   end
