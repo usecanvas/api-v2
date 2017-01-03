@@ -1,7 +1,7 @@
 defmodule CanvasAPI.OAuth.Slack.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{AddToSlackMediator, SignInMediator}
+  alias CanvasAPI.{AddToSlackMediator, BetaNotifier, SignInMediator}
 
   plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
@@ -23,7 +23,8 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
                            http_only: false)
         |> put_session(:account_id, account.id)
         |> send_resp_or_redirect()
-      {:error, :domain_not_whitelisted} ->
+      {:error, {:domain_not_whitelisted, domain}} ->
+        BetaNotifier.delay_notify(domain)
         redirect(conn, external: @beta_redirect_uri)
       {:error, _error} ->
         bad_request(conn)
