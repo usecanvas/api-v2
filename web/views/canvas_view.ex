@@ -1,7 +1,7 @@
 defmodule CanvasAPI.CanvasView do
   use CanvasAPI.Web, :view
 
-  alias CanvasAPI.{Endpoint, UserView}
+  alias CanvasAPI.{Canvas, Endpoint, UserView}
   alias CanvasAPI.Canvas.Formatter, as: CanvasFormatter
 
   def render("index.json", %{canvases: canvases}) do
@@ -57,29 +57,7 @@ defmodule CanvasAPI.CanvasView do
         inserted_at: canvas.inserted_at,
         updated_at: canvas.updated_at
       },
-      relationships: %{
-        creator: %{
-          data: %{id: canvas.creator_id, type: "user"}
-        },
-        ops: %{
-          links: %{
-            related: team_canvas_op_path(
-              Endpoint, :index, canvas.team_id, canvas.id)
-          }
-        },
-        pulse_events: %{
-          links: %{
-            related: team_canvas_pulse_event_path(
-              Endpoint, :index, canvas.team_id, canvas.id)
-          }
-        },
-        team: %{
-          data: %{id: canvas.team_id, type: "team"},
-          links: %{
-            related: team_path(Endpoint, :show, canvas.team_id)
-          }
-        }
-      },
+      relationships: relationships(canvas),
       type: "canvas"
     }
   end
@@ -87,4 +65,49 @@ defmodule CanvasAPI.CanvasView do
   def render("canvas.md", %{canvas: canvas}) do
     CanvasFormatter.to_markdown(canvas)
   end
+
+  @spec relationships(Canvas.t) :: map
+  defp relationships(canvas) do
+    %{
+      creator: %{
+        data: %{id: canvas.creator_id, type: "user"}
+      },
+      ops: %{
+        links: %{
+          related: team_canvas_op_path(
+            Endpoint, :index, canvas.team_id, canvas.id)
+        }
+      },
+      pulse_events: %{
+        links: %{
+          related: team_canvas_pulse_event_path(
+            Endpoint, :index, canvas.team_id, canvas.id)
+        }
+      },
+      team: %{
+        data: %{id: canvas.team_id, type: "team"},
+        links: %{
+          related: team_path(Endpoint, :show, canvas.team_id)
+        }
+      }
+    }
+    |> add_template(canvas)
+  end
+
+  @spec add_template(map, Canvas.t) :: map
+  defp add_template(rels, canvas = %Canvas{template_id: template_id})
+       when is_binary(template_id) do
+    rels
+    |> Map.put(:template, %{
+      data: %{id: canvas.template_id, type: "canvas"},
+      links: %{
+        related: team_canvas_path(Endpoint,
+                                  :show,
+                                  canvas.team_id,
+                                  canvas.template_id)
+      }
+    })
+  end
+
+  defp add_template(rels, _), do: rels
 end
