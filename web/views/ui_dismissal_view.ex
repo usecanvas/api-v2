@@ -1,9 +1,15 @@
 defmodule CanvasAPI.UIDismissalView do
   use CanvasAPI.Web, :view
 
-  def render("index.json", %{dismissals: dismissals}) do
+  def render("index.json", %{ui_dismissals: dismissals}) do
     %{
       data: render_many(dismissals, __MODULE__, "dismissal.json")
+    }
+  end
+
+  def render("show.json", %{ui_dismissal: dismissal}) do
+    %{
+      data: render_one(dismissal, __MODULE__, "dismissal.json")
     }
   end
 

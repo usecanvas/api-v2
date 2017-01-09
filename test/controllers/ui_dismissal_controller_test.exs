@@ -21,4 +21,19 @@ defmodule CanvasAPI.UIDismissalControllerTest do
         dis.id
     end
   end
+
+  describe "POST :create" do
+    test "creates a UI dismissal", %{conn: conn} do
+      account = insert(:account)
+
+      data = %{data: %{attributes: %{identifier: "ident"}}}
+
+      conn =
+        conn
+        |> put_private(:current_account, account)
+        |> post(ui_dismissal_path(conn, :create), data)
+
+      assert json_response(conn, 201)
+    end
+  end
 end
