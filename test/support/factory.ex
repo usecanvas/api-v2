@@ -91,6 +91,13 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def ui_dismissal_factory do
+    %CanvasAPI.UIDismissal{
+      account: build(:account),
+      identifier: sequence(:identifier, &"#{&1}")
+    }
+  end
+
   def user_factory do
     %CanvasAPI.User{
       email: "user@example.com",
