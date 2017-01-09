@@ -46,6 +46,8 @@ defmodule CanvasAPI.Router do
     delete "/session", SessionController, :delete
     resources "/unfurls", UnfurlController, only: [:index]
 
+    resources "/ui-dismissals", UIDismissalController, only: [:index, :create]
+
     resources "/teams", TeamController, only: [:index, :show, :update] do
       scope "/slack", Slack do
         resources "/channels", ChannelController, only: [:index]
