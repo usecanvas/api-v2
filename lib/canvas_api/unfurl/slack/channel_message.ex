@@ -37,16 +37,23 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
       }
     else
       {:error, %HTTPoison.Response{}} ->
-        %Unfurl{
-          id: url,
-          title: url,
-          text: nil,
-          thumbnail_url: nil,
-          fetched: false
-        }
-      _ ->
+        unfetched(url)
+      nil ->
+        unfetched(url)
+      err ->
         nil
     end
+  end
+
+  @spec unfetched(String.t) :: Unfurl.t
+  defp unfetched(url) do
+    %Unfurl{
+      id: url,
+      title: url,
+      text: nil,
+      thumbnail_url: nil,
+      fetched: false
+    }
   end
 
   @spec do_request(String.t, String.t, String.t) :: map
