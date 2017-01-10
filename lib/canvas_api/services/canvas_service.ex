@@ -227,15 +227,13 @@ defmodule CanvasAPI.CanvasService do
 
   @spec notify_slack(%User{}, %Canvas{}, list, Keyword.t) :: any
   defp notify_slack(notifier, canvas, old_channel_ids, opts \\ []) do
-    token =
-      Team.get_token(canvas.team, "slack")
-      |> Map.get(:meta)
-      |> get_in(~w(bot bot_access_token))
-
-    (canvas.slack_channel_ids -- old_channel_ids)
-    |> Enum.each(
-      &SlackChannelNotifier.delay_notify_new(
-        token, canvas.id, notifier.id, &1, opts))
+    with token when not is_nil(token) <- Team.get_token(canvas.team, "slack"),
+         token = get_in(token.meta, ~w(bot bot_access_token)) do
+      (canvas.slack_channel_ids -- old_channel_ids)
+      |> Enum.each(
+        &SlackChannelNotifier.delay_notify_new(
+          token, canvas.id, notifier.id, &1, opts))
+    end
   end
 
   @spec verify_can_show(%Canvas{} | nil, %Account{}) :: {:ok, %Canvas{}}
