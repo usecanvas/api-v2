@@ -1,7 +1,10 @@
 defmodule CanvasAPI.Router do
   use CanvasAPI.Web, :router
   use Plug.ErrorHandler
-  use Sentry.Plug
+
+  if Mix.env == "prod" do
+    use Sentry.Plug
+  end
 
   pipeline :oauth do
     plug :fetch_session
