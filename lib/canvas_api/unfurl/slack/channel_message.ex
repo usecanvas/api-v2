@@ -35,6 +35,17 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
         thumbnail_url: response[:user]["profile"]["image_original"],
         attachments: response[:attachments]
       }
+    else
+      {:error, %HTTPoison.Response{}} ->
+        %Unfurl{
+          id: url,
+          title: url,
+          text: nil,
+          thumbnail_url: nil,
+          fetched: false
+        }
+      _ ->
+        nil
     end
   end
 
