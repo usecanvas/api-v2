@@ -44,7 +44,7 @@ defmodule CanvasAPI.TeamView do
     |> Enum.find(&(&1.provider == "slack"))
     |> case do
       nil -> []
-      token -> token.meta["scopes"]
+      token -> token.meta["scopes"] || []
     end
   end
 
