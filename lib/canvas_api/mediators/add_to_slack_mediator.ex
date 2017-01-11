@@ -33,7 +33,7 @@ defmodule CanvasAPI.AddToSlackMediator do
   # Create or update an existing slack token.
   @spec create_or_update_token(map) :: {:ok, %OAuthToken{}} | {:error, any}
   defp create_or_update_token(response) do
-    with %{ "team_id" => team_id } <- response, 
+    with %{"team_id" => team_id} <- response,
         team = %Team{} <- find_team(team_id),
          nil <- find_existing_token(team.oauth_tokens) do
       create_token(team, response)
@@ -41,13 +41,13 @@ defmodule CanvasAPI.AddToSlackMediator do
       token = %OAuthToken{} ->
         update_token(token, response)
       error ->
-        error
+        {:error, error}
     end
   end
 
   @spec create_token(%Team{}, map) :: {:ok, %OAuthToken{}} | {:error, any}
-  defp create_token(team, %{ "bot" => bot, "scope" => scopes, 
-    "access_token" => token }) do
+  defp create_token(team, %{"bot" => bot, "scope" => scopes,
+    "access_token" => token}) do
     %OAuthToken{}
     |> OAuthToken.changeset(
          %{meta: %{"bot" => bot, "scopes" => format_scope(scopes)},
@@ -58,10 +58,10 @@ defmodule CanvasAPI.AddToSlackMediator do
   end
 
   @spec update_token(%OAuthToken{}, map) :: {:ok, %OAuthToken{}} | {:error, any}
-  defp update_token(token, %{ "scope" => scopes }) do
+  defp update_token(token, %{"scope" => scopes}) do
     token
     |> OAuthToken.changeset(
-         %{meta: Map.put(token.meta, "scopes", format_scope(scopes)) })
+         %{meta: Map.put(token.meta, "scopes", format_scope(scopes))})
     |> Repo.update
   end
 
