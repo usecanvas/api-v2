@@ -40,7 +40,7 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
         unfetched(url)
       nil ->
         unfetched(url)
-      err ->
+      _ ->
         nil
     end
   end
