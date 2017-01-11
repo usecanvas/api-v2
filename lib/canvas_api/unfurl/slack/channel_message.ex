@@ -71,6 +71,8 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
                  |> SlackParser.username_replace(users),
         attachments: make_attachments(messages, users),
         user: user}
+    else
+      _ -> nil
     end
   end
 
