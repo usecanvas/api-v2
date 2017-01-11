@@ -17,11 +17,7 @@ defmodule CanvasAPI.AddToSlackMediator do
   @spec add(String.t) :: {:ok, %OAuthToken{}} | {:error, any}
   def add(code) do
     with {:ok, response = %{"ok" => true}} <- exchange_code(code) do
-      %{"access_token" => token,
-        "bot" => bot,
-        "scope" => scope,
-        "team_id" => team_id} = response
-      persist_token(token, scope, bot, team_id)
+      create_or_update_token(response)
     end
   end
 
@@ -35,24 +31,38 @@ defmodule CanvasAPI.AddToSlackMediator do
   end
 
   # Persist a slack token.
-  @spec persist_token(String.t, String.t, map, String.t) :: {:ok, %OAuthToken{}}
-                                                          | {:error, any}
-  defp persist_token(token, scope, bot, team_id) do
-    with team = %Team{} <- find_team(team_id),
+  @spec create_or_update_token(map) :: {:ok, %OAuthToken{}} | {:error, any}
+  defp create_or_update_token(response) do
+    with %{ "team_id" => team_id } <- response, 
+        team = %Team{} <- find_team(team_id),
          nil <- find_existing_token(team.oauth_tokens) do
-      %OAuthToken{}
-      |> OAuthToken.changeset(
-           %{meta: %{"bot" => bot, "scopes" => format_scope(scope)},
-             provider: "slack",
-             token: token})
-      |> Ecto.Changeset.put_assoc(:team, team)
-      |> Repo.insert
+      create_token(team, response)
     else
       token = %OAuthToken{} ->
-        {:ok, token}
+        update_token(token, response)
       error ->
         error
     end
+  end
+
+  @spec create_token(%Team{}, map) :: {:ok, %OAuthToken{}} | {:error, any}
+  defp create_token(team, %{ "bot" => bot, "scope" => scopes, 
+    "access_token" => token }) do
+    %OAuthToken{}
+    |> OAuthToken.changeset(
+         %{meta: %{"bot" => bot, "scopes" => format_scope(scopes)},
+           provider: "slack",
+           token: token})
+    |> Ecto.Changeset.put_assoc(:team, team)
+    |> Repo.insert
+  end
+
+  @spec update_token(%OAuthToken{}, map) :: {:ok, %OAuthToken{}} | {:error, any}
+  defp update_token(token, %{ "scope" => scopes }) do
+    token
+    |> OAuthToken.changeset(
+         %{meta: Map.put(token.meta, "scopes", format_scope(scopes)) })
+    |> Repo.update
   end
 
   # Find an existing OAuth token.
