@@ -50,11 +50,17 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   end
 
   @spec build_attachments([map], Keyword.t) :: [map]
-  defp build_attachments(messages, user: user, users: users) do
+  defp build_attachments(messages, users: users) do
     messages
     |> Enum.filter(&(&1["user"] && &1["text"])) # Only messages w/user + text
     |> Enum.reverse # Oldest first
     |> Enum.map(fn message ->
+      user =
+        case get_user(users, message["user"]) do
+          {:ok, user} -> user
+          {:error, _} -> %{}
+        end
+
       %{author: "@#{user["name"]}",
         timestamp: message["ts"],
         text: parse_message(message, users: users),
@@ -112,7 +118,7 @@ defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
       message_info = %{
         channel: channel,
         message: parse_message(message, users: users),
-        attachments: build_attachments(messages, user: user, users: users),
+        attachments: build_attachments(messages, users: users),
         user: user}
 
       {:ok, message_info}
