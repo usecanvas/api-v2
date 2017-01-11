@@ -30,7 +30,7 @@ defmodule CanvasAPI.AddToSlackMediator do
                        redirect_uri: @redirect_uri)
   end
 
-  # Persist a slack token.
+  # Create or update an existing slack token.
   @spec create_or_update_token(map) :: {:ok, %OAuthToken{}} | {:error, any}
   defp create_or_update_token(response) do
     with %{ "team_id" => team_id } <- response, 
