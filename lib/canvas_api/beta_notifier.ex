@@ -47,6 +47,7 @@ defmodule CanvasAPI.BetaNotifier do
     from(Team, where: [domain: @canvas_domain])
     |> Repo.one!
     |> Team.get_token("slack")
+    |> elem(1)
     |> Map.get(:meta)
     |> get_in(["bot", "bot_access_token"])
   end

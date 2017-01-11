@@ -64,6 +64,10 @@ defmodule CanvasAPI.Team do
     from(assoc(team, :oauth_tokens), where: [provider: ^provider])
     |> first
     |> Repo.one
+    |> case do
+      nil -> {:error, :token_not_found}
+      token -> {:ok, token}
+    end
   end
 
   defp if_slack(changeset, func) do

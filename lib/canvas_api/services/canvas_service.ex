@@ -227,7 +227,7 @@ defmodule CanvasAPI.CanvasService do
 
   @spec notify_slack(%User{}, %Canvas{}, list, Keyword.t) :: any
   defp notify_slack(notifier, canvas, old_channel_ids, opts \\ []) do
-    with token when not is_nil(token) <- Team.get_token(canvas.team, "slack"),
+    with {:ok, token} <- Team.get_token(canvas.team, "slack"),
          token = get_in(token.meta, ~w(bot bot_access_token)) do
       (canvas.slack_channel_ids -- old_channel_ids)
       |> Enum.each(

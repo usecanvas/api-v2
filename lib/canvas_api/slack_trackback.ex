@@ -19,7 +19,7 @@ defmodule CanvasAPI.SlackTrackback do
     with canvas = %Canvas{} <- get_canvas(text),
          team = %Team{} <- get_team(team_id),
          user = %User{} <- get_user(team, user_id),
-         token = %OAuthToken{} <- Team.get_token(team, "slack") do
+         {:ok, token} <- Team.get_token(team, "slack") do
       PulseEventService.create(
         %{provider_name: "Slack",
           provider_url: "https://slack.com",
