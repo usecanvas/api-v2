@@ -16,9 +16,12 @@ defmodule CanvasAPI.AddToSlackMediator do
   """
   @spec add(String.t) :: {:ok, %OAuthToken{}} | {:error, any}
   def add(code) do
-    with {:ok, %{"access_token" => token, "bot" => bot, "team_id" => team_id}}
-      <- exchange_code(code) do
-      persist_token(token, bot, team_id)
+    with {:ok, response = %{"ok" => true}} <- exchange_code(code) do
+      %{"access_token" => token,
+        "bot" => bot,
+        "scope" => scope,
+        "team_id" => team_id} = response
+      persist_token(token, scope, bot, team_id)
     end
   end
 
@@ -32,13 +35,16 @@ defmodule CanvasAPI.AddToSlackMediator do
   end
 
   # Persist a slack token.
-  @spec persist_token(String.t, map, String.t) :: {:ok, %OAuthToken{}} | {:error, any}
-  defp persist_token(token, bot, team_id) do
+  @spec persist_token(String.t, String.t, map, String.t) :: {:ok, %OAuthToken{}}
+                                                          | {:error, any}
+  defp persist_token(token, scope, bot, team_id) do
     with team = %Team{} <- find_team(team_id),
          nil <- find_existing_token(team.oauth_tokens) do
       %OAuthToken{}
       |> OAuthToken.changeset(
-        %{meta: %{"bot" => bot}, provider: "slack", token: token})
+           %{meta: %{"bot" => bot, "scopes" => format_scope(scope)},
+             provider: "slack",
+             token: token})
       |> Ecto.Changeset.put_assoc(:team, team)
       |> Repo.insert
     else
@@ -54,6 +60,9 @@ defmodule CanvasAPI.AddToSlackMediator do
   defp find_existing_token(tokens) do
     Enum.find(tokens, &(&1.provider == "slack"))
   end
+
+  @spec format_scope(String.t) :: [String.t]
+  defp format_scope(scope), do: String.split(scope, ",")
 
   # Find a team by slack ID.
   @spec find_team(String.t) :: %Team{} | nil
