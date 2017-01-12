@@ -12,7 +12,11 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
 
   ## Examples
 
+  ### For a Slack team user account:
+
       mix canvas_api.access_token usecanvas user@example.com
+
+  ### For a personal domain user account:
 
       mix canvas_api.access_token "~clem"
   """
