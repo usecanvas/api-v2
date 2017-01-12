@@ -34,6 +34,13 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
     |> do_run()
   end
 
+  def run ([domain]) do
+    Logger.error """
+    "#{domain}" is not a valid personal domain. It must begin with a tilde (~).
+    """
+    exit({:shutdown, 1})
+  end
+
   def run([domain, email]) do
     Mix.Task.run("app.start", [])
 
