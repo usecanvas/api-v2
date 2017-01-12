@@ -2,57 +2,81 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
   @moduledoc """
   Generate a personal access token for an account.
 
-  Accepts an email address tied to a Slack user.
+  A personal access token is tied to an account, but must be created either by
+
+  1. Providing a personal domain (e.g. "~clem")
+  2. Providing a Slack team domain and a user email
+
+  This is because an email may be tied to multiple accounts (e.g. different
+  teams that aren't tied together under one account).
 
   ## Examples
 
       mix canvas_api.access_token usecanvas user@example.com
+
+      mix canvas_api.access_token "~clem"
   """
 
   @shortdoc "Generate a personal access token"
 
+  require Logger
+
   use Mix.Task
-  import Ecto.Query, only: [from: 2]
+  import Ecto.Query
   import Ecto.Changeset, only: [put_assoc: 3]
-  alias CanvasAPI.{PersonalAccessToken, Repo, Team, User}
+  alias CanvasAPI.{PersonalAccessToken, Repo, User}
 
   def run([domain = "~" <> _]) do
     Mix.Task.run("app.start", [])
-    get_account_from_personal_domain(domain)
-    |> generate_token
+
+    domain
+    |> get_account_from_personal_domain()
+    |> do_run()
   end
 
   def run([domain, email]) do
     Mix.Task.run("app.start", [])
-    get_account(domain, email)
-    |> generate_token
+
+    domain
+    |> get_account(email)
+    |> do_run()
   end
+
+  defp do_run(nil) do
+    Logger.error "No such account found."
+    exit({:shutdown, 1})
+  end
+
+  defp do_run(account), do: account |> Map.get(:account) |> generate_token()
 
   defp generate_token(account) do
     %PersonalAccessToken{}
-    |> PersonalAccessToken.changeset
+    |> PersonalAccessToken.changeset()
     |> put_assoc(:account, account)
-    |> Repo.insert!
-    |> format
-    |> IO.puts
+    |> Repo.insert!()
+    |> format()
+    |> IO.puts()
   end
 
   defp get_account_from_personal_domain(domain) do
-    from(u in User,
-         join: t in Team, on: t.id == u.team_id,
-         where: t.domain == ^domain,
-         preload: [:account])
-    |> Repo.one!
-    |> Map.get(:account)
+    domain
+    |> base_query()
+    |> Repo.one()
   end
 
   defp get_account(domain, email) do
-    from(u in User,
-         join: t in Team, on: t.id == u.team_id,
-         where: t.domain == ^domain,
-         where: u.email == ^email, preload: [:account])
-    |> Repo.one!
-    |> Map.get(:account)
+    domain
+    |> base_query()
+    |> where([u], u.email == ^email)
+    |> Repo.one()
+  end
+
+  defp base_query(domain) do
+    User
+    |> join(:left, [u], _ in assoc(u, :account))
+    |> join(:left, [u], _ in assoc(u, :team))
+    |> where([..., t], t.domain == ^domain)
+    |> preload([u, a], [account: a])
   end
 
   defp format(token) do
