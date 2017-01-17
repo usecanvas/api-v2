@@ -16,6 +16,8 @@ defmodule CanvasAPI.CommentView do
       id: comment.id,
       attributes: %{
         blocks: comment.blocks
+        inserted_at: comment.inserted_at,
+        updated_at: comment.updated_at
       },
       relationships: %{
         block: %{data: %{id: comment.block_id, type: "block"}},
