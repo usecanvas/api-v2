@@ -33,6 +33,7 @@ defmodule CanvasAPI.JSONAPIPlug do
     |> put_attrs(conn.params)
     |> put_rels(conn.params)
     |> put_account(conn.private[:current_account])
+    |> put_filter(conn.params)
   end
 
   @spec put_account(t, Account.t | nil) :: t
@@ -48,6 +49,11 @@ defmodule CanvasAPI.JSONAPIPlug do
                  %{"data" => %{"attributes" => attrs}}) when is_map(attrs),
     do: %{struct | attrs: attrs}
   defp put_attrs(struct, _), do: struct
+
+  @spec put_filter(t, Plug.Conn.params) :: t
+  defp put_filter(struct, %{"filter" => filter}) when is_map(filter),
+    do: put_in(struct.opts[:filter], filter)
+  defp put_filter(struct, _), do: struct
 
   @spec put_rels(t, Plug.Conn.params) :: t
   defp put_rels(struct,

@@ -20,4 +20,22 @@ defmodule CanvasAPI.CommentServiceTest do
       assert comment
     end
   end
+
+  describe ".index/2" do
+    test "lists comments for an account" do
+      comment = insert(:comment)
+      comments = CommentService.list(account: comment.creator.account)
+      assert List.first(comments).id == comment.id
+    end
+
+    test "lists comments filtered by canvas" do
+      canvas = insert(:canvas)
+      comment = insert(:comment, canvas: canvas)
+      canvas_2 = insert(:canvas, team: canvas.team)
+      insert(:comment, canvas: canvas_2)
+      [found_comment] = CommentService.list(account: canvas.creator.account,
+                                            filter: %{"canvas.id" => canvas.id})
+      assert found_comment.id == comment.id
+    end
+  end
 end

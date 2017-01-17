@@ -5,6 +5,8 @@ defmodule CanvasAPI.Comment do
 
   use CanvasAPI.Web, :model
 
+  @type t :: %__MODULE__{}
+
   schema "comments" do
     field :block_id, :string
 

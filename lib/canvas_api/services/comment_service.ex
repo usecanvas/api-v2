@@ -3,7 +3,7 @@ defmodule CanvasAPI.CommentService do
   A service for viewing and manipulating comments.
   """
 
-  alias CanvasAPI.{Account, CanvasService, Comment, Repo}
+  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Repo, Team, User}
   use CanvasAPI.Web, :service
 
   @doc """
@@ -67,6 +67,28 @@ defmodule CanvasAPI.CommentService do
   end
 
   defp put_creator(changeset, _), do: changeset
+
+  @doc """
+  List comments.
+  """
+  @spec list(Keyword.t) :: [Comment.t]
+  def list(opts) do
+    Comment
+    |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
+    |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
+    |> join(:left, [..., t], u in User, u.team_id == t.id)
+    |> where([..., u], u.account_id == ^opts[:account].id)
+    |> filter(opts[:filter])
+    |> Repo.all
+  end
+
+  @spec filter(Ecto.Query.t, map | nil) :: Ecto.Query.t
+  defp filter(query, %{"canvas.id" => canvas_id}) do
+    query
+    |> where(canvas_id: ^canvas_id)
+  end
+
+  defp filter(query, _), do: query
 
   @spec iget(map, atom) :: any
   defp iget(map, key) do
