@@ -76,7 +76,7 @@ defmodule CanvasAPI.CanvasController do
     account = conn.private.current_account
     case CanvasService.delete(id, account: account, team_id: team_id) do
       {:ok, _} ->
-        send_resp(conn, :no_content, "")
+        no_content(conn)
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
       nil ->

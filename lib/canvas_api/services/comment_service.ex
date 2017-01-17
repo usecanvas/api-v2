@@ -119,7 +119,7 @@ defmodule CanvasAPI.CommentService do
   defp do_filter(_, query), do: query
 
   @doc """
-  Update a comment
+  Update a comment.
   """
   @spec update(String.t | Comment.t, map, Keyword.t)
         :: {:ok, Comment.t} | {:error, Ecto.Changeset.t | :comment_not_found}
@@ -135,6 +135,30 @@ defmodule CanvasAPI.CommentService do
     comment
     |> Comment.changeset(attrs)
     |> Repo.update
+  end
+
+  @doc """
+  Delete a comment.
+  """
+  @spec delete(String.t | Comment.t, Keyword.t) :: :ok
+                                                 | {:error, :comment_not_found}
+  def delete(id, opts \\ [])
+
+  def delete(id, opts) when is_binary(id) do
+    with {:ok, comment} <- get(id, opts) do
+      __MODULE__.delete(comment, opts)
+    end
+  end
+
+  def delete(comment, _opts) do
+    comment
+    |> Repo.delete
+    |> case do
+      {:ok, _} ->
+        :ok
+      error ->
+        error
+    end
   end
 
   @spec iget(map, atom) :: any

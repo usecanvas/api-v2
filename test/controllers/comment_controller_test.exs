@@ -80,6 +80,21 @@ defmodule CanvasAPI.CommentControllerTest do
     end
   end
 
+  describe ".delete/2" do
+    test "deletes the requested comment", %{conn: conn} do
+      canvas = insert(:canvas)
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
+
+      conn =
+        conn
+        |> put_private(:current_account, comment.creator.account)
+        |> delete(comment_path(conn, :show, comment))
+
+      assert response(conn, 204) == ""
+      refute Repo.reload(comment)
+    end
+  end
+
   describe ".update/2" do
     test "updates a comment from valid attributes", %{conn: conn} do
       canvas = insert(:canvas)

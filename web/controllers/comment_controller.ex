@@ -66,4 +66,19 @@ defmodule CanvasAPI.CommentController do
         unprocessable_entity(conn, changeset)
     end
   end
+
+  @doc """
+  Respond to a request to delete a comment.
+  """
+  @spec delete(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def delete(conn = %{private: %{parsed_request: parsed_request}}, _) do
+    parsed_request.id
+    |> CommentService.delete(parsed_request.opts)
+    |> case do
+      :ok ->
+        no_content(conn)
+      {:error, :comment_not_found} ->
+        not_found(conn, detail: "Comment not found")
+    end
+  end
 end

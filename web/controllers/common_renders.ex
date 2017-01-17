@@ -30,6 +30,10 @@ defmodule CanvasAPI.CommonRenders do
     |> render(ErrorView, "403.json", %{detail: opts[:detail]})
   end
 
+  def no_content(conn, _opts \\ []) do
+    send_resp(conn, :no_content, "")
+  end
+
   def not_found(conn, opts \\ []) do
     conn
     |> put_status(:not_found)
