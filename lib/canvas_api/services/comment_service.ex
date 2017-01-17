@@ -69,6 +69,27 @@ defmodule CanvasAPI.CommentService do
   defp put_creator(changeset, _), do: changeset
 
   @doc """
+  Retrieve a single comment by ID.
+  """
+  @spec get(String.t, Keyword.t) :: {:ok, Comment.t}
+                                  | {:error, :comment_not_found}
+  def get(id, opts) do
+    Comment
+    |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
+    |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
+    |> join(:left, [..., t], u in User, u.team_id == t.id)
+    |> where([..., u], u.account_id == ^opts[:account].id)
+    |> where(id: ^id)
+    |> Repo.one
+    |> case do
+      comment = %Comment{} ->
+        {:ok, comment}
+      nil ->
+        {:error, :comment_not_found}
+    end
+  end
+
+  @doc """
   List comments.
   """
   @spec list(Keyword.t) :: [Comment.t]
@@ -96,6 +117,25 @@ defmodule CanvasAPI.CommentService do
   defp do_filter({"block.id", block_id}, query),
     do: where(query, block_id: ^block_id)
   defp do_filter(_, query), do: query
+
+  @doc """
+  Update a comment
+  """
+  @spec update(String.t | Comment.t, map, Keyword.t)
+        :: {:ok, Comment.t} | {:error, Ecto.Changeset.t | :comment_not_found}
+  def update(id, attrs, opts \\ [])
+
+  def update(id, attrs, opts) when is_binary(id) do
+    with {:ok, comment} <- get(id, opts) do
+      __MODULE__.update(comment, attrs, opts)
+    end
+  end
+
+  def update(comment, attrs, _opts) do
+    comment
+    |> Comment.changeset(attrs)
+    |> Repo.update
+  end
 
   @spec iget(map, atom) :: any
   defp iget(map, key) do

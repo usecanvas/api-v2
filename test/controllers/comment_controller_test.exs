@@ -65,4 +65,36 @@ defmodule CanvasAPI.CommentControllerTest do
       assert listed_comment["id"] == comment.id
     end
   end
+
+  describe ".update/2" do
+    test "updates a comment from valid attributes", %{conn: conn} do
+      canvas = insert(:canvas)
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
+      data = %{
+        attributes: %{
+          blocks: [%{type: "paragraph", content: "New content"}]
+        }
+      }
+
+      conn =
+        conn
+        |> put_private(:current_account, comment.creator.account)
+        |> patch(comment_path(conn, :update, comment), %{data: data})
+
+      assert json_response(conn, 200)
+      assert Repo.reload(comment).blocks |> Enum.map(&(&1.content)) ==
+        ["New content"]
+    end
+
+    test "returns a 404 when a comment isn't found", %{conn: conn} do
+      comment = insert(:comment)
+
+      conn =
+        conn
+        |> put_private(:current_account, insert(:account))
+        |> patch(comment_path(conn, :update, comment), %{data: %{}})
+
+      assert json_response(conn, 404)
+    end
+  end
 end

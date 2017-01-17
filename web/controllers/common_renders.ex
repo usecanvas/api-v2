@@ -34,7 +34,7 @@ defmodule CanvasAPI.CommonRenders do
     conn
     |> put_status(:not_found)
     |> maybe_halt(opts[:halt])
-    |> render(ErrorView, "404.json")
+    |> render(ErrorView, "404.json", %{detail: opts[:detail]})
   end
 
   def unauthorized(conn, opts \\ []) do

@@ -19,6 +19,7 @@ defmodule CanvasAPI.CommentController do
       {:ok, comment} ->
         created(conn, comment: comment)
       {:error, changeset} ->
+        IO.inspect(changeset)
         unprocessable_entity(conn, changeset)
     end
   end
@@ -32,5 +33,22 @@ defmodule CanvasAPI.CommentController do
       parsed_request.opts
       |> CommentService.list
     render(conn, "index.json", comments: comments)
+  end
+
+  @doc """
+  Respond to a request to update a comment.
+  """
+  @spec update(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def update(conn = %{private: %{parsed_request: parsed_request}}, _) do
+    parsed_request.id
+    |> CommentService.update(parsed_request.attrs, parsed_request.opts)
+    |> case do
+      {:ok, comment} ->
+        render(conn, "show.json", comment: comment)
+      {:error, :comment_not_found} ->
+        not_found(conn, detail: "Comment not found")
+      {:error, changeset} ->
+        unprocessable_entity(conn, changeset)
+    end
   end
 end

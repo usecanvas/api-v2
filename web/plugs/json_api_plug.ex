@@ -8,13 +8,15 @@ defmodule CanvasAPI.JSONAPIPlug do
 
   @behaviour Plug
 
-  defstruct attrs: %{},
+  defstruct id: nil,
+            attrs: %{},
             opts: []
 
   @typedoc """
   A parsed JSON API request.
   """
   @type t :: %__MODULE__{
+    id: String.t | nil,
     attrs: %{optional(String.t | atom) => any},
     opts: Keyword.t}
 
@@ -30,6 +32,7 @@ defmodule CanvasAPI.JSONAPIPlug do
   @spec parse_request(Plug.Conn.t) :: t
   defp parse_request(conn) do
     %__MODULE__{}
+    |> put_id(conn.params)
     |> put_attrs(conn.params)
     |> put_rels(conn.params)
     |> put_account(conn.private[:current_account])
@@ -54,6 +57,11 @@ defmodule CanvasAPI.JSONAPIPlug do
   defp put_filter(struct, %{"filter" => filter}) when is_map(filter),
     do: put_in(struct.opts[:filter], filter)
   defp put_filter(struct, _), do: struct
+
+  @spec put_id(t, Plug.Conn.params) :: t
+  defp put_id(struct, %{"id" => id}) when is_binary(id),
+    do: %{struct | id: id}
+  defp put_id(struct, _), do: struct
 
   @spec put_rels(t, Plug.Conn.params) :: t
   defp put_rels(struct,

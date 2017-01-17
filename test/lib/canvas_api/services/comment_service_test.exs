@@ -38,4 +38,14 @@ defmodule CanvasAPI.CommentServiceTest do
       assert found_comment.id == comment.id
     end
   end
+
+  describe ".update/3" do
+    test "updates a comment from valid params", %{canvas: canvas} do
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
+      blocks = [%{type: "paragraph", content: "New"}]
+      {:ok, comment} = CommentService.update(
+        comment.id, %{blocks: blocks}, account: canvas.creator.account)
+      assert Repo.reload(comment).blocks |> Enum.map(&(&1.content)) == ["New"]
+    end
+  end
 end
