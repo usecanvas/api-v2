@@ -7,7 +7,7 @@ defmodule CanvasAPI.CommentService do
   use CanvasAPI.Web, :service
 
   @doc """
-  Create a new comment on a given block and canvas.
+  Create a new comment on a given block and block.
   """
   @spec create(map, Keyword.t) :: {:ok, Comment.t} | {:error, Ecto.Changeset.t}
   def create(attrs, opts) do
@@ -83,12 +83,19 @@ defmodule CanvasAPI.CommentService do
   end
 
   @spec filter(Ecto.Query.t, map | nil) :: Ecto.Query.t
-  defp filter(query, %{"canvas.id" => canvas_id}) do
-    query
-    |> where(canvas_id: ^canvas_id)
+  defp filter(query, filter) when is_map(filter) do
+    filter
+    |> Enum.reduce(query, &do_filter/2)
   end
 
   defp filter(query, _), do: query
+
+  @spec do_filter({String.t, String.t}, Ecto.Query.t) :: Ecto.Query.t
+  defp do_filter({"canvas.id", canvas_id}, query),
+    do: where(query, canvas_id: ^canvas_id)
+  defp do_filter({"block.id", block_id}, query),
+    do: where(query, block_id: ^block_id)
+  defp do_filter(_, query), do: query
 
   @spec iget(map, atom) :: any
   defp iget(map, key) do
