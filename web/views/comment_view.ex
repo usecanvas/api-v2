@@ -15,7 +15,7 @@ defmodule CanvasAPI.CommentView do
     %{
       id: comment.id,
       attributes: %{
-        blocks: comment.blocks
+        blocks: comment.blocks,
         inserted_at: comment.inserted_at,
         updated_at: comment.updated_at
       },
