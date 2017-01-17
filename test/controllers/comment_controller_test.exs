@@ -66,6 +66,20 @@ defmodule CanvasAPI.CommentControllerTest do
     end
   end
 
+  describe ".show/2" do
+    test "shows the requested comment", %{conn: conn} do
+      canvas = insert(:canvas)
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
+
+      conn =
+        conn
+        |> put_private(:current_account, comment.creator.account)
+        |> get(comment_path(conn, :show, comment))
+
+      assert json_response(conn, 200)
+    end
+  end
+
   describe ".update/2" do
     test "updates a comment from valid attributes", %{conn: conn} do
       canvas = insert(:canvas)

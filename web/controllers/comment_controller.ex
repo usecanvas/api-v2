@@ -36,6 +36,21 @@ defmodule CanvasAPI.CommentController do
   end
 
   @doc """
+  Respond to a request for a single comment.
+  """
+  @spec show(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def show(conn = %{private: %{parsed_request: parsed_request}}, _) do
+    parsed_request.id
+    |> CommentService.get(parsed_request.opts)
+    |> case do
+      {:ok, comment} ->
+        render(conn, "show.json", comment: comment)
+      {:error, :comment_not_found} ->
+        not_found(conn, detail: "Comment not found")
+    end
+  end
+
+  @doc """
   Respond to a request to update a comment.
   """
   @spec update(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
