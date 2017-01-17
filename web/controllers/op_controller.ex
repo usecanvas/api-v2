@@ -15,8 +15,7 @@ defmodule CanvasAPI.OpController do
 
   defp ensure_canvas(conn, _opts) do
     CanvasService.get(conn.params["canvas_id"],
-                      account: conn.private.current_account,
-                      team_id: conn.params["team_id"])
+                      account: conn.private.current_account)
     |> case do
       {:ok, canvas} -> put_private(conn, :canvas, canvas)
       {:error, :not_found} -> not_found(conn, halt: true)

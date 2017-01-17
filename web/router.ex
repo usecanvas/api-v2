@@ -44,6 +44,7 @@ defmodule CanvasAPI.Router do
     pipe_through :api
 
     get "/account", AccountController, :show
+    resources "/comments", CommentController, only: [:create]
     get "/upload-signature", UploadSignatureController, :show
     post "/bulk", BulkController, :bulk
     delete "/session", SessionController, :delete

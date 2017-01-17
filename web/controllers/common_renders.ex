@@ -15,6 +15,14 @@ defmodule CanvasAPI.CommonRenders do
     |> render(ErrorView, "400.json", %{detail: opts[:detail]})
   end
 
+  defmacro created(conn, opts \\ []) do
+    quote do
+      unquote(conn)
+      |> put_status(:created)
+      |> render("show.json", unquote(opts))
+    end
+  end
+
   def forbidden(conn, opts \\ []) do
     conn
     |> maybe_halt(opts[:halt])
