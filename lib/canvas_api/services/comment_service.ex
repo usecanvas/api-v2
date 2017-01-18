@@ -74,12 +74,9 @@ defmodule CanvasAPI.CommentService do
   @spec get(String.t, Keyword.t) :: {:ok, Comment.t}
                                   | {:error, :comment_not_found}
   def get(id, opts) do
-    Comment
+    opts[:account].id
+    |> comment_query
     |> maybe_lock
-    |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
-    |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
-    |> join(:left, [..., t], u in User, u.team_id == t.id)
-    |> where([..., u], u.account_id == ^opts[:account].id)
     |> where(id: ^id)
     |> Repo.one
     |> case do
@@ -104,11 +101,8 @@ defmodule CanvasAPI.CommentService do
   """
   @spec list(Keyword.t) :: [Comment.t]
   def list(opts) do
-    Comment
-    |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
-    |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
-    |> join(:left, [..., t], u in User, u.team_id == t.id)
-    |> where([..., u], u.account_id == ^opts[:account].id)
+    opts[:account].id
+    |> comment_query
     |> filter(opts[:filter])
     |> Repo.all
   end
@@ -175,6 +169,15 @@ defmodule CanvasAPI.CommentService do
   def delete(comment, _opts) do
     comment
     |> Repo.delete
+  end
+
+  @spec comment_query(String.t) :: Ecto.Query.t
+  defp comment_query(account_id) do
+    Comment
+    |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
+    |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
+    |> join(:left, [..., t], u in User, u.team_id == t.id)
+    |> where([..., u], u.account_id == ^account_id)
   end
 
   @spec iget(map, atom) :: any
