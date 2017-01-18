@@ -13,13 +13,21 @@ defmodule CanvasAPI.TokenService do
   """
   @spec create(map, Keyword.t) :: {:ok, PersonalAccessToken.t}
                                 | {:error, Ecto.Changeset.t}
-  def create(attrs, account: account) do
+  def create(attrs, opts) do
     %PersonalAccessToken{}
     |> PersonalAccessToken.changeset(attrs)
-    |> put_change(:expires_at, expires_at())
-    |> put_assoc(:account, account)
+    |> put_expires_at(opts[:expires])
+    |> put_assoc(:account, opts[:account])
     |> Repo.insert
   end
+
+  @spec put_expires_at(Ecto.Changeset.t, boolean | nil) :: Ecto.Changeset.t
+  defp put_expires_at(changeset, nil) do
+    changeset
+    |> put_change(:expires_at, expires_at())
+  end
+
+  defp put_expires_at(changeset, false), do: changeset
 
   @doc """
   Get a token by ID.

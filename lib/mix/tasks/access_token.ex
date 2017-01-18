@@ -27,8 +27,7 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
 
   use Mix.Task
   import Ecto.Query
-  import Ecto.Changeset, only: [put_assoc: 3]
-  alias CanvasAPI.{PersonalAccessToken, Repo, User}
+  alias CanvasAPI.{PersonalAccessToken, Repo, User, TokenService}
 
   def run([domain = "~" <> _]) do
     Mix.Task.run("app.start", [])
@@ -61,12 +60,11 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
   defp do_run(account), do: account |> Map.get(:account) |> generate_token()
 
   defp generate_token(account) do
-    %PersonalAccessToken{}
-    |> PersonalAccessToken.changeset()
-    |> put_assoc(:account, account)
-    |> Repo.insert!()
-    |> format()
-    |> IO.puts()
+    {:ok, token} = TokenService.create(%{}, account: account, expires: false)
+
+    token
+    |> PersonalAccessToken.formatted_token
+    |> IO.puts
   end
 
   defp get_account_from_personal_domain(domain) do
@@ -88,9 +86,5 @@ defmodule Mix.Tasks.CanvasApi.AccessToken do
     |> join(:left, [u], _ in assoc(u, :team))
     |> where([..., t], t.domain == ^domain)
     |> preload([u, a], [account: a])
-  end
-
-  defp format(token) do
-    "#{Base62UUID.encode(token.id)}:#{token.token}"
   end
 end
