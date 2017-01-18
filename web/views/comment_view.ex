@@ -3,7 +3,7 @@ defmodule CanvasAPI.CommentView do
   A view for rendering comments.
   """
 
-  alias CanvasAPI.{Endpoint, Repo}
+  alias CanvasAPI.Endpoint
   use CanvasAPI.Web, :view
 
   def render("index.json", %{comments: comments}) do
