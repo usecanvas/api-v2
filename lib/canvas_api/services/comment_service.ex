@@ -75,7 +75,7 @@ defmodule CanvasAPI.CommentService do
                                   | {:error, :comment_not_found}
   def get(id, opts) do
     Comment
-    |> maybe_lock(opts[:lock])
+    |> maybe_lock
     |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
     |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)
@@ -90,9 +90,14 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  @spec maybe_lock(Ecto.Query.t, boolean) :: Ecto.Query.t
-  defp maybe_lock(query, true), do: lock(query, "FOR UPDATE")
-  defp maybe_lock(query, _), do: query
+  @spec maybe_lock(Ecto.Query.t) :: Ecto.Query.t
+  defp maybe_lock(query) do
+    if Repo.in_transaction? do
+      lock(query, "FOR UPDATE")
+    else
+      query
+    end
+  end
 
   @doc """
   List comments.
@@ -132,7 +137,7 @@ defmodule CanvasAPI.CommentService do
 
   def update(id, attrs, opts) when is_binary(id) do
     Repo.transaction fn ->
-      with {:ok, comment} <- get(id, Keyword.put(opts, :lock, true)) do
+      with {:ok, comment} <- get(id, opts) do
         __MODULE__.update(comment, attrs, opts)
       end
       |> case do
@@ -157,7 +162,7 @@ defmodule CanvasAPI.CommentService do
 
   def delete(id, opts) when is_binary(id) do
     Repo.transaction fn ->
-      with {:ok, comment} <- get(id, Keyword.put(opts, :lock, true)) do
+      with {:ok, comment} <- get(id, opts) do
         __MODULE__.delete(comment, opts)
       end
       |> case do
