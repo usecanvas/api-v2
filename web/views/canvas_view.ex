@@ -69,6 +69,12 @@ defmodule CanvasAPI.CanvasView do
   @spec relationships(Canvas.t) :: map
   defp relationships(canvas) do
     %{
+      comments: %{
+        links: %{
+          related: comment_path(Endpoint, :index,
+                                filter: %{"canvas.id" => canvas.id})
+        }
+      },
       creator: %{
         data: %{id: canvas.creator_id, type: "user"}
       },
