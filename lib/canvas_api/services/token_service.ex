@@ -1,0 +1,63 @@
+defmodule CanvasAPI.TokenService do
+  @moduledoc """
+  A service for viewing and manipulating access tokens.
+  """
+
+  alias CanvasAPI.{Account, PersonalAccessToken}
+  use CanvasAPI.Web, :service
+
+  @preload [:account]
+
+  @doc """
+  Create a new personal access token for a given account.
+  """
+  @spec create(map, Keyword.t) :: {:ok, PersonalAccessToken.t}
+                                | {:error, Ecto.Changeset.t}
+  def create(attrs, account: account) do
+    %PersonalAccessToken{}
+    |> PersonalAccessToken.changeset(attrs)
+    |> put_change(:expires_at, expires_at())
+    |> put_assoc(:account, account)
+    |> Repo.insert
+  end
+
+  @doc """
+  Get a token by ID.
+  """
+  @spec get(String.t) :: {:ok, PersonalAccessToken.t}
+                       | {:error, :token_not_found}
+  def get(id, _opts \\ []) do
+    PersonalAccessToken
+    |> preload(^@preload)
+    |> Repo.get(id)
+    |> case do
+      token = %PersonalAccessToken{} ->
+        {:ok, token}
+      nil ->
+        {:error, :token_not_found}
+    end
+  end
+
+  @doc """
+  Verify a token.
+  """
+  @spec verify(String.t) :: {:ok, Account.t} | {:error, :invalid_token}
+  def verify(token) do
+    with [id, token_str] <- String.split(token, ":", parts: 2),
+         {:ok, id} <- Base62UUID.decode(id),
+         {:ok, access_token} <- get(id),
+         true <- access_token.token == token_str do
+      {:ok, access_token.account}
+    else
+      _ ->
+        {:error, :invalid_token}
+    end
+  end
+
+  @spec expires_at() :: pos_integer
+  defp expires_at() do
+    DateTime.utc_now
+    |> Timex.shift(minutes: 5)
+    |> Timex.to_unix
+  end
+end

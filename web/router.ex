@@ -48,6 +48,7 @@ defmodule CanvasAPI.Router do
     get "/upload-signature", UploadSignatureController, :show
     post "/bulk", BulkController, :bulk
     delete "/session", SessionController, :delete
+    resources "/tokens", TokenController, only: [:create]
     resources "/unfurls", UnfurlController, only: [:index]
 
     resources "/ui-dismissals", UIDismissalController, only: [:index, :create]
