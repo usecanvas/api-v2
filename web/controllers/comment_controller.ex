@@ -75,7 +75,7 @@ defmodule CanvasAPI.CommentController do
     parsed_request.id
     |> CommentService.delete(parsed_request.opts)
     |> case do
-      :ok ->
+      {:ok, _} ->
         no_content(conn)
       {:error, :comment_not_found} ->
         not_found(conn, detail: "Comment not found")

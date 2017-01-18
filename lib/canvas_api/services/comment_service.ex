@@ -75,6 +75,7 @@ defmodule CanvasAPI.CommentService do
                                   | {:error, :comment_not_found}
   def get(id, opts) do
     Comment
+    |> maybe_lock(opts[:lock])
     |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
     |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)
@@ -88,6 +89,10 @@ defmodule CanvasAPI.CommentService do
         {:error, :comment_not_found}
     end
   end
+
+  @spec maybe_lock(Ecto.Query.t, boolean) :: Ecto.Query.t
+  defp maybe_lock(query, true), do: lock(query, "FOR UPDATE")
+  defp maybe_lock(query, _), do: query
 
   @doc """
   List comments.
@@ -126,8 +131,14 @@ defmodule CanvasAPI.CommentService do
   def update(id, attrs, opts \\ [])
 
   def update(id, attrs, opts) when is_binary(id) do
-    with {:ok, comment} <- get(id, opts) do
-      __MODULE__.update(comment, attrs, opts)
+    Repo.transaction fn ->
+      with {:ok, comment} <- get(id, Keyword.put(opts, :lock, true)) do
+        __MODULE__.update(comment, attrs, opts)
+      end
+      |> case do
+        {:ok, comment} -> comment
+        {:error, error} -> Repo.rollback(error)
+      end
     end
   end
 
@@ -140,25 +151,25 @@ defmodule CanvasAPI.CommentService do
   @doc """
   Delete a comment.
   """
-  @spec delete(String.t | Comment.t, Keyword.t) :: :ok
+  @spec delete(String.t | Comment.t, Keyword.t) :: {:ok, Comment.t}
                                                  | {:error, :comment_not_found}
   def delete(id, opts \\ [])
 
   def delete(id, opts) when is_binary(id) do
-    with {:ok, comment} <- get(id, opts) do
-      __MODULE__.delete(comment, opts)
+    Repo.transaction fn ->
+      with {:ok, comment} <- get(id, Keyword.put(opts, :lock, true)) do
+        __MODULE__.delete(comment, opts)
+      end
+      |> case do
+        {:ok, comment} -> comment
+        {:error, error} -> Repo.rollback(error)
+      end
     end
   end
 
   def delete(comment, _opts) do
     comment
     |> Repo.delete
-    |> case do
-      {:ok, _} ->
-        :ok
-      error ->
-        error
-    end
   end
 
   @spec iget(map, atom) :: any
