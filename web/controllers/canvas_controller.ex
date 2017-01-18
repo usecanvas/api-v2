@@ -72,7 +72,7 @@ defmodule CanvasAPI.CanvasController do
   end
 
   @spec delete(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
-  def delete(conn, %{"id" => id, "team_id" => team_id}) do
+  def delete(conn, %{"id" => id}) do
     account = conn.private.current_account
     case CanvasService.delete(id, account: account) do
       {:ok, _} ->
