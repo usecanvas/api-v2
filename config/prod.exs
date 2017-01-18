@@ -15,6 +15,9 @@ config :canvas_api, CanvasAPI.Endpoint,
   http: [port: {:system, "PORT"}],
   instrumenters: [Appsignal.Phoenix.Instrumenter],
   url: [host: System.get_env("HOST"), port: 80],
+  pubsub: [name: CanvasAPI.PubSub,
+           adapter: Phoenix.PubSub.Redis,
+           url: System.get_env("REDIS_URL")],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
   # force_ssl: [hsts: true]
 
