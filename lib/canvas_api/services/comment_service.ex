@@ -29,8 +29,8 @@ defmodule CanvasAPI.CommentService do
 
   @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
   defp put_block(changeset = %{valid?: true}, id) when is_binary(id) do
-    with %{blocks: blocks} = get_change(changeset, :canvas).data,
-         block when not is_nil(block) <- Enum.find(blocks, &(&1.id == id)) do
+    with canvas = get_change(changeset, :canvas).data,
+         block when not is_nil(block) <- Canvas.find_block(canvas, id) do
         changeset
         |> put_change(:block_id, block.id)
     else

@@ -6,7 +6,9 @@ defmodule CanvasAPI.CommentServiceTest do
 
   setup do
     block = build(:block, content: "Hello, world!")
-    canvas = insert(:canvas, blocks: [block])
+    list_item = build(:block, content: "List item")
+    list = build(:block, type: "list", blocks: [list_item])
+    canvas = insert(:canvas, blocks: [block, list])
     {:ok, canvas: canvas}
   end
 
@@ -16,6 +18,19 @@ defmodule CanvasAPI.CommentServiceTest do
         %{blocks: [%{type: "paragraph", content: "Hi"}],
           canvas_id: canvas.id,
           block_id: List.first(canvas.blocks).id}
+        |> CommentService.create(account: canvas.creator.account)
+      assert comment
+    end
+
+    test "creates a new comment on a nested block", %{canvas: canvas} do
+      list_item =
+        canvas.blocks
+        |> get_in([Access.at(1), Access.key(:blocks), Access.at(0)])
+
+      {:ok, comment} =
+        %{blocks: [%{type: "paragraph", content: "Hi"}],
+          canvas_id: canvas.id,
+          block_id: list_item.id}
         |> CommentService.create(account: canvas.creator.account)
       assert comment
     end
