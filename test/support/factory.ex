@@ -61,6 +61,17 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def comment_factory do
+    canvas = insert(:canvas)
+
+    %CanvasAPI.Comment{
+      blocks: [build(:block)],
+      block_id: Base62UUID.generate,
+      canvas: canvas,
+      creator: canvas.creator
+    }
+  end
+
   def oauth_token_factory do
     %CanvasAPI.OAuthToken{
       token: "token",

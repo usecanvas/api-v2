@@ -106,8 +106,7 @@ defmodule CanvasAPI.CanvasServiceTest do
     test "finds a canvas amongst an account's accessible canvases" do
       canvas = Repo.preload(insert(:canvas), [:template])
       assert CanvasService.get(canvas.id,
-                               account: canvas.creator.account,
-                               team_id: canvas.team_id) ==
+                               account: canvas.creator.account) ==
       {:ok,
        Repo.preload(Repo.get(Canvas, canvas.id),
                     [:team, :template, creator: [:team]])}
@@ -116,8 +115,8 @@ defmodule CanvasAPI.CanvasServiceTest do
     test "returns a not found error if no canvas is found" do
       canvas = insert(:canvas)
       assert CanvasService.get(canvas.id,
-                               account: insert(:account),
-                               team_id: canvas.team_id) == {:error, :not_found}
+                               account: insert(:account)) ==
+                                {:error, :not_found}
     end
   end
 
@@ -205,18 +204,16 @@ defmodule CanvasAPI.CanvasServiceTest do
       account = canvas.creator.account
 
       {:ok, canvas} =
-        CanvasService.delete(
-          canvas.id, account: account, team_id: canvas.team_id)
+        CanvasService.delete(canvas.id, account: account)
       assert Repo.get(Canvas, canvas.id) == nil
     end
 
     test "returns not_found for a not found canvas" do
       canvas = insert(:canvas)
       account = canvas.creator.account
-      CanvasService.delete(canvas.id, account: account, team_id: canvas.team_id)
-      assert CanvasService.delete(
-        canvas.id, account: account, team_id: canvas.team_id) ==
-          {:error, :not_found}
+      CanvasService.delete(canvas.id, account: account)
+      assert CanvasService.delete(canvas.id, account: account) ==
+        {:error, :not_found}
     end
   end
 end

@@ -76,7 +76,7 @@ defmodule CanvasAPI.CanvasController do
     account = conn.private.current_account
     case CanvasService.delete(id, account: account, team_id: team_id) do
       {:ok, _} ->
-        send_resp(conn, :no_content, "")
+        no_content(conn)
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
       nil ->
@@ -87,8 +87,7 @@ defmodule CanvasAPI.CanvasController do
   @spec ensure_canvas(Plug.Conn.t, map) :: Plug.Conn.t
   defp ensure_canvas(conn, _opts) do
     CanvasService.get(conn.params["id"],
-                      account: conn.private.current_account,
-                      team_id: conn.params["team_id"])
+                      account: conn.private.current_account)
     |> case do
       {:ok, canvas} -> put_private(conn, :canvas, canvas)
       {:error, :not_found} -> not_found(conn, halt: true)

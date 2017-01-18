@@ -86,26 +86,23 @@ defmodule CanvasAPI.CanvasService do
   @doc """
   Get a canvas that is in an account's teams.
 
-  The user must pass in an account and team ID.
+  The user must pass in an account.
 
   Options:
 
   - `account`: `%Account{}` (**required**) The account requesting the canvas
-  - `team_id`: `String.t` (**required**) The team ID the canvas is in
 
   ## Examples
 
   ```elixir
   CanvasService.get(
     "6ijSghOIflAjKVki5j0dpL",
-    account: conn.private.current_account,
-    team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+    account: conn.private.current_account)
   ```
   """
   @spec get(String.t, Keyword.t) :: {:ok, %Canvas{}} | {:error, :not_found}
-  def get(id, account: account, team_id: team_id) do
+  def get(id, account: account) do
     from(assoc(account, :canvases),
-         where: [team_id: ^team_id],
          preload: ^@preload)
     |> Repo.get(id)
     |> case do
@@ -191,15 +188,14 @@ defmodule CanvasAPI.CanvasService do
   ## Examples
 
   ```elixir
-  CanvasService.delete(
-    "6ijSghOIflAjKVki5j0dpL", team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+  CanvasService.delete("6ijSghOIflAjKVki5j0dpL", account: account)
   ```
   """
   @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}}
                                      | {:error, Ecto.Changeset.t}
                                      | {:error, :not_found}
-  def delete(id, account: account, team_id: team_id) do
-    get(id, account: account, team_id: team_id)
+  def delete(id, account: account) do
+    get(id, account: account)
     |> case do
       {:ok, canvas} -> Repo.delete(canvas)
       {:error, :not_found} -> {:error, :not_found}
