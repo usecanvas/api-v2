@@ -3,6 +3,7 @@ defmodule CanvasAPI.CommentView do
   A view for rendering comments.
   """
 
+  alias CanvasAPI.{Endpoint, Repo}
   use CanvasAPI.Web, :view
 
   def render("index.json", %{comments: comments}) do
@@ -27,7 +28,13 @@ defmodule CanvasAPI.CommentView do
       },
       relationships: %{
         block: %{data: %{id: comment.block_id, type: "block"}},
-        canvas: %{data: %{id: comment.canvas_id, type: "canvas"}},
+        canvas: %{
+          data: %{id: comment.canvas_id, type: "canvas"},
+          links: %{
+            related: team_canvas_path(Endpoint, :show,
+                                      comment.canvas.team_id, comment.canvas.id)
+          }
+        },
         creator: %{data: %{id: comment.creator_id, type: "user"}}
       },
       type: "comment"

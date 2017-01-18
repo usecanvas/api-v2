@@ -6,6 +6,8 @@ defmodule CanvasAPI.CommentService do
   alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Repo, Team, User}
   use CanvasAPI.Web, :service
 
+  @preload [:canvas]
+
   @doc """
   Create a new comment on a given block and block.
   """
@@ -17,6 +19,12 @@ defmodule CanvasAPI.CommentService do
     |> put_block(iget(attrs, :block_id))
     |> put_creator(opts[:account])
     |> Repo.insert
+    |> case do
+      {:ok, comment} ->
+        {:ok, Repo.preload(comment, @preload)}
+      error ->
+        error
+    end
   end
 
   @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
@@ -178,6 +186,7 @@ defmodule CanvasAPI.CommentService do
     |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)
     |> where([..., u], u.account_id == ^account_id)
+    |> preload(^@preload)
   end
 
   @spec iget(map, atom) :: any
