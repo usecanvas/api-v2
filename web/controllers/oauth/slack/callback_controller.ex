@@ -28,8 +28,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         BetaNotifier.delay_notify(domain)
         redirect(conn, external: @beta_redirect_uri)
       {:error, error} ->
-        Logger.error("Failed Slack sign in callback")
-        IO.inspect(error)
+        Logger.error("Failed Slack sign in callback: #{inspect error}")
         bad_request(conn)
     end
   end
@@ -43,7 +42,8 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
       {:ok, _token} ->
         conn
         |> send_resp_or_redirect()
-      _ ->
+      error ->
+        Logger.error("Failed Slack sign in callback: #{inspect error}")
         bad_request(conn)
     end
   end

@@ -19,7 +19,6 @@ defmodule CanvasAPI.CommentController do
       {:ok, comment} ->
         created(conn, comment: comment)
       {:error, changeset} ->
-        IO.inspect(changeset)
         unprocessable_entity(conn, changeset)
     end
   end
