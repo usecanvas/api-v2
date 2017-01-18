@@ -33,6 +33,7 @@ defmodule CanvasAPI.CommentServiceTest do
           block_id: list_item.id}
         |> CommentService.create(account: canvas.creator.account)
       assert comment
+      assert list_item.id == comment.block_id
     end
   end
 

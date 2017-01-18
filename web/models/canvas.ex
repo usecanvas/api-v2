@@ -62,7 +62,7 @@ defmodule CanvasAPI.Canvas do
   """
   def find_block(canvas, id) do
     canvas.blocks
-    |> Enum.find(fn block ->
+    |> Enum.find_value(fn block ->
       case block do
         %Block{id: ^id} -> block
         %Block{type: "list"} -> find_block(block, id)
