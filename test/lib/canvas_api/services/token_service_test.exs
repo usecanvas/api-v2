@@ -32,5 +32,22 @@ defmodule CanvasAPI.TokenServiceTest do
 
       assert account.id == token.account_id
     end
+
+    test "returns an error for an invalid token" do
+      assert TokenService.verify("hi") == {:error, :invalid_token}
+    end
+
+    test "returns an error for an expires token", %{token: token} do
+      the_past = DateTime.utc_now |> Timex.shift(hours: -1) |> Timex.to_unix
+
+      token_str =
+        token
+        |> PersonalAccessToken.changeset
+        |> put_change(:expires_at, the_past)
+        |> Repo.update!
+        |> PersonalAccessToken.formatted_token
+
+      assert TokenService.verify(token_str) == {:error, :invalid_token}
+    end
   end
 end

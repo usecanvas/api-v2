@@ -46,6 +46,7 @@ defmodule CanvasAPI.TokenService do
     with [id, token_str] <- String.split(token, ":", parts: 2),
          {:ok, id} <- Base62UUID.decode(id),
          {:ok, access_token} <- get(id),
+         true <- validate_expires_at(access_token),
          true <- access_token.token == token_str do
       {:ok, access_token.account}
     else
@@ -59,5 +60,14 @@ defmodule CanvasAPI.TokenService do
     DateTime.utc_now
     |> Timex.shift(minutes: 5)
     |> Timex.to_unix
+  end
+
+  @spec validate_expires_at(PersonalAccessToken.t) :: boolean
+  defp validate_expires_at(token) do
+    if token.expires_at do
+      token.expires_at >= DateTime.utc_now |> Timex.to_unix
+    else
+      true
+    end
   end
 end
