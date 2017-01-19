@@ -3,7 +3,9 @@ defmodule CanvasAPI.CommentService do
   A service for viewing and manipulating comments.
   """
 
-  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Team, User}
+  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Team, User,
+                   UserService}
+  alias Ecto.Changeset
   use CanvasAPI.Web, :service
 
   @preload [:canvas]
@@ -11,7 +13,7 @@ defmodule CanvasAPI.CommentService do
   @doc """
   Create a new comment on a given block and block.
   """
-  @spec create(map, Keyword.t) :: {:ok, Comment.t} | {:error, Ecto.Changeset.t}
+  @spec create(map, Keyword.t) :: {:ok, Comment.t} | {:error, Changeset.t}
   def create(attrs, opts) do
     %Comment{}
     |> Comment.changeset(attrs)
@@ -28,28 +30,20 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
-  defp put_block(changeset = %{valid?: true}, id) when is_binary(id) do
-    with canvas = get_change(changeset, :canvas).data,
-         block when not is_nil(block) <- Canvas.find_block(canvas, id) do
-        changeset
-        |> put_change(:block_id, block.id)
+  @spec put_block(Changeset.t, String.t | nil) :: Changeset.t
+  defp put_block(changeset, id) when is_binary(id) do
+    with canvas when not is_nil(canvas) <- get_field(changeset, :canvas),
+         block  when not is_nil(block)  <- Canvas.find_block(canvas, id) do
+      put_change(changeset, :block_id, id)
     else
-      _ ->
-        changeset
-        |> add_error(:block, "was not found")
+      _ -> add_error(changeset, :block, "was not found")
     end
   end
 
-  defp put_block(changeset, nil) do
-    changeset
-    |> add_error(:block, "is required")
-  end
+  defp put_block(changeset, _),
+    do: add_error(changeset, :block, "is required")
 
-  defp put_block(changeset, _), do: changeset
-
-  @spec put_canvas(Ecto.Changeset.t, String.t | nil, Account.t)
-        :: Ecto.Changeset.t
+  @spec put_canvas(Changeset.t, String.t | nil, Account.t) :: Changeset.t
   defp put_canvas(changeset, id, account) when is_binary(id) do
     id
     |> CanvasService.get(account: account)
@@ -64,18 +58,15 @@ defmodule CanvasAPI.CommentService do
   defp put_canvas(changeset, _, _),
     do: changeset |> add_error(:canvas, "is required")
 
-  @spec put_creator(Ecto.Changeset.t, Account.t) :: Ecto.Changeset.t
-  defp put_creator(changeset = %{valid?: true}, account) do
-    canvas = get_change(changeset, :canvas).data
-    user =
-      account
-      |> assoc(:users)
-      |> from(where: [team_id: ^canvas.team_id])
-      |> Repo.one
-    put_assoc(changeset, :creator, user)
+  @spec put_creator(Changeset.t, Account.t) :: Changeset.t
+  defp put_creator(changeset, account) do
+    with canvas when not is_nil(canvas) <- get_field(changeset, :canvas) do
+      {:ok, user} = UserService.find_by_team(account, team_id: canvas.team_id)
+      put_assoc(changeset, :creator, user)
+    else
+      _ -> changeset
+    end
   end
-
-  defp put_creator(changeset, _), do: changeset
 
   @doc """
   Retrieve a single comment by ID.
@@ -135,7 +126,7 @@ defmodule CanvasAPI.CommentService do
   Update a comment.
   """
   @spec update(String.t | Comment.t, map, Keyword.t)
-        :: {:ok, Comment.t} | {:error, Ecto.Changeset.t | :comment_not_found}
+        :: {:ok, Comment.t} | {:error, Changeset.t | :comment_not_found}
   def update(id, attrs, opts \\ [])
 
   def update(id, attrs, opts) when is_binary(id) do
