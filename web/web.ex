@@ -50,12 +50,14 @@ defmodule CanvasAPI.Web do
 
   def service do
     quote do
-      alias CanvasAPI.Repo
+      alias CanvasAPI.{Endpoint, Repo}
+
       import Ecto
       import Ecto.Query
       import Ecto.Changeset
 
       import CanvasAPI.Gettext
+      import CanvasAPI.Service.Helpers
     end
   end
 

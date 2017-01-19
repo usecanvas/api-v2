@@ -15,9 +15,9 @@ defmodule CanvasAPI.CommentServiceTest do
   describe ".create/2" do
     test "creates a new comment from valid params", %{canvas: canvas} do
       {:ok, comment} =
-        %{blocks: [%{type: "paragraph", content: "Hi"}],
-          canvas_id: canvas.id,
-          block_id: List.first(canvas.blocks).id}
+        %{"blocks" => [%{"type" => "paragraph", "content" => "Hi"}],
+          "canvas_id" => canvas.id,
+          "block_id" => List.first(canvas.blocks).id}
         |> CommentService.create(account: canvas.creator.account)
       assert comment
     end
@@ -28,9 +28,9 @@ defmodule CanvasAPI.CommentServiceTest do
         |> get_in([Access.at(1), Access.key(:blocks), Access.at(0)])
 
       {:ok, comment} =
-        %{blocks: [%{type: "paragraph", content: "Hi"}],
-          canvas_id: canvas.id,
-          block_id: list_item.id}
+        %{"blocks" => [%{"type" => "paragraph", "content" => "Hi"}],
+          "canvas_id" => canvas.id,
+          "block_id" => list_item.id}
         |> CommentService.create(account: canvas.creator.account)
       assert comment
       assert list_item.id == comment.block_id
@@ -58,10 +58,19 @@ defmodule CanvasAPI.CommentServiceTest do
   describe ".update/3" do
     test "updates a comment from valid params", %{canvas: canvas} do
       comment = insert(:comment, canvas: canvas, creator: canvas.creator)
-      blocks = [%{type: "paragraph", content: "New"}]
+      blocks = [%{"type" => "paragraph", "content" => "New"}]
       {:ok, comment} = CommentService.update(
-        comment.id, %{blocks: blocks}, account: canvas.creator.account)
+        comment.id, %{"blocks" => blocks}, account: canvas.creator.account)
       assert Repo.reload(comment).blocks |> Enum.map(&(&1.content)) == ["New"]
+    end
+  end
+
+  describe ".delete/2" do
+    test "deletes a comment", %{canvas: canvas} do
+      comment = insert(:comment, canvas: canvas)
+      {:ok, comment} =
+        CommentService.delete(comment.id, account: canvas.creator.account)
+      refute Repo.reload(comment)
     end
   end
 end

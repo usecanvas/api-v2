@@ -3,8 +3,7 @@ defmodule CanvasAPI.CommentService do
   A service for viewing and manipulating comments.
   """
 
-  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, CommentView,
-                   Endpoint, Repo, Team, User}
+  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Team, User}
   use CanvasAPI.Web, :service
 
   @preload [:canvas]
@@ -16,8 +15,8 @@ defmodule CanvasAPI.CommentService do
   def create(attrs, opts) do
     %Comment{}
     |> Comment.changeset(attrs)
-    |> put_canvas(iget(attrs, :canvas_id), opts[:account])
-    |> put_block(iget(attrs, :block_id))
+    |> put_canvas(attrs["canvas_id"], opts[:account])
+    |> put_block(attrs["block_id"])
     |> put_creator(opts[:account])
     |> Repo.insert
     |> case do
@@ -32,8 +31,10 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_new_comment(Comment.t) :: any
   defp notify_new_comment(comment) do
-    Endpoint.broadcast("canvas:#{comment.canvas_id}", "new_comment",
-                       CommentView.render("show.json", %{comment: comment}))
+    notify("canvas:#{comment.canvas_id}",
+           "new_comment",
+           "show.json",
+           comment: comment)
   end
 
   @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
@@ -172,8 +173,10 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_updated_comment(Comment.t) :: any
   defp notify_updated_comment(comment) do
-    Endpoint.broadcast("canvas:#{comment.canvas_id}", "updated_comment",
-                       CommentView.render("show.json", %{comment: comment}))
+    notify("canvas:#{comment.canvas_id}",
+           "updated_comment",
+           "show.json",
+           comment: comment)
   end
 
   @doc """
@@ -208,8 +211,10 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_deleted_comment(Comment.t) :: any
   defp notify_deleted_comment(comment) do
-    Endpoint.broadcast("canvas:#{comment.canvas_id}", "deleted_comment",
-                       CommentView.render("show.json", %{comment: comment}))
+    notify("canvas:#{comment.canvas_id}",
+           "deleted_comment",
+           "show.json",
+           comment: comment)
   end
 
   @spec comment_query(String.t) :: Ecto.Query.t
@@ -220,14 +225,5 @@ defmodule CanvasAPI.CommentService do
     |> join(:left, [..., t], u in User, u.team_id == t.id)
     |> where([..., u], u.account_id == ^account_id)
     |> preload(^@preload)
-  end
-
-  @spec iget(map, atom) :: any
-  defp iget(map, key) do
-    if Map.has_key?(map, key) do
-      map[key]
-    else
-      map[to_string(key)]
-    end
   end
 end
