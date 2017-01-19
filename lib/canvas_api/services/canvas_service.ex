@@ -4,8 +4,10 @@ defmodule CanvasAPI.CanvasService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
+
   import CanvasAPI.UUIDMatch
+
+  alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
 
   @preload [:team, :template, creator: [:team]]
 
