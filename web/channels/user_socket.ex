@@ -4,7 +4,7 @@ defmodule CanvasAPI.UserSocket do
   alias CanvasAPI.TokenService
 
   ## Channels
-  channel "team:*", CanvasAPI.TeamChannel
+  channel "canvas:*", CanvasAPI.CanvasChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,

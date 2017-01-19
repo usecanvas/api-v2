@@ -1,17 +1,16 @@
-defmodule CanvasAPI.TeamChannelTest do
+defmodule CanvasAPI.CanvasChannelTest do
   use CanvasAPI.ChannelCase
 
-  alias CanvasAPI.TeamChannel
+  alias CanvasAPI.CanvasChannel
   import CanvasAPI.Factory
 
   setup do
     canvas = insert(:canvas)
     account = canvas.creator.account
-    team = canvas.team
 
     {:ok, _, socket} =
       socket("current_account", %{current_account: account})
-      |> subscribe_and_join(TeamChannel, "team:#{team.id}")
+      |> subscribe_and_join(CanvasChannel, "canvas:#{canvas.id}")
 
     {:ok, socket: socket}
   end
