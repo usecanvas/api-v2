@@ -20,7 +20,8 @@ config :canvas_api, CanvasAPI.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: CanvasAPI.ErrorView, accepts: ~w(json)],
   pubsub: [name: CanvasAPI.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+           adapter: Phoenix.PubSub.Redis,
+           url: System.get_env("REDIS_URL")]
 
 config :phoenix, :format_encoders,
   json: CanvasAPI.JSONEncoder

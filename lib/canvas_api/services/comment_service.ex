@@ -3,7 +3,8 @@ defmodule CanvasAPI.CommentService do
   A service for viewing and manipulating comments.
   """
 
-  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Repo, Team, User}
+  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, CommentView,
+                   Endpoint, Repo, Team, User}
   use CanvasAPI.Web, :service
 
   @preload [:canvas]
@@ -21,10 +22,18 @@ defmodule CanvasAPI.CommentService do
     |> Repo.insert
     |> case do
       {:ok, comment} ->
-        {:ok, Repo.preload(comment, @preload)}
+        comment = Repo.preload(comment, @preload)
+        notify_new_comment(comment)
+        {:ok, comment}
       error ->
         error
     end
+  end
+
+  @spec notify_new_comment(Comment.t) :: any
+  defp notify_new_comment(comment) do
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "new_comment",
+                       CommentView.render("show.json", %{comment: comment}))
   end
 
   @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
@@ -153,6 +162,18 @@ defmodule CanvasAPI.CommentService do
     comment
     |> Comment.changeset(attrs)
     |> Repo.update
+    |> case do
+      {:ok, comment} ->
+        notify_updated_comment(comment)
+        {:ok, comment}
+      error -> error
+    end
+  end
+
+  @spec notify_updated_comment(Comment.t) :: any
+  defp notify_updated_comment(comment) do
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "updated_comment",
+                       CommentView.render("show.json", %{comment: comment}))
   end
 
   @doc """
@@ -177,6 +198,18 @@ defmodule CanvasAPI.CommentService do
   def delete(comment, _opts) do
     comment
     |> Repo.delete
+    |> case do
+      {:ok, comment} ->
+        notify_deleted_comment(comment)
+        {:ok, comment}
+      error -> error
+    end
+  end
+
+  @spec notify_deleted_comment(Comment.t) :: any
+  defp notify_deleted_comment(comment) do
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "deleted_comment",
+                       CommentView.render("show.json", %{comment: comment}))
   end
 
   @spec comment_query(String.t) :: Ecto.Query.t
