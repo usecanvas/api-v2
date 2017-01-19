@@ -32,8 +32,7 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_new_comment(Comment.t) :: any
   defp notify_new_comment(comment) do
-    team_id = comment.canvas.team_id
-    Endpoint.broadcast("team:#{team_id}", "new_comment",
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "new_comment",
                        CommentView.render("show.json", %{comment: comment}))
   end
 
@@ -173,8 +172,7 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_updated_comment(Comment.t) :: any
   defp notify_updated_comment(comment) do
-    team_id = comment.canvas.team_id
-    Endpoint.broadcast("team:#{team_id}", "updated_comment",
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "updated_comment",
                        CommentView.render("show.json", %{comment: comment}))
   end
 
@@ -210,8 +208,7 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_deleted_comment(Comment.t) :: any
   defp notify_deleted_comment(comment) do
-    team_id = comment.canvas.team_id
-    Endpoint.broadcast("team:#{team_id}", "deleted_comment",
+    Endpoint.broadcast("canvas:#{comment.canvas_id}", "deleted_comment",
                        CommentView.render("show.json", %{comment: comment}))
   end
 
