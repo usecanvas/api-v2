@@ -29,9 +29,8 @@ defmodule CanvasAPI.CurrentAccountPlug do
   end
 
   defp get_account(conn) do
-    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-         {:ok, account} <- TokenService.verify(token) do
-      account
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization") do
+      TokenService.verify(token)
     else
       _ -> get_account_from_session(conn)
     end
