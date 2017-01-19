@@ -21,20 +21,11 @@ defmodule CanvasAPI.CommentService do
     |> Repo.insert
     |> case do
       {:ok, comment} ->
-        comment = Repo.preload(comment, @preload)
-        notify_new_comment(comment)
+        notify_comment(comment, "new_comment")
         {:ok, comment}
       error ->
         error
     end
-  end
-
-  @spec notify_new_comment(Comment.t) :: any
-  defp notify_new_comment(comment) do
-    notify("canvas:#{comment.canvas_id}",
-           "new_comment",
-           "show.json",
-           comment: comment)
   end
 
   @spec put_block(Ecto.Changeset.t, String.t | nil) :: Ecto.Changeset.t
@@ -165,18 +156,10 @@ defmodule CanvasAPI.CommentService do
     |> Repo.update
     |> case do
       {:ok, comment} ->
-        notify_updated_comment(comment)
+        notify_comment(comment, "updated_comment")
         {:ok, comment}
       error -> error
     end
-  end
-
-  @spec notify_updated_comment(Comment.t) :: any
-  defp notify_updated_comment(comment) do
-    notify("canvas:#{comment.canvas_id}",
-           "updated_comment",
-           "show.json",
-           comment: comment)
   end
 
   @doc """
@@ -203,18 +186,10 @@ defmodule CanvasAPI.CommentService do
     |> Repo.delete
     |> case do
       {:ok, comment} ->
-        notify_deleted_comment(comment)
+        notify_comment(comment, "deleted_comment")
         {:ok, comment}
       error -> error
     end
-  end
-
-  @spec notify_deleted_comment(Comment.t) :: any
-  defp notify_deleted_comment(comment) do
-    notify("canvas:#{comment.canvas_id}",
-           "deleted_comment",
-           "show.json",
-           comment: comment)
   end
 
   @spec comment_query(String.t) :: Ecto.Query.t
@@ -225,5 +200,13 @@ defmodule CanvasAPI.CommentService do
     |> join(:left, [..., t], u in User, u.team_id == t.id)
     |> where([..., u], u.account_id == ^account_id)
     |> preload(^@preload)
+  end
+
+  @spec notify_comment(Comment.t, String.t) :: any
+  defp notify_comment(comment, event) do
+    notify("canvas:#{comment.canvas_id}",
+           event,
+           "show.json",
+           comment: comment)
   end
 end
