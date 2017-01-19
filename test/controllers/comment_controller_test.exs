@@ -115,6 +115,18 @@ defmodule CanvasAPI.CommentControllerTest do
         ["New content"]
     end
 
+    test "returns a 403 when a non-creator is updating", %{conn: conn} do
+      comment = insert(:comment)
+      updater = insert(:user, team: comment.canvas.team)
+
+      conn =
+        conn
+        |> put_private(:current_account, updater.account)
+        |> patch(comment_path(conn, :update, comment), %{data: %{}})
+
+      assert json_response(conn, 403)
+    end
+
     test "returns a 404 when a comment isn't found", %{conn: conn} do
       comment = insert(:comment)
 

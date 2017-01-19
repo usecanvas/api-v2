@@ -61,6 +61,8 @@ defmodule CanvasAPI.CommentController do
         render(conn, "show.json", comment: comment)
       {:error, :comment_not_found} ->
         not_found(conn, detail: "Comment not found")
+      {:error, :does_not_own} ->
+        forbidden(conn)
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
     end

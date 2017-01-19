@@ -8,7 +8,7 @@ defmodule CanvasAPI.CommentService do
   alias Ecto.Changeset
   use CanvasAPI.Web, :service
 
-  @preload [:canvas]
+  @preload [:canvas, :creator]
 
   @doc """
   Create a new comment on a given block and block.
@@ -126,7 +126,8 @@ defmodule CanvasAPI.CommentService do
   Update a comment.
   """
   @spec update(String.t | Comment.t, map, Keyword.t)
-        :: {:ok, Comment.t} | {:error, Changeset.t | :comment_not_found}
+        :: {:ok, Comment.t}
+         | {:error, Changeset.t | :comment_not_found | :does_not_own}
   def update(id, attrs, opts \\ [])
 
   def update(id, attrs, opts) when is_binary(id) do
@@ -141,15 +142,19 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  def update(comment, attrs, _opts) do
-    comment
-    |> Comment.changeset(attrs)
-    |> Repo.update
-    |> case do
-      {:ok, comment} ->
-        notify_comment(comment, "updated_comment")
-        {:ok, comment}
-      error -> error
+  def update(comment, attrs, opts) do
+    if opts[:account].id == comment.creator.account_id do
+      comment
+      |> Comment.changeset(attrs)
+      |> Repo.update
+      |> case do
+        {:ok, comment} ->
+          notify_comment(comment, "updated_comment")
+          {:ok, comment}
+        error -> error
+      end
+    else
+      {:error, :does_not_own}
     end
   end
 

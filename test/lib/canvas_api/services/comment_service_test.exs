@@ -63,11 +63,19 @@ defmodule CanvasAPI.CommentServiceTest do
         comment.id, %{"blocks" => blocks}, account: canvas.creator.account)
       assert Repo.reload(comment).blocks |> Enum.map(&(&1.content)) == ["New"]
     end
+
+    test "does not allow non-creator to update", %{canvas: canvas} do
+      updater = insert(:user, team: canvas.team)
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
+      blocks = [%{"type" => "paragraph", "content" => "New"}]
+      assert {:error, :does_not_own} == CommentService.update(
+        comment.id, %{"blocks" => blocks}, account: updater.account)
+    end
   end
 
   describe ".delete/2" do
     test "deletes a comment", %{canvas: canvas} do
-      comment = insert(:comment, canvas: canvas)
+      comment = insert(:comment, canvas: canvas, creator: canvas.creator)
       {:ok, comment} =
         CommentService.delete(comment.id, account: canvas.creator.account)
       refute Repo.reload(comment)
