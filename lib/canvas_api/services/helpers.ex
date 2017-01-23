@@ -3,7 +3,7 @@ defmodule CanvasAPI.Service.Helpers do
   Helpers for common tasks in services.
   """
 
-  defmacro notify(channel, event, template, assigns \\ []) do
+  defmacro broadcast(channel, event, template, assigns \\ []) do
     quote do
       CanvasAPI.Endpoint.broadcast(
         unquote(channel),
