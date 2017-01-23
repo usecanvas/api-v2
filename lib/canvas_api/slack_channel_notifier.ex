@@ -66,6 +66,7 @@ defmodule CanvasAPI.SlackChannelNotifier do
       Slack.client(token)
       |> Slack.Chat.postMessage(
         channel: channel_id,
+        parse: "full",
         text: notify_new_comment_text(notifier),
         attachments: Poison.encode!([%{
           title: Canvas.title(comment.canvas),
