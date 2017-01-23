@@ -3,12 +3,12 @@ defmodule CanvasAPI.CommentService do
   A service for viewing and manipulating comments.
   """
 
-  alias CanvasAPI.{Account, Canvas, CanvasService, Comment, Team, User,
-                   UserService}
+  alias CanvasAPI.{Account, Canvas, CanvasService, Comment,
+                   SlackChannelNotifier, Team, User, UserService}
   alias Ecto.Changeset
   use CanvasAPI.Web, :service
 
-  @preload [:canvas, :creator]
+  @preload [:creator, canvas: [:team]]
 
   @doc """
   Create a new comment on a given block and block.
@@ -200,9 +200,21 @@ defmodule CanvasAPI.CommentService do
 
   @spec notify_comment(Comment.t, String.t) :: any
   defp notify_comment(comment, event) do
-    notify("canvas:#{comment.canvas_id}",
+    notify_slack(comment)
+    broadcast("canvas:#{comment.canvas_id}",
            event,
            "show.json",
            comment: comment)
+  end
+
+  @spec notify_slack(Comment.t) :: any
+  defp notify_slack(comment) do
+    with {:ok, token} <- Team.get_token(comment.canvas.team, "slack"),
+         token = get_in(token.meta, ~w(bot bot_access_token)) do
+      comment.canvas.slack_channel_ids
+      |> Enum.each(
+           &SlackChannelNotifier.delay_notify_new_comment(
+             token, comment.id, &1))
+    end
   end
 end

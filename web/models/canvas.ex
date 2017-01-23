@@ -101,9 +101,11 @@ defmodule CanvasAPI.Canvas do
   @doc """
   Get the summary of a canvas.
   """
-  @spec summary(%__MODULE__{}) :: String.t
-  def summary(%__MODULE__{blocks: blocks}) do
-    case Enum.at(blocks, 1) do
+  @spec summary(t | Canvas.Comment.t) :: String.t
+  def summary(%{blocks: blocks}) do
+    blocks
+    |> Enum.find(&(&1.type !== "title"))
+    |> case do
       %Block{blocks: [block | _]} ->
         String.slice(block.content, 0..140)
       %Block{content: content} ->
