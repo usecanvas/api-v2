@@ -51,6 +51,7 @@ defmodule CanvasAPI.Web do
   def service do
     quote do
       alias CanvasAPI.{Endpoint, Repo}
+      alias Ecto.Changeset
 
       import Ecto
       import Ecto.Query
@@ -58,6 +59,8 @@ defmodule CanvasAPI.Web do
 
       import CanvasAPI.Gettext
       import CanvasAPI.Service.Helpers
+
+      @type attrs :: %{optional(String.t) => any}
     end
   end
 
