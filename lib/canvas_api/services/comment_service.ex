@@ -87,15 +87,6 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  @spec maybe_lock(Ecto.Query.t) :: Ecto.Query.t
-  defp maybe_lock(query) do
-    if Repo.in_transaction? do
-      lock(query, "FOR UPDATE")
-    else
-      query
-    end
-  end
-
   @doc """
   List comments.
   """

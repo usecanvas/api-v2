@@ -5,7 +5,10 @@ defmodule CanvasAPI.WatchedCanvasService do
 
   use CanvasAPI.Web, :service
 
-  alias CanvasAPI.{Canvas, CanvasService, UserService, WatchedCanvas}
+  alias CanvasAPI.{Canvas, CanvasService, Team, User, UserService,
+                   WatchedCanvas}
+
+  @preload [:user, canvas: [:team]]
 
   @doc """
   Insert a new watched canvas.
@@ -43,5 +46,51 @@ defmodule CanvasAPI.WatchedCanvasService do
     else
         _ -> changeset
     end
+  end
+
+  @doc """
+  Get a watched canvas by ID.
+  """
+  @spec get(String.t, Keyword.t) :: {:ok, WatchedCanvas.t}
+                                  | {:error, :watch_not_found}
+  def get(id, opts) do
+    opts[:account].id
+    |> watch_query
+    |> maybe_lock
+    |> where(canvas_id: ^id)
+    |> Repo.one
+    |> case do
+      watch = %WatchedCanvas{} ->
+        {:ok, watch}
+      nil ->
+        {:error, :watch_not_found}
+    end
+  end
+
+  @doc """
+  Delete a watched canvas.
+  """
+  @spec delete(String.t, Keyword.t) :: {:ok, WatchedCanvas.t}
+                                     | {:error, :watch_not_found}
+  def delete(id, opts) do
+    Repo.transaction(fn ->
+      with {:ok, watch} <- get(id, opts) do
+        Repo.delete(watch)
+      end
+      |> case do
+        {:ok, watch} -> watch
+        {:error, error} -> Repo.rollback(error)
+      end
+    end)
+  end
+
+  @spec watch_query(String.t) :: Ecto.Query.t
+  defp watch_query(account_id) do
+    WatchedCanvas
+    |> join(:left, [w], c in Canvas, w.canvas_id == c.id)
+    |> join(:left, [..., c], t in Team, c.team_id == t.id)
+    |> join(:left, [..., t], u in User, u.team_id == t.id)
+    |> where([..., u], u.account_id == ^account_id)
+    |> preload(^@preload)
   end
 end

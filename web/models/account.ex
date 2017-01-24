@@ -15,6 +15,7 @@ defmodule CanvasAPI.Account do
     has_many :oauth_tokens, CanvasAPI.OAuthToken
     has_many :personal_access_tokens, CanvasAPI.PersonalAccessToken
     has_many :ui_dismissals, CanvasAPI.UIDismissal
+    has_many :watched_canvases, through: [:users, :watched_canvases]
 
     timestamps
   end

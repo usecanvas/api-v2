@@ -23,6 +23,7 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
         |> post(watched_canvas_path(conn, :create, %{data: data}))
 
       assert json_response(conn, 201)["data"]["type"] == "watched-canvas"
+      assert json_response(conn, 201)["data"]["id"] == canvas.id
     end
 
     test "returns an error when invalid", %{conn: conn} do
@@ -39,6 +40,32 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
         |> post(watched_canvas_path(conn, :create, %{data: data}))
 
       assert json_response(conn, 422)
+    end
+  end
+
+  describe "DELETE .delete/2" do
+    test "deletes a watched canvas if found", %{conn: conn} do
+      watched = insert(:watched_canvas)
+
+      conn =
+        conn
+        |> put_private(:current_account, watched.user.account)
+        |> delete(watched_canvas_path(conn, :delete, watched.canvas_id))
+
+      assert response(conn, 204) == ""
+      refute Repo.reload(watched)
+    end
+
+    test "returns 404 when not found", %{conn: conn} do
+      watched = insert(:watched_canvas)
+
+      conn =
+        conn
+        |> put_private(:current_account, watched.user.account)
+        |> delete(watched_canvas_path(conn, :delete, watched.canvas_id <> "x"))
+
+      assert Repo.reload(watched)
+      assert json_response(conn, 404)
     end
   end
 end

@@ -7,7 +7,8 @@ defmodule CanvasAPI.WatchedCanvasController do
 
   alias CanvasAPI.WatchedCanvasService
 
-  plug CanvasAPI.JSONAPIPlug
+  plug CanvasAPI.CurrentAccountPlug
+  plug CanvasAPI.JSONAPIPlug when action in [:create]
 
   @doc """
   Create a new watched canvas from request params.
@@ -21,6 +22,21 @@ defmodule CanvasAPI.WatchedCanvasController do
         created(conn, watched_canvas: watched_canvas)
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
+    end
+  end
+
+  @doc """
+  Delete a watched canvas (the watch, not the canvas).
+  """
+  @spec delete(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def delete(conn, params) do
+    params["id"]
+    |> WatchedCanvasService.delete(account: conn.private.current_account)
+    |> case do
+      {:ok, _} ->
+        no_content(conn)
+      {:error, :watch_not_found} ->
+        not_found(conn, detail: "Watched canvas not found")
     end
   end
 end

@@ -121,6 +121,15 @@ defmodule CanvasAPI.Factory do
     }
   end
 
+  def watched_canvas_factory do
+    canvas = insert(:canvas)
+
+    %CanvasAPI.WatchedCanvas{
+      canvas: canvas,
+      user: build(:user, team: canvas.team)
+    }
+  end
+
   def whitelisted_domain_factory do
     %CanvasAPI.WhitelistedSlackDomain{
       domain: sequence(:domain, &"domain-#{&1}")
