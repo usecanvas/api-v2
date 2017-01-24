@@ -43,6 +43,23 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
     end
   end
 
+  describe "GET .index/2" do
+    test "lists watched canvases", %{conn: conn} do
+      watch = insert(:watched_canvas)
+
+      conn =
+        conn
+        |> put_private(:current_account, watch.user.account)
+        |> get(watched_canvas_path(conn, :index))
+
+      assert(
+        conn
+        |> json_response(200)
+        |> Map.get("data")
+        |> Enum.map(&(&1["id"])) == [watch.canvas_id])
+    end
+  end
+
   describe "DELETE .delete/2" do
     test "deletes a watched canvas if found", %{conn: conn} do
       watched = insert(:watched_canvas)

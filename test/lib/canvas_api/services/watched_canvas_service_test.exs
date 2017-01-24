@@ -24,6 +24,27 @@ defmodule CanvasAPI.WatchedCanvasServiceTest do
     end
   end
 
+  describe ".list/1" do
+    test "lists watched canvases" do
+      watch = insert(:watched_canvas)
+      list = WatchedCanvasService.list(account: watch.user.account)
+      assert Enum.map(list, (&(&1.id))) == [watch.id]
+    end
+
+    test "filters by canvas ID" do
+      user = insert(:user)
+      canvas = insert(:canvas, team: user.team)
+      canvas2 = insert(:canvas, team: user.team)
+      watch = insert(:watched_canvas, user: user, canvas: canvas)
+      _watch2 = insert(:watched_canvas, user: user, canvas: canvas2)
+
+      list = WatchedCanvasService.list(
+        account: watch.user.account,
+        filter: %{"canvas.id" => watch.canvas_id})
+      assert Enum.map(list, (&(&1.id))) == [watch.id]
+    end
+  end
+
   describe ".delete/2" do
     test "deletes a watched canvas" do
       watch = insert(:watched_canvas)

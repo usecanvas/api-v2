@@ -68,6 +68,29 @@ defmodule CanvasAPI.WatchedCanvasService do
   end
 
   @doc """
+  List watched canvases.
+  """
+  @spec list(Keyword.t) :: [WatchedCanvas.t]
+  def list(opts) do
+    opts[:account].id
+    |> watch_query
+    |> filter(opts[:filter])
+    |> Repo.all
+  end
+
+  @spec filter(Ecto.Query.t, map | nil) :: Ecto.Query.t
+  defp filter(query, filter) when is_map(filter) do
+    filter
+    |> Enum.reduce(query, &do_filter/2)
+  end
+
+  defp filter(query, _), do: query
+
+  @spec do_filter({String.t, String.t}, Ecto.Query.t) :: Ecto.Query.t
+  defp do_filter({"canvas.id", canvas_id}, query),
+    do: where(query, canvas_id: ^canvas_id)
+
+  @doc """
   Delete a watched canvas.
   """
   @spec delete(String.t, Keyword.t) :: {:ok, WatchedCanvas.t}

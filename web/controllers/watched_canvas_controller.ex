@@ -8,7 +8,7 @@ defmodule CanvasAPI.WatchedCanvasController do
   alias CanvasAPI.WatchedCanvasService
 
   plug CanvasAPI.CurrentAccountPlug
-  plug CanvasAPI.JSONAPIPlug when action in [:create]
+  plug CanvasAPI.JSONAPIPlug when action in [:create, :index]
 
   @doc """
   Create a new watched canvas from request params.
@@ -23,6 +23,17 @@ defmodule CanvasAPI.WatchedCanvasController do
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
     end
+  end
+
+  @doc """
+  List watched canvases.
+  """
+  @spec index(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def index(conn = %{private: %{parsed_request: parsed_request}}, _) do
+    watched_canvases =
+      parsed_request.opts
+      |> WatchedCanvasService.list
+    render(conn, "index.json", watched_canvases: watched_canvases)
   end
 
   @doc """
