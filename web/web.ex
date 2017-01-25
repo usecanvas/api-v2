@@ -64,6 +64,17 @@ defmodule CanvasAPI.Web do
     end
   end
 
+  def worker do
+    quote do
+      use CanvasAPI.Worker.Helpers
+
+      import Ecto
+      import Ecto.Query
+
+      alias CanvasAPI.Repo
+    end
+  end
+
   def view do
     quote do
       use Phoenix.View, root: "web/templates", namespace: CanvasAPI

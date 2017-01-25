@@ -229,8 +229,8 @@ defmodule CanvasAPI.CanvasService do
          token = get_in(token.meta, ~w(bot bot_access_token)) do
       (canvas.slack_channel_ids -- old_channel_ids)
       |> Enum.each(
-        &SlackChannelNotifier.delay_notify_new(
-          token, canvas.id, notifier.id, &1, opts))
+        &SlackChannelNotifier.delay(
+          {:notify_new, [token, canvas.id, notifier.id, &1]}, opts))
     end
   end
 

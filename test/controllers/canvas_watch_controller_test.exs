@@ -22,7 +22,7 @@ defmodule CanvasAPI.CanvasWatchControllerTest do
         |> put_private(:current_account, user.account)
         |> post(canvas_watch_path(conn, :create, %{data: data}))
 
-      assert json_response(conn, 201)["data"]["type"] == "watched-canvas"
+      assert json_response(conn, 201)["data"]["type"] == "canvas-watch"
       assert json_response(conn, 201)["data"]["id"] == canvas.id
     end
 

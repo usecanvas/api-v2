@@ -43,7 +43,7 @@ defmodule CanvasAPI.CanvasServiceTest do
 
     test "sends a notification when instructed", %{user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay_notify_new: &mock_notify/5]) do
+        CanvasAPI.SlackChannelNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, canvas} =
@@ -53,16 +53,17 @@ defmodule CanvasAPI.CanvasServiceTest do
               team: user.team,
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay_notify_new(
-            get_in(token.meta, ~w(bot bot_access_token)),
-            canvas.id,
-            user.id,
-            "abcdef",
+          assert called CanvasAPI.SlackChannelNotifier.delay(
+            {:notify_new,
+             [get_in(token.meta, ~w(bot bot_access_token)),
+              canvas.id,
+              user.id,
+              "abcdef"]},
             delay: 300)
         end
     end
 
-    defp mock_notify(_token, _canvas, _notifier_id, _channel_id, _opts), do: nil
+    defp mock_notify(_tuple, _opts), do: nil
   end
 
   describe ".list" do
@@ -180,7 +181,7 @@ defmodule CanvasAPI.CanvasServiceTest do
 
     test "sends notifications when specified", %{canvas: canvas, user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay_notify_new: &mock_notify/5]) do
+        CanvasAPI.SlackChannelNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, _} =
@@ -188,11 +189,12 @@ defmodule CanvasAPI.CanvasServiceTest do
             |> CanvasService.update(%{"slack_channel_ids" => ["abc"]},
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay_notify_new(
-            get_in(token.meta, ~w(bot bot_access_token)),
-            canvas.id,
-            user.id,
-            "abc",
+          assert called CanvasAPI.SlackChannelNotifier.delay(
+            {:notify_new,
+             [get_in(token.meta, ~w(bot bot_access_token)),
+              canvas.id,
+              user.id,
+              "abc"]},
             [])
         end
     end

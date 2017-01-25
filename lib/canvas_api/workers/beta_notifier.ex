@@ -3,25 +3,16 @@ defmodule CanvasAPI.BetaNotifier do
   Notifies Canvas of non-whitelisted domain login attempts.
   """
 
-  alias CanvasAPI.{Repo, Team}
-  import Ecto.Query, only: [from: 2]
+  use CanvasAPI.Web, :worker
+  alias CanvasAPI.Team
 
   @canvas_domain "usecanvas"
   @notify_user "oren"
 
-  defmodule NotifyWorker do
-    @moduledoc """
-    Asynchronously notifies Canvas of non-whitelisted domain login attempts.
-    """
-
-    def perform(domain) do
-      CanvasAPI.BetaNotifier.notify(domain)
-    end
-  end
-
   @doc """
   Notify Canvas of a non-whitelisted domain login attempt.
   """
+  @spec notify(String.t) :: any
   def notify(domain) do
     get_token
     |> Slack.client
@@ -31,18 +22,7 @@ defmodule CanvasAPI.BetaNotifier do
          link_names: true)
   end
 
-  @doc """
-  Asynchronously notify Cnavas of a non-whitelisted domain login attempt.
-  """
-  def delay_notify(domain, opts \\ []) do
-    Exq.Enqueuer.enqueue_in(
-      CanvasAPI.Queue.Enqueuer,
-      "default",
-      Keyword.get(opts, :delay, 0),
-      NotifyWorker,
-      [domain])
-  end
-
+  @spec get_token :: String.t | nil | no_return
   defp get_token do
     from(Team, where: [domain: @canvas_domain])
     |> Repo.one!

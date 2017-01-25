@@ -3,34 +3,9 @@ defmodule CanvasAPI.SlackChannelNotifier do
   Notifes a Slack channel of canvas activity.
   """
 
-  alias CanvasAPI.{Canvas, Comment, Repo, User}
+  use CanvasAPI.Web, :worker
 
-  defmodule NotifyNewWorker do
-    @moduledoc """
-    Asynchronously notifies Slack channels of new canvases.
-    """
-
-    def perform(token, canvas_id, notifier_id, channel_id) do
-      CanvasAPI.SlackChannelNotifier.notify_new(
-        token,
-        canvas_id,
-        notifier_id,
-        channel_id)
-    end
-  end
-
-  defmodule NotifyNewCommentWorker do
-    @moduledoc """
-    Asynchronously notifies Slack channels of new comments.
-    """
-
-    def perform(token, comment_id, channel_id) do
-      CanvasAPI.SlackChannelNotifier.notify_new_comment(
-        token,
-        comment_id,
-        channel_id)
-    end
-  end
+  alias CanvasAPI.{Canvas, Comment, User}
 
   @doc """
   Notify a Slack channel of a new canvas.
@@ -78,24 +53,6 @@ defmodule CanvasAPI.SlackChannelNotifier do
           text: Canvas.summary(comment)
         }]))
     end
-  end
-
-  def delay_notify_new(token, canvas_id, notifier_id, channel_id, opts \\ []) do
-    Exq.Enqueuer.enqueue_in(
-      CanvasAPI.Queue.Enqueuer,
-      "default",
-      Keyword.get(opts, :delay, 0),
-      NotifyNewWorker,
-      [token, canvas_id, notifier_id, channel_id])
-  end
-
-  def delay_notify_new_comment(token, comment_id, channel_id, opts \\ []) do
-    Exq.Enqueuer.enqueue_in(
-      CanvasAPI.Queue.Enqueuer,
-      "default",
-      Keyword.get(opts, :delay, 0),
-      NotifyNewCommentWorker,
-      [token, comment_id, channel_id])
   end
 
   # Get the text for a new canvas notice.

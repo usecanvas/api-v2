@@ -204,8 +204,8 @@ defmodule CanvasAPI.CommentService do
          token = get_in(token.meta, ~w(bot bot_access_token)) do
       comment.canvas.slack_channel_ids
       |> Enum.each(
-           &SlackChannelNotifier.delay_notify_new_comment(
-             token, comment.id, &1))
+           &SlackChannelNotifier.delay(
+             {:notify_new_comment, [token, comment.id, &1]}))
     end
   end
 end
