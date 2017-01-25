@@ -8,9 +8,9 @@ defmodule CanvasAPI.Worker.Helpers do
       @doc """
       React to a notify job.
       """
-      @spec perform({atom, [any]}) :: any
-      def perform({func, args}) do
-        apply(__MODULE__, func, args)
+      @spec perform(String.t, [any]) :: any
+      def perform(func, args) do
+        apply(__MODULE__, String.to_atom(func), args)
       end
 
       @doc """
@@ -23,7 +23,7 @@ defmodule CanvasAPI.Worker.Helpers do
           "default",
           Keyword.get(opts, :delay, 0),
           __MODULE__,
-          {func, args})
+          [to_string(func), args])
       end
     end
   end
