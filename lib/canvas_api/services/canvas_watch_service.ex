@@ -1,23 +1,23 @@
-defmodule CanvasAPI.WatchedCanvasService do
+defmodule CanvasAPI.CanvasWatchService do
   @moduledoc """
-  A service for viewing and manipulating watched canvases.
+  A service for viewing and manipulating canvas watches.
   """
 
   use CanvasAPI.Web, :service
 
   alias CanvasAPI.{Canvas, CanvasService, Team, User, UserService,
-                   WatchedCanvas}
+                   CanvasWatch}
 
   @preload [:user, canvas: [:team]]
 
   @doc """
-  Insert a new watched canvas.
+  Insert a new canvas watch.
   """
-  @spec insert(attrs, Keyword.t) :: {:ok, WatchedCanvas.t}
+  @spec insert(attrs, Keyword.t) :: {:ok, CanvasWatch.t}
                                   | {:error, Changeset.t}
   def insert(attrs, opts) do
-    %WatchedCanvas{}
-    |> WatchedCanvas.changeset(attrs)
+    %CanvasWatch{}
+    |> CanvasWatch.changeset(attrs)
     |> put_canvas(attrs["canvas_id"], opts[:account])
     |> put_user(opts[:account])
     |> Repo.insert
@@ -49,9 +49,9 @@ defmodule CanvasAPI.WatchedCanvasService do
   end
 
   @doc """
-  Get a watched canvas by ID.
+  Get a canvas watch by ID.
   """
-  @spec get(String.t, Keyword.t) :: {:ok, WatchedCanvas.t}
+  @spec get(String.t, Keyword.t) :: {:ok, CanvasWatch.t}
                                   | {:error, :watch_not_found}
   def get(id, opts) do
     opts[:account].id
@@ -60,7 +60,7 @@ defmodule CanvasAPI.WatchedCanvasService do
     |> where(canvas_id: ^id)
     |> Repo.one
     |> case do
-      watch = %WatchedCanvas{} ->
+      watch = %CanvasWatch{} ->
         {:ok, watch}
       nil ->
         {:error, :watch_not_found}
@@ -68,9 +68,9 @@ defmodule CanvasAPI.WatchedCanvasService do
   end
 
   @doc """
-  List watched canvases.
+  List canvas watches.
   """
-  @spec list(Keyword.t) :: [WatchedCanvas.t]
+  @spec list(Keyword.t) :: [CanvasWatch.t]
   def list(opts) do
     opts[:account].id
     |> watch_query
@@ -91,9 +91,9 @@ defmodule CanvasAPI.WatchedCanvasService do
     do: where(query, canvas_id: ^canvas_id)
 
   @doc """
-  Delete a watched canvas.
+  Delete a canvas watch.
   """
-  @spec delete(String.t, Keyword.t) :: {:ok, WatchedCanvas.t}
+  @spec delete(String.t, Keyword.t) :: {:ok, CanvasWatch.t}
                                      | {:error, :watch_not_found}
   def delete(id, opts) do
     Repo.transaction(fn ->
@@ -109,7 +109,7 @@ defmodule CanvasAPI.WatchedCanvasService do
 
   @spec watch_query(String.t) :: Ecto.Query.t
   defp watch_query(account_id) do
-    WatchedCanvas
+    CanvasWatch
     |> join(:left, [w], c in Canvas, w.canvas_id == c.id)
     |> join(:left, [..., c], t in Team, c.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)

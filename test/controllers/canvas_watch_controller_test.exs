@@ -1,4 +1,4 @@
-defmodule CanvasAPI.WatchedCanvasControllerTest do
+defmodule CanvasAPI.CanvasWatchControllerTest do
   use CanvasAPI.ConnCase, async: true
 
   import CanvasAPI.Factory
@@ -8,7 +8,7 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
   end
 
   describe "POST .create/2" do
-    test "creates a watched canvas if found", %{conn: conn} do
+    test "creates a canvas watch if found", %{conn: conn} do
       canvas = insert(:canvas)
       user = insert(:user, team: canvas.team)
 
@@ -20,7 +20,7 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
       conn =
         conn
         |> put_private(:current_account, user.account)
-        |> post(watched_canvas_path(conn, :create, %{data: data}))
+        |> post(canvas_watch_path(conn, :create, %{data: data}))
 
       assert json_response(conn, 201)["data"]["type"] == "watched-canvas"
       assert json_response(conn, 201)["data"]["id"] == canvas.id
@@ -37,20 +37,20 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
       conn =
         conn
         |> put_private(:current_account, insert(:account))
-        |> post(watched_canvas_path(conn, :create, %{data: data}))
+        |> post(canvas_watch_path(conn, :create, %{data: data}))
 
       assert json_response(conn, 422)
     end
   end
 
   describe "GET .index/2" do
-    test "lists watched canvases", %{conn: conn} do
-      watch = insert(:watched_canvas)
+    test "lists canvas watches", %{conn: conn} do
+      watch = insert(:canvas_watch)
 
       conn =
         conn
         |> put_private(:current_account, watch.user.account)
-        |> get(watched_canvas_path(conn, :index))
+        |> get(canvas_watch_path(conn, :index))
 
       assert(
         conn
@@ -61,25 +61,25 @@ defmodule CanvasAPI.WatchedCanvasControllerTest do
   end
 
   describe "DELETE .delete/2" do
-    test "deletes a watched canvas if found", %{conn: conn} do
-      watched = insert(:watched_canvas)
+    test "deletes a canvas watch if found", %{conn: conn} do
+      watched = insert(:canvas_watch)
 
       conn =
         conn
         |> put_private(:current_account, watched.user.account)
-        |> delete(watched_canvas_path(conn, :delete, watched.canvas_id))
+        |> delete(canvas_watch_path(conn, :delete, watched.canvas_id))
 
       assert response(conn, 204) == ""
       refute Repo.reload(watched)
     end
 
     test "returns 404 when not found", %{conn: conn} do
-      watched = insert(:watched_canvas)
+      watched = insert(:canvas_watch)
 
       conn =
         conn
         |> put_private(:current_account, watched.user.account)
-        |> delete(watched_canvas_path(conn, :delete, watched.canvas_id <> "x"))
+        |> delete(canvas_watch_path(conn, :delete, watched.canvas_id <> "x"))
 
       assert Repo.reload(watched)
       assert json_response(conn, 404)

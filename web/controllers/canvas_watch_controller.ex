@@ -1,48 +1,48 @@
-defmodule CanvasAPI.WatchedCanvasController do
+defmodule CanvasAPI.CanvasWatchController do
   @moduledoc """
-  A controller for responding to requests related to watched canvasess
+  A controller for responding to requests related to canvas watches
   """
 
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.WatchedCanvasService
+  alias CanvasAPI.CanvasWatchService
 
   plug CanvasAPI.CurrentAccountPlug
   plug CanvasAPI.JSONAPIPlug when action in [:create, :index]
 
   @doc """
-  Create a new watched canvas from request params.
+  Create a new canvas watch from request params.
   """
   @spec create(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def create(conn = %{private: %{parsed_request: parsed_request}}, _) do
     parsed_request.attrs
-    |> WatchedCanvasService.insert(parsed_request.opts)
+    |> CanvasWatchService.insert(parsed_request.opts)
     |> case do
-      {:ok, watched_canvas} ->
-        created(conn, watched_canvas: watched_canvas)
+      {:ok, canvas_watch} ->
+        created(conn, canvas_watch: canvas_watch)
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
     end
   end
 
   @doc """
-  List watched canvases.
+  List canvas watches.
   """
   @spec index(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def index(conn = %{private: %{parsed_request: parsed_request}}, _) do
-    watched_canvases =
+    canvas_watches =
       parsed_request.opts
-      |> WatchedCanvasService.list
-    render(conn, "index.json", watched_canvases: watched_canvases)
+      |> CanvasWatchService.list
+    render(conn, "index.json", canvas_watches: canvas_watches)
   end
 
   @doc """
-  Delete a watched canvas (the watch, not the canvas).
+  Delete a canvas watch (the watch, not the canvas).
   """
   @spec delete(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
   def delete(conn, params) do
     params["id"]
-    |> WatchedCanvasService.delete(account: conn.private.current_account)
+    |> CanvasWatchService.delete(account: conn.private.current_account)
     |> case do
       {:ok, _} ->
         no_content(conn)

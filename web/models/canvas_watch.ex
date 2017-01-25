@@ -1,4 +1,4 @@
-defmodule CanvasAPI.WatchedCanvas do
+defmodule CanvasAPI.CanvasWatch do
   @moduledoc """
   A canvas that a user has elected to receive direct messages related to it.
   """
@@ -7,7 +7,7 @@ defmodule CanvasAPI.WatchedCanvas do
 
   @type t :: %__MODULE__{}
 
-  schema "watched_canvases" do
+  schema "canvas_watches" do
     belongs_to :canvas, CanvasAPI.Canvas, type: :string
     belongs_to :user, CanvasAPI.User
 

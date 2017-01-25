@@ -121,10 +121,10 @@ defmodule CanvasAPI.Factory do
     }
   end
 
-  def watched_canvas_factory do
+  def canvas_watch_factory do
     canvas = insert(:canvas)
 
-    %CanvasAPI.WatchedCanvas{
+    %CanvasAPI.CanvasWatch{
       canvas: canvas,
       user: build(:user, team: canvas.team)
     }

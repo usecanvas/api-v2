@@ -22,7 +22,7 @@ defmodule CanvasAPI.User do
     has_many :created_canvases, CanvasAPI.Canvas
     has_many :comments, through: [:canvases, :comments]
     has_many :created_comments, CanvasAPI.Comment
-    has_many :watched_canvases, CanvasAPI.WatchedCanvas
+    has_many :canvas_watches, CanvasAPI.CanvasWatch
 
     timestamps
   end
