@@ -4,7 +4,7 @@ defmodule CanvasAPI.CommentService do
   """
 
   alias CanvasAPI.{Account, Canvas, CanvasService, Comment,
-                   SlackChannelNotifier, Team, User, UserService}
+                   SlackNotifier, Team, User, UserService}
   alias Ecto.Changeset
   use CanvasAPI.Web, :service
 
@@ -73,12 +73,11 @@ defmodule CanvasAPI.CommentService do
   """
   @spec get(String.t, Keyword.t) :: {:ok, Comment.t}
                                   | {:error, :comment_not_found}
-  def get(id, opts) do
-    opts[:account].id
+  def get(id, opts \\ []) do
+    opts[:account]
     |> comment_query
     |> maybe_lock
-    |> where(id: ^id)
-    |> Repo.one
+    |> Repo.get(id)
     |> case do
       comment = %Comment{} ->
         {:ok, comment}
@@ -87,21 +86,12 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  @spec maybe_lock(Ecto.Query.t) :: Ecto.Query.t
-  defp maybe_lock(query) do
-    if Repo.in_transaction? do
-      lock(query, "FOR UPDATE")
-    else
-      query
-    end
-  end
-
   @doc """
   List comments.
   """
   @spec list(Keyword.t) :: [Comment.t]
   def list(opts) do
-    opts[:account].id
+    opts[:account]
     |> comment_query
     |> filter(opts[:filter])
     |> Repo.all
@@ -188,19 +178,22 @@ defmodule CanvasAPI.CommentService do
     end
   end
 
-  @spec comment_query(String.t) :: Ecto.Query.t
-  defp comment_query(account_id) do
+  @spec comment_query(Account.t | nil) :: Ecto.Query.t
+  defp comment_query(nil), do: Comment |> preload(^@preload)
+
+  defp comment_query(account) do
     Comment
     |> join(:left, [co], ca in Canvas, co.canvas_id == ca.id)
     |> join(:left, [..., ca], t in Team, ca.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)
-    |> where([..., u], u.account_id == ^account_id)
+    |> where([..., u], u.account_id == ^account.id)
     |> preload(^@preload)
   end
 
   @spec notify_comment(Comment.t, String.t) :: any
   defp notify_comment(comment, event) do
-    notify_slack(comment)
+    if event == "new_comment", do: notify_slack(comment)
+
     broadcast("canvas:#{comment.canvas_id}",
            event,
            "show.json",
@@ -213,8 +206,9 @@ defmodule CanvasAPI.CommentService do
          token = get_in(token.meta, ~w(bot bot_access_token)) do
       comment.canvas.slack_channel_ids
       |> Enum.each(
-           &SlackChannelNotifier.delay_notify_new_comment(
-             token, comment.id, &1))
+           &SlackNotifier.delay(
+             {:notify_new_comment, [token, comment.id, &1]}))
+      SlackNotifier.delay({:dm_new_comment, [token, comment.id]})
     end
   end
 end

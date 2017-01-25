@@ -25,7 +25,7 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
         |> put_session(:account_id, account.id)
         |> send_resp_or_redirect()
       {:error, {:domain_not_whitelisted, domain}} ->
-        BetaNotifier.delay_notify(domain)
+        BetaNotifier.delay({:notify, [domain]})
         redirect(conn, external: @beta_redirect_uri)
       {:error, error} ->
         Logger.error("Failed Slack sign in callback: #{inspect error}")
