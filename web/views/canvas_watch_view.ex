@@ -34,7 +34,7 @@ defmodule CanvasAPI.CanvasWatchView do
         },
         user: %{data: %{id: canvas_watch.user_id, type: "user"}}
       },
-      type: "watched-canvas"
+      type: "canvas-watch"
     }
   end
 end
