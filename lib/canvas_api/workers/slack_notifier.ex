@@ -1,4 +1,4 @@
-defmodule CanvasAPI.SlackChannelNotifier do
+defmodule CanvasAPI.SlackNotifier do
   @moduledoc """
   Notifes a Slack channel of canvas activity.
   """

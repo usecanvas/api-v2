@@ -43,7 +43,7 @@ defmodule CanvasAPI.CanvasServiceTest do
 
     test "sends a notification when instructed", %{user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay: &mock_notify/2]) do
+        CanvasAPI.SlackNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, canvas} =
@@ -53,7 +53,7 @@ defmodule CanvasAPI.CanvasServiceTest do
               team: user.team,
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay(
+          assert called CanvasAPI.SlackNotifier.delay(
             {:notify_new,
              [get_in(token.meta, ~w(bot bot_access_token)),
               canvas.id,
@@ -181,7 +181,7 @@ defmodule CanvasAPI.CanvasServiceTest do
 
     test "sends notifications when specified", %{canvas: canvas, user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay: &mock_notify/2]) do
+        CanvasAPI.SlackNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, _} =
@@ -189,7 +189,7 @@ defmodule CanvasAPI.CanvasServiceTest do
             |> CanvasService.update(%{"slack_channel_ids" => ["abc"]},
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay(
+          assert called CanvasAPI.SlackNotifier.delay(
             {:notify_new,
              [get_in(token.meta, ~w(bot bot_access_token)),
               canvas.id,

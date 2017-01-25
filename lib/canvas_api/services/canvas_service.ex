@@ -7,7 +7,7 @@ defmodule CanvasAPI.CanvasService do
 
   import CanvasAPI.UUIDMatch
 
-  alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
+  alias CanvasAPI.{Account, Canvas, SlackNotifier, Team, User}
 
   @preload [:team, :template, creator: [:team]]
 
@@ -229,7 +229,7 @@ defmodule CanvasAPI.CanvasService do
          token = get_in(token.meta, ~w(bot bot_access_token)) do
       (canvas.slack_channel_ids -- old_channel_ids)
       |> Enum.each(
-        &SlackChannelNotifier.delay(
+        &SlackNotifier.delay(
           {:notify_new, [token, canvas.id, notifier.id, &1]}, opts))
     end
   end
