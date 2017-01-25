@@ -5,7 +5,8 @@ defmodule CanvasAPI.SlackNotifier do
 
   use CanvasAPI.Web, :worker
 
-  alias CanvasAPI.{Canvas, Comment, User}
+  alias CanvasAPI.{Block, Canvas, CanvasWatch, CanvasWatchService, Comment,
+                   CommentService, User}
 
   @doc """
   Notify a Slack channel of a new canvas.
@@ -30,29 +31,65 @@ defmodule CanvasAPI.SlackNotifier do
   end
 
   @doc """
+  Direct message a Slack user of a new comment.
+  """
+  @spec dm_new_comment(String.t, String.t) :: any
+  def dm_new_comment(token, comment_id) do
+    with {:ok, comment} <- CommentService.get(comment_id),
+         watches <- CanvasWatchService.list(canvas: comment.canvas) do
+      watches
+      |> Enum.each(fn watch -> dm_watch(token, comment, watch) end)
+    end
+  end
+
+  @spec dm_watch(String.t, Comment.t, CanvasWatch.t) :: any
+  defp dm_watch(token, comment, watch) do
+    with {:ok, im_id} <- get_im_id(token, watch.user),
+         block = Canvas.find_block(comment.canvas, comment.block_id) do
+      token
+      |> Slack.client
+      |> Slack.Chat.postMessage(new_comment_message(im_id, comment, block))
+    end
+  end
+
+  @spec get_im_id(String.t, User.t) :: {:ok, String.t} | :error
+  defp get_im_id(token, user) do
+    token
+    |> Slack.client
+    |> Slack.IM.open(user: user.slack_id)
+    |> case do
+      {:ok, %{"channel" => %{"id" => id}}} -> {:ok, id}
+      _ -> :error
+    end
+  end
+
+  @doc """
   Notify a Slack channel of a new comment.
   """
   @spec notify_new_comment(String.t, String.t, String.t) :: any
   def notify_new_comment(token, comment_id, channel_id) do
     with comment = %Comment{} <- Repo.get(Comment, comment_id),
          comment = Repo.preload(comment, [:creator, canvas: [:creator, :team]]),
-         notifier = comment.creator,
          block = Canvas.find_block(comment.canvas, comment.block_id) do
       Slack.client(token)
-      |> Slack.Chat.postMessage(
-        channel: channel_id,
-        parse: "full",
-        text: notify_new_comment_text(notifier),
-        attachments: Poison.encode!([%{
-          title: Canvas.title(comment.canvas),
-          title_link: Canvas.web_url(comment.canvas) <> "?block=#{block.id}",
-          text: Canvas.summary(%{blocks: [block]})
-        }, %{
-          author_name: notifier.name,
-          author_icon: user_icon_url(notifier),
-          text: Canvas.summary(comment)
-        }]))
+      |> Slack.Chat.postMessage(new_comment_message(channel_id, comment, block))
     end
+  end
+
+  @spec new_comment_message(String.t, Comment.t, Block.t) :: Keyword.t
+  defp new_comment_message(channel_id, comment, block) do
+    [channel: channel_id,
+     parse: "full",
+     text: notify_new_comment_text(comment.creator),
+     attachments: Poison.encode!([%{
+       title: Canvas.title(comment.canvas),
+       title_link: Canvas.web_url(comment.canvas) <> "?block=#{block.id}",
+       text: Canvas.summary(%{blocks: [block]})
+     }, %{
+       author_name: comment.creator.name,
+       author_icon: user_icon_url(comment.creator),
+       text: Canvas.summary(comment)
+     }])]
   end
 
   # Get the text for a new canvas notice.

@@ -25,6 +25,7 @@ defmodule CanvasAPI.Canvas do
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas, type: :string
+    has_many :canvas_watches, CanvasAPI.CanvasWatch
     has_many :comments, CanvasAPI.Comment
     has_many :ops, CanvasAPI.Op
     has_many :pulse_events, CanvasAPI.PulseEvent

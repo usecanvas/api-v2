@@ -5,7 +5,7 @@ defmodule CanvasAPI.CanvasWatchService do
 
   use CanvasAPI.Web, :service
 
-  alias CanvasAPI.{Canvas, CanvasService, Team, User, UserService,
+  alias CanvasAPI.{Account, Canvas, CanvasService, Team, User, UserService,
                    CanvasWatch}
 
   @preload [:user, canvas: [:team]]
@@ -54,7 +54,7 @@ defmodule CanvasAPI.CanvasWatchService do
   @spec get(String.t, Keyword.t) :: {:ok, CanvasWatch.t}
                                   | {:error, :watch_not_found}
   def get(id, opts) do
-    opts[:account].id
+    opts[:account]
     |> watch_query
     |> maybe_lock
     |> where(canvas_id: ^id)
@@ -71,24 +71,29 @@ defmodule CanvasAPI.CanvasWatchService do
   List canvas watches.
   """
   @spec list(Keyword.t) :: [CanvasWatch.t]
-  def list(opts) do
-    opts[:account].id
+  def list(opts \\ []) do
+    opts[:account]
     |> watch_query
+    |> filter(canvas: opts[:canvas])
     |> filter(opts[:filter])
     |> Repo.all
   end
 
-  @spec filter(Ecto.Query.t, map | nil) :: Ecto.Query.t
-  defp filter(query, filter) when is_map(filter) do
+  @spec filter(Ecto.Query.t, Keyword.t | map | nil) :: Ecto.Query.t
+  defp filter(query, filter) when is_map(filter) or is_list(filter) do
     filter
     |> Enum.reduce(query, &do_filter/2)
   end
 
   defp filter(query, _), do: query
 
-  @spec do_filter({String.t, String.t}, Ecto.Query.t) :: Ecto.Query.t
+  @spec do_filter({String.t | atom, any}, Ecto.Query.t) :: Ecto.Query.t
+  defp do_filter({:canvas, canvas = %Canvas{}}, query),
+    do: where(query, canvas_id: ^canvas.id)
   defp do_filter({"canvas.id", canvas_id}, query),
     do: where(query, canvas_id: ^canvas_id)
+  defp do_filter(_, query),
+    do: query
 
   @doc """
   Delete a canvas watch.
@@ -107,13 +112,15 @@ defmodule CanvasAPI.CanvasWatchService do
     end)
   end
 
-  @spec watch_query(String.t) :: Ecto.Query.t
-  defp watch_query(account_id) do
+  @spec watch_query(Account.t | nil) :: Ecto.Query.t
+  defp watch_query(nil), do: CanvasWatch |> preload(^@preload)
+
+  defp watch_query(account) do
     CanvasWatch
     |> join(:left, [w], c in Canvas, w.canvas_id == c.id)
     |> join(:left, [..., c], t in Team, c.team_id == t.id)
     |> join(:left, [..., t], u in User, u.team_id == t.id)
-    |> where([..., u], u.account_id == ^account_id)
+    |> where([..., u], u.account_id == ^account.id)
     |> preload(^@preload)
   end
 end
