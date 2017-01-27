@@ -20,6 +20,11 @@ defmodule CanvasAPI.AccountView do
           links: %{
             related: team_path(CanvasAPI.Endpoint, :index)
           }
+        },
+        ui_dismissals: %{
+          links: %{
+            related: ui_dismissal_path(CanvasAPI.Endpoint, :index)
+          }
         }
       },
       type: "account"

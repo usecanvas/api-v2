@@ -9,6 +9,7 @@ defmodule CanvasAPI.Canvas do
   alias CanvasAPI.Block
 
   @primary_key {:id, CanvasAPI.Base62UUIDField, autogenerate: true}
+  @type t :: %__MODULE__{}
 
   schema "canvases" do
     field :is_template, :boolean, default: false
@@ -24,6 +25,9 @@ defmodule CanvasAPI.Canvas do
     belongs_to :creator, CanvasAPI.User
     belongs_to :team, CanvasAPI.Team
     belongs_to :template, CanvasAPI.Canvas, type: :string
+    has_many :canvas_watches, CanvasAPI.CanvasWatch
+    has_many :comments, CanvasAPI.Comment
+    has_many :ops, CanvasAPI.Op
     has_many :pulse_events, CanvasAPI.PulseEvent
 
     embeds_many :blocks, Block, on_replace: :delete
@@ -59,7 +63,7 @@ defmodule CanvasAPI.Canvas do
   """
   def find_block(canvas, id) do
     canvas.blocks
-    |> Enum.find(fn block ->
+    |> Enum.find_value(fn block ->
       case block do
         %Block{id: ^id} -> block
         %Block{type: "list"} -> find_block(block, id)
@@ -74,27 +78,35 @@ defmodule CanvasAPI.Canvas do
   TODO: This currently allows finding a canvas by ID only (not requiring to be
   in the team).
   """
-  @spec put_template(Ecto.Changeset.t, map | nil) :: Ecto.Changeset.t
-  def put_template(changeset, %{"id" => id, "type" => "canvases"}) do
+  @spec put_template(Ecto.Changeset.t, map | nil, Keyword.t) :: Ecto.Changeset.t
+  def put_template(changeset, data, opts \\ [])
+
+  def put_template(changeset, %{"id" => id, "type" => "canvas"}, opts) do
     case Repo.get(__MODULE__, id) do
       nil ->
         changeset
       template = %__MODULE__{blocks: blocks} ->
-        changeset
-        |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
-        |> cast_embed(:blocks)
+        if opts[:ignore_blocks] do
+          changeset
+        else
+          changeset
+          |> cast(%{blocks: Enum.map(blocks, &Block.to_params/1)}, [])
+          |> cast_embed(:blocks)
+        end
         |> put_assoc(:template, template)
     end
   end
 
-  def put_template(changeset, _), do: changeset
+  def put_template(changeset, _, _), do: changeset
 
   @doc """
   Get the summary of a canvas.
   """
-  @spec summary(%__MODULE__{}) :: String.t
-  def summary(%__MODULE__{blocks: blocks}) do
-    case Enum.at(blocks, 1) do
+  @spec summary(t | Canvas.Comment.t) :: String.t
+  def summary(%{blocks: blocks}) do
+    blocks
+    |> Enum.find(&(&1.type !== "title"))
+    |> case do
       %Block{blocks: [block | _]} ->
         String.slice(block.content, 0..140)
       %Block{content: content} ->

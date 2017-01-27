@@ -25,6 +25,30 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
 
 ## Tasks
 
+### Personal Access Tokens
+
+To create a personal access token for an umbrella account, provide the domain
+and email address of a Slack user tied to that account, or the personal domain
+tied to the account:
+
+```sh
+mix canvas_api.access_token usecanvas user@example.com
+```
+
+Or:
+
+
+```sh
+mix canvas_api.access_token "~personal"
+```
+
+Then, use token auth:
+
+```sh
+curl https://pro-api.usecanvas.com/v1/teams \
+  -H "Authorization: Bearer $token"
+```
+
 ### Importing/Updating Templates
 
 A template may be imported using the command line if it is in the ".canvas"

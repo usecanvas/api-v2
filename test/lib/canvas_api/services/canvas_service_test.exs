@@ -1,7 +1,7 @@
 defmodule CanvasAPI.CanvasServiceTest do
   use CanvasAPI.ModelCase
 
-  alias CanvasAPI.{Canvas, CanvasService}
+  alias CanvasAPI.{Block, Canvas, CanvasService}
   import CanvasAPI.Factory
   import Mock
 
@@ -35,7 +35,7 @@ defmodule CanvasAPI.CanvasServiceTest do
         |> CanvasService.create(
           creator: user,
           team: user.team,
-          template: %{"id" => template.id, "type" => "canvases"})
+          template: %{"id" => template.id, "type" => "canvas"})
 
       assert canvas.template_id == template.id
       assert Enum.map(canvas.blocks, & &1.content) == ["Template Title"]
@@ -43,7 +43,7 @@ defmodule CanvasAPI.CanvasServiceTest do
 
     test "sends a notification when instructed", %{user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay_notify_new: &mock_notify/5]) do
+        CanvasAPI.SlackNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, canvas} =
@@ -53,16 +53,17 @@ defmodule CanvasAPI.CanvasServiceTest do
               team: user.team,
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay_notify_new(
-            get_in(token.meta, ~w(bot bot_access_token)),
-            canvas.id,
-            user.id,
-            "abcdef",
+          assert called CanvasAPI.SlackNotifier.delay(
+            {:notify_new,
+             [get_in(token.meta, ~w(bot bot_access_token)),
+              canvas.id,
+              user.id,
+              "abcdef"]},
             delay: 300)
         end
     end
 
-    defp mock_notify(_token, _canvas, _notifier_id, _channel_id, _opts), do: nil
+    defp mock_notify(_tuple, _opts), do: nil
   end
 
   describe ".list" do
@@ -104,47 +105,56 @@ defmodule CanvasAPI.CanvasServiceTest do
 
   describe ".get" do
     test "finds a canvas amongst an account's accessible canvases" do
-      canvas = insert(:canvas)
+      canvas = Repo.preload(insert(:canvas), [:template])
       assert CanvasService.get(canvas.id,
-                               account: canvas.creator.account,
-                               team_id: canvas.team_id) ==
+                               account: canvas.creator.account) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
 
     test "returns a not found error if no canvas is found" do
       canvas = insert(:canvas)
       assert CanvasService.get(canvas.id,
-                               account: insert(:account),
-                               team_id: canvas.team_id) == {:error, :not_found}
+                               account: insert(:account)) ==
+                                {:error, :not_found}
     end
   end
 
   describe ".show" do
-    test "finds a canvas with an ID in a given team by team ID" do
-      canvas = insert(:canvas)
+    setup do
+      {:ok, canvas: Repo.preload(insert(:canvas), [:template])}
+    end
+
+    test "finds a canvas with an ID in a given team by team ID", context do
+      canvas = context.canvas
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team_id) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
 
-    test "finds a canvas with an ID in a given team by team domain" do
-      canvas = insert(:canvas)
+    test "finds a canvas with an ID in a given team by team domain", context do
+      canvas = context.canvas
       assert CanvasService.show(canvas.id,
                                 account: canvas.creator.account,
                                 team_id: canvas.team.domain) ==
       {:ok,
-       Repo.preload(Repo.get(Canvas, canvas.id), [:team, creator: [:team]])}
+       Repo.preload(Repo.get(Canvas, canvas.id),
+                    [:team, :template, creator: [:team]])}
     end
   end
 
   describe ".update" do
     setup context do
       canvas =
-        insert(:canvas, creator: context[:user], team: context[:user].team)
-      {:ok, canvas: canvas}
+        insert(:canvas,
+               blocks: [%Block{type: "title", content: "Title"}],
+               creator: context[:user],
+               team: context[:user].team)
+      {:ok, canvas: canvas |> Repo.preload([:template])}
     end
 
     test "updates a canvas", %{canvas: canvas} do
@@ -156,9 +166,22 @@ defmodule CanvasAPI.CanvasServiceTest do
       assert updated_canvas.slack_channel_ids == ["abc"]
     end
 
+    test "updates the canvas template", %{canvas: canvas} do
+      template =
+        insert(:canvas, is_template: true, team: canvas.team, blocks: [])
+      template_rel_object = %{"type" => "canvas", "id" => template.id}
+
+      {:ok, updated_canvas} =
+        canvas
+        |> CanvasService.update(%{}, template: template_rel_object)
+
+      assert updated_canvas.template_id == template.id
+      assert updated_canvas.blocks == canvas.blocks
+    end
+
     test "sends notifications when specified", %{canvas: canvas, user: user} do
       with_mock(
-        CanvasAPI.SlackChannelNotifier, [delay_notify_new: &mock_notify/5]) do
+        CanvasAPI.SlackNotifier, [delay: &mock_notify/2]) do
           token = insert(:oauth_token, team: user.team, provider: "slack")
 
           {:ok, _} =
@@ -166,11 +189,12 @@ defmodule CanvasAPI.CanvasServiceTest do
             |> CanvasService.update(%{"slack_channel_ids" => ["abc"]},
               notify: user)
 
-          assert called CanvasAPI.SlackChannelNotifier.delay_notify_new(
-            get_in(token.meta, ~w(bot bot_access_token)),
-            canvas.id,
-            user.id,
-            "abc",
+          assert called CanvasAPI.SlackNotifier.delay(
+            {:notify_new,
+             [get_in(token.meta, ~w(bot bot_access_token)),
+              canvas.id,
+              user.id,
+              "abc"]},
             [])
         end
     end
@@ -182,18 +206,16 @@ defmodule CanvasAPI.CanvasServiceTest do
       account = canvas.creator.account
 
       {:ok, canvas} =
-        CanvasService.delete(
-          canvas.id, account: account, team_id: canvas.team_id)
+        CanvasService.delete(canvas.id, account: account)
       assert Repo.get(Canvas, canvas.id) == nil
     end
 
     test "returns not_found for a not found canvas" do
       canvas = insert(:canvas)
       account = canvas.creator.account
-      CanvasService.delete(canvas.id, account: account, team_id: canvas.team_id)
-      assert CanvasService.delete(
-        canvas.id, account: account, team_id: canvas.team_id) ==
-          {:error, :not_found}
+      CanvasService.delete(canvas.id, account: account)
+      assert CanvasService.delete(canvas.id, account: account) ==
+        {:error, :not_found}
     end
   end
 end

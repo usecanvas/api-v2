@@ -1,7 +1,10 @@
 defmodule CanvasAPI.Router do
   use CanvasAPI.Web, :router
   use Plug.ErrorHandler
-  use Sentry.Plug
+
+  if Mix.env == "prod" do
+    use Sentry.Plug
+  end
 
   pipeline :oauth do
     plug :fetch_session
@@ -41,10 +44,16 @@ defmodule CanvasAPI.Router do
     pipe_through :api
 
     get "/account", AccountController, :show
+    resources "/comments", CommentController
+    resources "/canvas-watches", CanvasWatchController,
+              only: [:create, :index, :delete]
     get "/upload-signature", UploadSignatureController, :show
     post "/bulk", BulkController, :bulk
     delete "/session", SessionController, :delete
+    resources "/tokens", TokenController, only: [:create]
     resources "/unfurls", UnfurlController, only: [:index]
+
+    resources "/ui-dismissals", UIDismissalController, only: [:index, :create]
 
     resources "/teams", TeamController, only: [:index, :show, :update] do
       scope "/slack", Slack do
@@ -52,6 +61,7 @@ defmodule CanvasAPI.Router do
       end
 
       resources "/canvases", CanvasController do
+        resources "/ops", OpController, only: [:index]
         resources "/pulse-events", PulseEventController, only: [:index]
       end
 

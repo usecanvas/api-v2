@@ -1,80 +1,163 @@
 defmodule CanvasAPI.Unfurl.Slack.ChannelMessage do
   @moduledoc """
-  An unfurled Slack channel message.
+  An unfurls Slack channel message.
+
+  This module receives a URL pointing to a Slack Channel message and parses it
+  into an Unfurl struct. It makes a reasonable attempt at parsing usernames
+  and other such data into human-readable forms, but will sometimes leave bare
+  Slack "syntax" in the message.
   """
 
-  @lint {Credo.Check.Readability.MaxLineLength, false}
-  @match ~r|\Ahttps://(?<domain>[^\.]+)\.slack\.com/archives/(?<channel>[^/]+)/p(?<timestamp>\d+)\z|
+  @match Regex.compile!("""
+  \\A
+  https://(?<domain>[^\\.]+)\\.slack\\.com
+  /archives
+  /(?<channel>[^/]+)
+  /p(?<timestamp>\\d+)
+  \\z
+  """, "x")
 
-  alias CanvasAPI.{OAuthToken, Repo, SlackParser, Team, Unfurl}
-  alias Slack.{Channel, User}
+  @channel_history_length 50
 
-  import Ecto.Query, only: [from: 2]
-  import Ecto, only: [assoc: 2]
+  alias CanvasAPI.{SlackParser, Team, TeamService, Unfurl}
 
   def match, do: @match
 
   @doc """
-  Unfurl a Slack channel message URL.
+  Unfurl a Slack channel message URL into an Unfurl struct.
   """
-  @spec unfurl(url::String.t, options::Keyword.t) :: Unfurl.t | nil
+  @spec unfurl(String.t, Keyword.t) :: Unfurl.t | nil
   def unfurl(url, account: account) do
-    with %{channel: channel, domain: domain, timestamp: timestamp}
-           <- parse_url(url),
-         team = %Team{} <- get_team(account, domain),
-         token = %OAuthToken{} <- Team.get_token(team, "slack"),
-         response when response != nil <-
-           do_request(token.token, channel, timestamp) do
+    {domain, channel, message_id} = parse_url(url)
+
+    with {:ok, team}  <- TeamService.show(domain, account: account),
+         {:ok, %{token: token}} <- Team.get_token(team, "slack"),
+         {:ok, message_info} <- get_message_info(token, channel, message_id) do
       %Unfurl{
         id: url,
-        title: "Message from @#{response[:user]["name"]}",
-        text: SlackParser.to_text(response[:message]["text"]),
-        thumbnail_url: response[:user]["profile"]["image_original"]
-      }
+        title: "Message from @#{message_info[:user]["name"]}",
+        text: message_info[:message],
+        thumbnail_url: message_info[:user]["profile"]["image_original"],
+        attachments: message_info[:attachments]}
+    else
+        {:error, %HTTPoison.Response{}} ->
+          failed_fetch(url)
+        {:error, :token_not_found} ->
+          failed_fetch(url)
+        _ ->
+          nil
     end
   end
 
-  defp do_request(token, name, timestamp) do
+  @spec build_attachments([map], Keyword.t) :: [map]
+  defp build_attachments(messages, users: users) do
+    messages
+    |> Enum.filter(&(&1["user"] && &1["text"])) # Only messages w/user + text
+    |> Enum.reverse # Oldest first
+    |> Enum.map(fn message ->
+      user =
+        case get_user(users, message["user"]) do
+          {:ok, user} -> user
+          {:error, _} -> %{}
+        end
+
+      %{author: "@#{user["name"]}",
+        timestamp: message["ts"],
+        text: parse_message(message, users: users),
+        thumbnail_url: get_in(user, ~w(profile image_original))}
+    end)
+  end
+
+  @spec failed_fetch(String.t) :: Unfurl.t
+  defp failed_fetch(url) do
+    %Unfurl{
+      id: url,
+      title: url,
+      text: nil,
+      thumbnail_url: nil,
+      fetched: false
+    }
+  end
+
+  @spec find_channel(Slack.Client.t, String.t) :: {:ok, map} | {:error, any}
+  defp find_channel(client, channel_name) do
+    with {:ok, %{"channels" => channels}} <- Slack.Channel.list(client) do
+      channels
+      |> Enum.find(&(&1["name"] == channel_name))
+      |> case do
+        channel when is_map(channel) ->
+          {:ok, channel}
+        nil ->
+          {:error, :channel_not_found}
+      end
+    end
+  end
+
+  @spec get_channel_history(Slack.Client.t, map, String.t) :: {:ok, map}
+                                                            | {:error, any}
+  defp get_channel_history(client, channel, message_id) do
+    Slack.Channel.history(
+      client,
+      channel: channel["id"],
+      oldest: message_id,
+      inclusive: 1,
+      count: @channel_history_length)
+  end
+
+  @spec get_message_info(String.t, String.t, String.t) :: {:ok, map}
+                                                        | {:error, any}
+  defp get_message_info(token, channel_name, message_id) do
     with client = Slack.client(token),
-         {:ok, %{"channels" => channels}} <- get_channels(client),
-         channel when not is_nil(channel) <- find_channel(channels, name),
-         {:ok, %{"messages" => [message]}} <-
-           get_message(client, channel, timestamp),
-         {:ok, %{"user" => user}} <- get_user(client, message["user"]) do
-      %{channel: channel, message: message, user: user}
+         {:ok, channel} <- find_channel(client, channel_name),
+         {:ok, %{"members" => users}} <- Slack.User.list(client),
+         {:ok, %{"messages" => messages}} <-
+           get_channel_history(client, channel, message_id),
+         message = List.last(messages),
+         {:ok, user} <- get_user(users, message["user"]) do
+
+      message_info = %{
+        channel: channel,
+        message: parse_message(message, users: users),
+        attachments: build_attachments(messages, users: users),
+        user: user}
+
+      {:ok, message_info}
     end
   end
 
-  defp get_channels(client) do
-    Channel.list(client)
+  @spec get_user([map], String.t) :: {:ok, map} | {:error, :user_not_found}
+  defp get_user(users, user_id) do
+    users
+    |> Enum.find(&(&1["id"] == user_id))
+    |> case do
+      user when is_map(user) ->
+        {:ok, user}
+      nil ->
+        {:error, :user_not_found}
+    end
   end
 
-  defp get_team(account, domain) do
-    from(assoc(account, :teams), where: [domain: ^domain])
-    |> Repo.one
+  @spec parse_message(map, Keyword.t) :: map
+  defp parse_message(message, users: users) do
+    message["text"]
+    |> SlackParser.to_text
+    |> SlackParser.username_replace(users)
   end
 
-  defp get_message(client, channel, timestamp) do
-    Channel.history(client,
-      channel: channel["id"], oldest: timestamp, inclusive: 1, count: 1)
-  end
-
-  defp get_user(client, user_id) do
-    User.info(client, user: user_id)
-  end
-
-  defp find_channel(channels, name) do
-    channels
-    |> Enum.find(fn channel -> channel["name"] == name end)
-  end
-
+  @spec parse_url(String.t) :: {String.t, String.t, String.t}
   defp parse_url(url) do
-    %{"channel" => channel, "domain" => domain, "timestamp" => timestamp} =
-      Regex.named_captures(@match, url)
-    %{channel: channel, domain: domain, timestamp: parse_timestamp(timestamp)}
+    matches = Regex.named_captures(@match, url)
+
+    {matches["domain"],
+     matches["channel"],
+     timestamp_to_message_id(matches["timestamp"])}
   end
 
-  defp parse_timestamp(timestamp) do
-    String.split_at(timestamp, -6) |> Tuple.to_list |> Enum.join(".")
+  @spec timestamp_to_message_id(String.t) :: String.t
+  defp timestamp_to_message_id(timestamp) do
+    timestamp
+    |> String.split_at(-6)
+    |> Tuple.to_list
+    |> Enum.join(".")
   end
 end

@@ -15,6 +15,10 @@ config :canvas_api, CanvasAPI.Endpoint,
   http: [port: {:system, "PORT"}],
   instrumenters: [Appsignal.Phoenix.Instrumenter],
   url: [host: System.get_env("HOST"), port: 80],
+  check_origin: ["https://pro.usecanvas.com"],
+  pubsub: [name: CanvasAPI.PubSub,
+           adapter: Phoenix.PubSub.Redis,
+           url: System.get_env("REDIS_URL")],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
   # force_ssl: [hsts: true]
 
@@ -38,7 +42,7 @@ config :appsignal, :config,
 # Configure Sentry
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
-  environment_name: to_string(Mix.env),
+  environment_name: Mix.env,
   included_environments: [:prod],
   use_error_logger: true,
   release: System.get_env("HEROKU_SLUG_COMMIT")

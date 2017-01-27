@@ -4,10 +4,12 @@ defmodule CanvasAPI.CanvasService do
   """
 
   use CanvasAPI.Web, :service
-  alias CanvasAPI.{Account, Canvas, SlackChannelNotifier, Team, User}
+
   import CanvasAPI.UUIDMatch
 
-  @preload [:team, creator: [:team]]
+  alias CanvasAPI.{Account, Canvas, SlackNotifier, Team, User}
+
+  @preload [:team, :template, creator: [:team]]
 
   @doc """
   Create a new canvas from the given params.
@@ -86,26 +88,23 @@ defmodule CanvasAPI.CanvasService do
   @doc """
   Get a canvas that is in an account's teams.
 
-  The user must pass in an account and team ID.
+  The user must pass in an account.
 
   Options:
 
   - `account`: `%Account{}` (**required**) The account requesting the canvas
-  - `team_id`: `String.t` (**required**) The team ID the canvas is in
 
   ## Examples
 
   ```elixir
   CanvasService.get(
     "6ijSghOIflAjKVki5j0dpL",
-    account: conn.private.current_account,
-    team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+    account: conn.private.current_account)
   ```
   """
   @spec get(String.t, Keyword.t) :: {:ok, %Canvas{}} | {:error, :not_found}
-  def get(id, account: account, team_id: team_id) do
+  def get(id, account: account) do
     from(assoc(account, :canvases),
-         where: [team_id: ^team_id],
          preload: ^@preload)
     |> Repo.get(id)
     |> case do
@@ -170,6 +169,7 @@ defmodule CanvasAPI.CanvasService do
 
     canvas
     |> Canvas.update_changeset(params)
+    |> Canvas.put_template(opts[:template], ignore_blocks: true)
     |> Repo.update
     |> case do
       {:ok, canvas} ->
@@ -190,15 +190,14 @@ defmodule CanvasAPI.CanvasService do
   ## Examples
 
   ```elixir
-  CanvasService.delete(
-    "6ijSghOIflAjKVki5j0dpL", team_id: "87ee9199-e2fa-49e6-9d99-16988af57fd5")
+  CanvasService.delete("6ijSghOIflAjKVki5j0dpL", account: account)
   ```
   """
   @spec delete(String.t, Keyword.t) :: {:ok, %Canvas{}}
                                      | {:error, Ecto.Changeset.t}
                                      | {:error, :not_found}
-  def delete(id, account: account, team_id: team_id) do
-    get(id, account: account, team_id: team_id)
+  def delete(id, account: account) do
+    get(id, account: account)
     |> case do
       {:ok, canvas} -> Repo.delete(canvas)
       {:error, :not_found} -> {:error, :not_found}
@@ -226,15 +225,13 @@ defmodule CanvasAPI.CanvasService do
 
   @spec notify_slack(%User{}, %Canvas{}, list, Keyword.t) :: any
   defp notify_slack(notifier, canvas, old_channel_ids, opts \\ []) do
-    token =
-      Team.get_token(canvas.team, "slack")
-      |> Map.get(:meta)
-      |> get_in(~w(bot bot_access_token))
-
-    (canvas.slack_channel_ids -- old_channel_ids)
-    |> Enum.each(
-      &SlackChannelNotifier.delay_notify_new(
-        token, canvas.id, notifier.id, &1, opts))
+    with {:ok, token} <- Team.get_token(canvas.team, "slack"),
+         token = get_in(token.meta, ~w(bot bot_access_token)) do
+      (canvas.slack_channel_ids -- old_channel_ids)
+      |> Enum.each(
+        &SlackNotifier.delay(
+          {:notify_new, [token, canvas.id, notifier.id, &1]}, opts))
+    end
   end
 
   @spec verify_can_show(%Canvas{} | nil, %Account{}) :: {:ok, %Canvas{}}

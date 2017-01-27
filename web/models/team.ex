@@ -7,6 +7,8 @@ defmodule CanvasAPI.Team do
 
   alias CanvasAPI.ImageMap
 
+  @type t :: %__MODULE__{}
+
   schema "teams" do
     field :domain, :string
     field :images, :map, default: %{}
@@ -62,6 +64,10 @@ defmodule CanvasAPI.Team do
     from(assoc(team, :oauth_tokens), where: [provider: ^provider])
     |> first
     |> Repo.one
+    |> case do
+      nil -> {:error, :token_not_found}
+      token -> {:ok, token}
+    end
   end
 
   defp if_slack(changeset, func) do

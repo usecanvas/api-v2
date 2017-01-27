@@ -4,13 +4,14 @@ defmodule CanvasAPI.Unfurl do
   in a common way for clients to display.
   """
 
-  defstruct id: nil, fields: [], height: nil, html: nil, labels: [],
-    provider_icon_url: nil, provider_name: nil, provider_url: nil, text: nil,
-    thumbnail_url: nil, title: nil, type: "link", width: nil, fetched: true,
-    url: nil
+  defstruct id: nil, attachments: [], fields: [], height: nil, html: nil,
+    labels: [], provider_icon_url: nil, provider_name: nil, provider_url: nil,
+    text: nil, thumbnail_url: nil, title: nil, type: "link", width: nil,
+    fetched: true, url: nil
 
   @type t :: %__MODULE__{
     id: String.t | nil,
+    attachments: [map],
     fields: [CanvasAPI.Unfurl.Field.t],
     height: pos_integer | nil,
     html: String.t | nil,

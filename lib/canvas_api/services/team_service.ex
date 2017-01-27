@@ -31,7 +31,7 @@ defmodule CanvasAPI.TeamService do
       |> Team.create_changeset(params, type: :slack)
       |> Repo.insert
     else
-      {:error, :domain_not_whitelisted}
+      {:error, {:domain_not_whitelisted, params["domain"]}}
     end
   end
 

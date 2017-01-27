@@ -29,6 +29,7 @@ defmodule CanvasAPI.TeamView do
         is_in_team: user != nil,
         images: (if user, do: team.images, else: %{}),
         name: (if user, do: team.name, else: nil),
+        slack_scopes: slack_scopes(team),
         slack_id: (if user, do: team.slack_id, else: nil),
         inserted_at: team.inserted_at,
         updated_at: team.updated_at
@@ -36,6 +37,15 @@ defmodule CanvasAPI.TeamView do
       relationships: relationships(team, user),
       type: "team"
     }
+  end
+
+  defp slack_scopes(team) do
+    team.oauth_tokens
+    |> Enum.find(&(&1.provider == "slack"))
+    |> case do
+      nil -> []
+      token -> token.meta["scopes"] || []
+    end
   end
 
   defp relationships(team, user) do

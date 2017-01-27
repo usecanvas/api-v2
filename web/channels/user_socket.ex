@@ -1,12 +1,14 @@
 defmodule CanvasAPI.UserSocket do
   use Phoenix.Socket
 
+  alias CanvasAPI.TokenService
+
   ## Channels
-  # channel "room:*", CanvasAPI.RoomChannel
+  channel "canvas:*", CanvasAPI.CanvasChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
-  # transport :longpoll, Phoenix.Transports.LongPoll
+  transport :websocket, Phoenix.Transports.WebSocket,
+    timeout: 30_000 # Shorter than Herkou timeout of 60_000
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -19,8 +21,15 @@ defmodule CanvasAPI.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(params, socket) do
+    (params["token"] || "")
+    |> TokenService.verify
+    |> case do
+      {:ok, account} ->
+        {:ok, assign(socket, :current_account, account)}
+      _error ->
+        :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given

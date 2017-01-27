@@ -20,6 +20,9 @@ defmodule CanvasAPI.User do
     belongs_to :team, CanvasAPI.Team
     has_many :canvases, through: [:team, :canvases]
     has_many :created_canvases, CanvasAPI.Canvas
+    has_many :comments, through: [:canvases, :comments]
+    has_many :created_comments, CanvasAPI.Comment
+    has_many :canvas_watches, CanvasAPI.CanvasWatch
 
     timestamps
   end

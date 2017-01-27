@@ -1,10 +1,12 @@
 defmodule CanvasAPI.OAuth.Slack.CallbackController do
   use CanvasAPI.Web, :controller
 
-  alias CanvasAPI.{AddToSlackMediator, SignInMediator}
+  require Logger
+  alias CanvasAPI.{AddToSlackMediator, BetaNotifier, SignInMediator}
 
   plug CanvasAPI.CurrentAccountPlug, permit_none: true
 
+  @beta_redirect_uri System.get_env("BETA_REDIRECT_URI")
 
   @doc """
   Respond to a Slack OAuth callback by creating a new user and team.
@@ -22,7 +24,11 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
                            http_only: false)
         |> put_session(:account_id, account.id)
         |> send_resp_or_redirect()
-      {:error, _error} ->
+      {:error, {:domain_not_whitelisted, domain}} ->
+        BetaNotifier.delay({:notify, [domain]})
+        redirect(conn, external: @beta_redirect_uri)
+      {:error, error} ->
+        Logger.error("Failed Slack sign in callback: #{inspect error}")
         bad_request(conn)
     end
   end
@@ -36,7 +42,8 @@ defmodule CanvasAPI.OAuth.Slack.CallbackController do
       {:ok, _token} ->
         conn
         |> send_resp_or_redirect()
-      _ ->
+      error ->
+        Logger.error("Failed Slack sign in callback: #{inspect error}")
         bad_request(conn)
     end
   end

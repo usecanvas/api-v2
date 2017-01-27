@@ -40,7 +40,9 @@ defmodule CanvasAPI.AddToSlackMediatorTest do
   defp mock_access(team, access_token \\ "access_token") do
     fn client_id: _, client_secret: _, code: _, redirect_uri: _ ->
       {:ok,
-       %{"access_token" => access_token,
+       %{"ok" => true,
+         "access_token" => access_token,
+         "scope" => "channels:read",
          "bot" => %{"bot_access_token" => "bot_access_token"},
          "team_id" => team.slack_id}}
     end
