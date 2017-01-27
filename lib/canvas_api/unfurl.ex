@@ -45,23 +45,16 @@ defmodule CanvasAPI.Unfurl do
   end
 
   defp get_unfurl_mod(url) do
-    cond do
-      Regex.match?(CanvasAPI.Unfurl.Canvas.canvas_regex, url) ->
-        CanvasAPI.Unfurl.Canvas
-      Regex.match?(CanvasAPI.Unfurl.Gist.gist_regex, url) ->
-        CanvasAPI.Unfurl.Gist
-      Regex.match?(CanvasAPI.Unfurl.Youtube.youtube_regex, url) ->
-        CanvasAPI.Unfurl.Youtube
-      Regex.match?(CanvasAPI.Unfurl.Framer.framer_regex, url) ->
-        CanvasAPI.Unfurl.Framer
-      Regex.match?(~r|\Ahttps?://(?:www\.)?github\.com/|, url) ->
-        CanvasAPI.Unfurl.GitHub
-      Regex.match?(~r|\Ahttps?://[^/]*slack\.com/|, url) ->
-        CanvasAPI.Unfurl.Slack
-      Regex.match?(~r|\Ahttps?://|, url) ->
-        CanvasAPI.Unfurl.Embedly
-      true ->
-        nil
-    end
+    [{CanvasAPI.Unfurl.Canvas.canvas_regex, CanvasAPI.Unfurl.Canvas},
+     {CanvasAPI.Unfurl.Gist.gist_regex, CanvasAPI.Unfurl.Gist},
+     {CanvasAPI.Unfurl.Youtube.youtube_regex, CanvasAPI.Unfurl.Youtube},
+     {CanvasAPI.Unfurl.Framer.framer_regex, CanvasAPI.Unfurl.Framer},
+     {CanvasAPI.Unfurl.Vimeo.vimeo_regex, CanvasAPI.Unfurl.Vimeo},
+     {~r|\Ahttps?://(?:www\.)?github\.com/|, CanvasAPI.Unfurl.GitHub},
+     {~r|\Ahttps?://[^/]*slack\.com/|, CanvasAPI.Unfurl.Slack},
+     {~r|\Ahttps?://|, CanvasAPI.Unfurl.Embedly}]
+    |> Enum.find_value(fn {regex, mod} ->
+         if Regex.match?(regex, url), do: mod
+       end)
   end
 end
