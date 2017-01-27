@@ -38,7 +38,7 @@ defmodule CanvasAPI.Unfurl.Vimeo do
   defp unfurl_from_body(extracted, url) do
     %CanvasAPI.Unfurl{
       id: url,
-      html: ~s(<iframe src="#{@provider_url}#{extracted["video_id"]}"></iframe>),
+      html: html(extracted["video_id"]),
       title: "Vimeo Clip",
       width: extracted["width"],
       height: extracted["height"],
@@ -48,4 +48,6 @@ defmodule CanvasAPI.Unfurl.Vimeo do
     }
   end
 
+  defp html(video_id),
+    do: ~s(<iframe src="#{@provider_url}#{video_id}"></iframe>)
 end
