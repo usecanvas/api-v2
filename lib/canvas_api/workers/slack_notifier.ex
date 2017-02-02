@@ -43,6 +43,8 @@ defmodule CanvasAPI.SlackNotifier do
   end
 
   @spec dm_watch(String.t, Comment.t, CanvasWatch.t) :: any
+  defp dm_watch(_, %{creator_id: user_id}, %{user_id: user_id}), do: :ok
+
   defp dm_watch(token, comment, watch) do
     with {:ok, im_id} <- get_im_id(token, watch.user),
          block = Canvas.find_block(comment.canvas, comment.block_id) do
