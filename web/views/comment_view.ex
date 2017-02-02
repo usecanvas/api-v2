@@ -3,18 +3,20 @@ defmodule CanvasAPI.CommentView do
   A view for rendering comments.
   """
 
-  alias CanvasAPI.Endpoint
+  alias CanvasAPI.{Endpoint, UserView}
   use CanvasAPI.Web, :view
 
   def render("index.json", %{comments: comments}) do
     %{
-      data: render_many(comments, __MODULE__, "comment.json")
+      data: render_many(comments, __MODULE__, "comment.json"),
+      included: Enum.map(comments, &include_comment_creator/1)
     }
   end
 
   def render("show.json", %{comment: comment}) do
     %{
-      data: render_one(comment, __MODULE__, "comment.json")
+      data: render_one(comment, __MODULE__, "comment.json"),
+      included: include_comment_creator(comment)
     }
   end
 
@@ -39,5 +41,11 @@ defmodule CanvasAPI.CommentView do
       },
       type: "comment"
     }
+  end
+
+  defp include_comment_creator(comment = %{creator: creator}) do
+    creator
+    |> Map.put(:team, comment.canvas.team)
+    |> render_one(UserView, "user.json")
   end
 end
