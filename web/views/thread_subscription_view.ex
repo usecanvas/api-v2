@@ -28,7 +28,7 @@ defmodule CanvasAPI.ThreadSubscriptionView do
   def render("thread_subscription.json",
              %{thread_subscription: thread_subscription}) do
     %{
-      id: thread_subscription.id,
+      id: thread_subscription.block_id,
       attributes: %{
         inserted_at: thread_subscription.inserted_at,
         updated_at: thread_subscription.updated_at

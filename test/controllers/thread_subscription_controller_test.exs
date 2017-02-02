@@ -44,4 +44,71 @@ defmodule CanvasAPI.ThreadSubscriptionControllerTest do
       assert Repo.reload(sub).subscribed
     end
   end
+
+  describe "GET .index/2" do
+    test "lists thread subscriptions", %{conn: conn} do
+      sub = insert(:thread_subscription)
+
+      conn =
+        conn
+        |> put_private(:current_account, sub.user.account)
+        |> get(thread_subscription_path(conn, :index))
+
+      assert conn
+             |> json_response(200)
+             |> Map.get("data")
+             |> Enum.map(&(&1["id"])) == [sub.block_id]
+    end
+
+    test "lists only user's subscriptions", %{conn: conn} do
+      sub = insert(:thread_subscription)
+      insert(:thread_subscription, canvas: sub.canvas)
+
+      conn =
+        conn
+        |> put_private(:current_account, sub.user.account)
+        |> get(thread_subscription_path(conn, :index))
+
+      assert conn
+             |> json_response(200)
+             |> Map.get("data")
+             |> Enum.map(&(&1["id"])) == [sub.block_id]
+    end
+
+    test "filters by block ID", %{conn: conn} do
+      sub = insert(:thread_subscription)
+      insert(:thread_subscription,
+             user: sub.user, block_id: "XXX", canvas: sub.canvas)
+
+      conn =
+        conn
+        |> put_private(:current_account, sub.user.account)
+        |> get(thread_subscription_path(conn, :index),
+               %{"filter" => %{"block.id" => sub.block_id}})
+
+      assert conn
+             |> json_response(200)
+             |> Map.get("data")
+             |> Enum.map(&(&1["id"])) == [sub.block_id]
+    end
+
+    test "filters by canvas ID", %{conn: conn} do
+      sub = insert(:thread_subscription)
+      insert(:thread_subscription,
+             user: sub.user,
+             block_id: sub.block_id,
+             canvas: insert(:canvas, creator: sub.user, team: sub.canvas.team))
+
+      conn =
+        conn
+        |> put_private(:current_account, sub.user.account)
+        |> get(thread_subscription_path(conn, :index),
+               %{"filter" => %{"canvas.id" => sub.canvas_id}})
+
+      assert conn
+             |> json_response(200)
+             |> Map.get("data")
+             |> Enum.map(&(&1["id"])) == [sub.block_id]
+    end
+  end
 end

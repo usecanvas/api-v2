@@ -8,6 +8,8 @@ defmodule CanvasAPI.ThreadSubscriptionService do
   alias CanvasAPI.{Account, Canvas, CanvasService, ThreadSubscription,
                    UserService}
 
+  @preload [:user, canvas: [:team]]
+
   @doc """
   Create or update a thread subscription.
   """
@@ -59,5 +61,36 @@ defmodule CanvasAPI.ThreadSubscriptionService do
     else
         _ -> changeset
     end
+  end
+
+  @doc """
+  List thread subscriptinos.
+  """
+  @spec list(Keyword.t) :: [ThreadSubscription.t]
+  def list(opts) do
+    opts[:account]
+    |> thread_subscription_query
+    |> filter(opts[:filter])
+    |> Repo.all
+  end
+
+  @spec filter(Ecto.Query.t, map | nil) :: Ecto.Query.t
+  defp filter(query, filter) when is_map(filter),
+    do: Enum.reduce(filter, query, &do_filter/2)
+  defp filter(query, _),
+    do: query
+
+  @spec do_filter({String.t, String.t}, Ecto.Query.t) :: Ecto.Query.t
+  defp do_filter({"canvas.id", canvas_id}, query),
+    do: where(query, canvas_id: ^canvas_id)
+  defp do_filter({"block.id", block_id}, query),
+    do: where(query, block_id: ^block_id)
+  defp do_filter(_, query), do: query
+
+  @spec thread_subscription_query(Account.t) :: Ecto.Query.t
+  defp thread_subscription_query(account) do
+    account
+    |> assoc(:thread_subscriptions)
+    |> preload(^@preload)
   end
 end

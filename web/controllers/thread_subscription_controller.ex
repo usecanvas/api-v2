@@ -8,7 +8,7 @@ defmodule CanvasAPI.ThreadSubscriptionController do
   alias CanvasAPI.ThreadSubscriptionService
 
   plug CanvasAPI.CurrentAccountPlug
-  plug CanvasAPI.JSONAPIPlug when action in [:upsert]
+  plug CanvasAPI.JSONAPIPlug when action in [:upsert, :index]
 
   @doc """
   Create or update a thread subscription from a request.
@@ -24,5 +24,16 @@ defmodule CanvasAPI.ThreadSubscriptionController do
       {:error, changeset} ->
         unprocessable_entity(conn, changeset)
     end
+  end
+
+  @doc """
+  List thread subscriptions for a user.
+  """
+  @spec index(Plug.Conn.t, Plug.Conn.params) :: Plug.Conn.t
+  def index(conn = %{private: %{parsed_request: parsed_request}}, _) do
+    subs =
+      parsed_request.opts
+      |> ThreadSubscriptionService.list
+    render(conn, "index.json", thread_subscriptions: subs)
   end
 end
