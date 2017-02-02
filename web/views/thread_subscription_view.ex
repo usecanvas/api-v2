@@ -30,6 +30,7 @@ defmodule CanvasAPI.ThreadSubscriptionView do
     %{
       id: thread_subscription.block_id,
       attributes: %{
+        subscribed: thread_subscription.subscribed,
         inserted_at: thread_subscription.inserted_at,
         updated_at: thread_subscription.updated_at
       },
@@ -47,7 +48,7 @@ defmodule CanvasAPI.ThreadSubscriptionView do
         },
         user: %{data: %{id: thread_subscription.user_id, type: "user"}}
       },
-      type: "thread_subscription"
+      type: "thread-subscription"
     }
   end
 
