@@ -70,6 +70,7 @@ defmodule CanvasAPI.ThreadSubscriptionService do
   def list(opts) do
     opts[:account]
     |> thread_subscription_query
+    |> filter(canvas: opts[:canvas], block_id: opts[:block])
     |> filter(opts[:filter])
     |> Repo.all
   end
@@ -81,13 +82,20 @@ defmodule CanvasAPI.ThreadSubscriptionService do
     do: query
 
   @spec do_filter({String.t, String.t}, Ecto.Query.t) :: Ecto.Query.t
+  defp do_filter({:canvas, canvas}, query),
+    do: do_filter({"canvas.id", canvas.id}, query)
+  defp do_filter({:block_id, block_id}, query),
+    do: do_filter({"block.id", block_id}, query)
   defp do_filter({"canvas.id", canvas_id}, query),
     do: where(query, canvas_id: ^canvas_id)
   defp do_filter({"block.id", block_id}, query),
     do: where(query, block_id: ^block_id)
   defp do_filter(_, query), do: query
 
-  @spec thread_subscription_query(Account.t) :: Ecto.Query.t
+  @spec thread_subscription_query(Account.t | nil) :: Ecto.Query.t
+  defp thread_subscription_query(nil),
+    do: preload(ThreadSubscription, ^@preload)
+
   defp thread_subscription_query(account) do
     account
     |> assoc(:thread_subscriptions)

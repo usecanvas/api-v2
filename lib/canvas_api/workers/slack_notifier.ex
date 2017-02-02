@@ -5,8 +5,8 @@ defmodule CanvasAPI.SlackNotifier do
 
   use CanvasAPI.Web, :worker
 
-  alias CanvasAPI.{Block, Canvas, CanvasWatch, CanvasWatchService, Comment,
-                   CommentService, User}
+  alias CanvasAPI.{Block, Canvas, CanvasWatchService, Comment, CommentService,
+                   ThreadSubscriptionService, User}
 
   @doc """
   Notify a Slack channel of a new canvas.
@@ -36,17 +36,32 @@ defmodule CanvasAPI.SlackNotifier do
   @spec dm_new_comment(String.t, String.t) :: any
   def dm_new_comment(token, comment_id) do
     with {:ok, comment} <- CommentService.get(comment_id),
-         watches <- CanvasWatchService.list(canvas: comment.canvas) do
-      watches
-      |> Enum.each(fn watch -> dm_watch(token, comment, watch) end)
+         watches <- CanvasWatchService.list(canvas: comment.canvas),
+         subs <- ThreadSubscriptionService.list(
+                   canvas: comment.canvas,
+                   block_id: comment.block_id) do
+      users = Enum.map(watches, &(&1.user))
+
+      subs
+      |> Enum.reduce(users, fn
+        (sub = %{subscribed: true}, users) ->
+          if sub.user in users, do: users, else: [sub.user | users]
+        (sub = %{subscribed: false}, users) ->
+          if sub.user in users do
+            Enum.reject(users, &(&1 == sub.user))
+          else
+            users
+          end
+      end)
+      |> Enum.each(fn user -> dm_watch(token, comment, user) end)
     end
   end
 
-  @spec dm_watch(String.t, Comment.t, CanvasWatch.t) :: any
-  defp dm_watch(_, %{creator_id: user_id}, %{user_id: user_id}), do: :ok
+  @spec dm_watch(String.t, Comment.t, User.t) :: any
+  defp dm_watch(_, %{creator_id: user_id}, %{id: user_id}), do: :ok
 
-  defp dm_watch(token, comment, watch) do
-    with {:ok, im_id} <- get_im_id(token, watch.user),
+  defp dm_watch(token, comment, user) do
+    with {:ok, im_id} <- get_im_id(token, user),
          block = Canvas.find_block(comment.canvas, comment.block_id) do
       token
       |> Slack.client
