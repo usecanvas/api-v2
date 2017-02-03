@@ -56,6 +56,7 @@ defmodule CanvasAPI.Factory do
 
     %CanvasAPI.Canvas{
       id: sequence(:id, fn _ -> Base62UUID.generate end),
+      blocks: [%CanvasAPI.Block{type: "title", content: "Title"}],
       creator: user,
       team: user.team
     }
@@ -99,6 +100,17 @@ defmodule CanvasAPI.Factory do
       images: %{},
       name: "Canvas",
       slack_id: sequence(:slack_id, &"ABCDEFG#{&1}")
+    }
+  end
+
+  def thread_subscription_factory do
+    canvas = insert(:canvas)
+
+    %CanvasAPI.ThreadSubscription{
+      subscribed: false,
+      user: build(:user, team: canvas.team),
+      canvas: canvas,
+      block_id: List.first(canvas.blocks).id
     }
   end
 

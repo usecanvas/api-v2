@@ -47,6 +47,8 @@ defmodule CanvasAPI.Router do
     resources "/comments", CommentController
     resources "/canvas-watches", CanvasWatchController,
               only: [:create, :index, :delete]
+    put "/thread-subscriptions/:id", ThreadSubscriptionController, :upsert
+    get "/thread-subscriptions", ThreadSubscriptionController, :index
     get "/upload-signature", UploadSignatureController, :show
     post "/bulk", BulkController, :bulk
     delete "/session", SessionController, :delete

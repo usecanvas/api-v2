@@ -5,7 +5,7 @@ defmodule CanvasAPI.CanvasWatchService do
 
   use CanvasAPI.Web, :service
 
-  alias CanvasAPI.{Account, Canvas, CanvasService, Team, User, UserService,
+  alias CanvasAPI.{Account, Canvas, CanvasService, User, UserService,
                    CanvasWatch}
 
   @preload [:user, canvas: [:team]]
@@ -117,10 +117,8 @@ defmodule CanvasAPI.CanvasWatchService do
 
   defp watch_query(account) do
     CanvasWatch
-    |> join(:left, [w], c in Canvas, w.canvas_id == c.id)
-    |> join(:left, [..., c], t in Team, c.team_id == t.id)
-    |> join(:left, [..., t], u in User, u.team_id == t.id)
-    |> where([..., u], u.account_id == ^account.id)
+    |> join(:left, [w], u in User, w.user_id == u.id)
+    |> where([_, u], u.account_id == ^account.id)
     |> preload(^@preload)
   end
 end
