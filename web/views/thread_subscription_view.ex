@@ -21,7 +21,7 @@ defmodule CanvasAPI.ThreadSubscriptionView do
       data: render_one(thread_subscription,
                        __MODULE__,
                        "thread_subscription.json"),
-      included: include_thread_subscription_user(thread_subscription)
+      included: [include_thread_subscription_user(thread_subscription)]
     }
   end
 

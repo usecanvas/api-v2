@@ -16,7 +16,7 @@ defmodule CanvasAPI.CommentView do
   def render("show.json", %{comment: comment}) do
     %{
       data: render_one(comment, __MODULE__, "comment.json"),
-      included: include_comment_creator(comment)
+      included: [include_comment_creator(comment)]
     }
   end
 
