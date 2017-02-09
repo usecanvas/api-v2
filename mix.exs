@@ -61,7 +61,7 @@ defmodule CanvasAPI.Mixfile do
      {:timex, "~> 3.0"},
      {:floki, "~> 0.10.1"},
      {:base62_uuid, "~> 1.2.3"},
-     {:appsignal, "~> 0.9.2"},
+     {:appsignal, "~> 0.11"},
      {:exq, github: "akira/exq", ref: "84e05ff"},
      {:ecto, github: "elixir-ecto/ecto", ref: "8460f42", override: true},
      {:sentry, "~> 2.0"},
