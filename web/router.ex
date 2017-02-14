@@ -44,6 +44,7 @@ defmodule CanvasAPI.Router do
     pipe_through :api
 
     get "/account", AccountController, :show
+    get "/exports/:team_id", ExportController, :show
     resources "/comments", CommentController
     resources "/canvas-watches", CanvasWatchController,
               only: [:create, :index, :delete]
