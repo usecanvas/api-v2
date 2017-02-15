@@ -6,6 +6,8 @@ defmodule CanvasAPI.UserService do
   use CanvasAPI.Web, :service
   alias CanvasAPI.{Account, Team, User}
 
+  @preload [:team]
+
   @doc """
   Insert a new user from the given params.
 
@@ -48,6 +50,18 @@ defmodule CanvasAPI.UserService do
   """
   @spec find_by_team(Account.t, Keyword.t) :: {:ok, User.t}
                                             | {:error, :not_found}
+  def find_by_team(account, team_domain: team_domain) do
+    from(u in assoc(account, :users),
+         join: t in Team, on: t.id == u.team_id,
+         where: t.domain == ^team_domain,
+         preload: [:team])
+    |> Repo.one
+    |> case do
+      nil ->  {:error, :not_found}
+      user -> {:ok, user}
+    end
+  end
+
   def find_by_team(account, team_id: team_id) do
     from(u in assoc(account, :users),
          join: t in Team, on: t.id == u.team_id,
@@ -59,4 +73,20 @@ defmodule CanvasAPI.UserService do
       user -> {:ok, user}
     end
   end
+
+  @doc """
+  Get a user by ID.
+  """
+  @spec get(String.t) :: {:ok, User.t} | {:error, :not_found}
+  def get(user_id) do
+    User
+    |> Repo.get(user_id)
+    |> case do
+      nil ->
+        {:error, :not_found}
+      user ->
+        {:ok, Repo.preload(user, @preload)}
+    end
+  end
+
 end

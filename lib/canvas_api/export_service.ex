@@ -10,9 +10,10 @@ defmodule CanvasAPI.ExportService do
   @doc """
   Get an export for a given team.
   """
-  @spec get(String.t, Keyword.t) :: {:ok, export} | {:error, any}
-  def get(team_id, account: account) do
-    with {:ok, user} <- UserService.find_by_team(account, team_id: team_id),
+  @spec get(String.t) :: {:ok, export} | {:error, any}
+  def get(encoded_token) do
+    with {:ok, user_id} <- validate_token(encoded_token),
+         {:ok, user} <- UserService.get(user_id),
          canvases <- CanvasService.list(user: user) do
       archive_name = "canvas-export-#{user.team.domain}"
 
@@ -29,6 +30,32 @@ defmodule CanvasAPI.ExportService do
 
       "#{archive_name}.zip"
       |> :zip.zip([readme(archive_name) | zip_files], [:memory])
+    end
+  end
+
+  @doc """
+  Get an export token.
+  """
+  @spec get_token(String.t, String.t) :: {:ok, String.t} | {:error, any}
+  def get_token(account, team_domain) do
+    with {:ok, user} <-
+           UserService.find_by_team(account, team_domain: team_domain) do
+      token =
+        CanvasAPI.Endpoint
+        |> Phoenix.Token.sign("export", user.id)
+        |> Base.url_encode64(padding: false)
+      {:ok, token}
+    end
+  end
+
+  @spec validate_token(String.t) :: {:ok, String.t} | {:error, any}
+  defp validate_token(encoded_token) do
+    with {:ok, token} <- Base.url_decode64(encoded_token, padding: false) do
+      Phoenix.Token.verify(
+        CanvasAPI.Endpoint,
+        "export",
+        token,
+        max_age: 600)
     end
   end
 
