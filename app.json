@@ -34,6 +34,10 @@
       "description": "Size of database pool",
       "required": false
     },
+    "DOCKER": {
+      "description": "Whether the app is running in a Docker container",
+      "required": false
+    },
     "EMBEDLY_API_KEY": {
       "description": "API key for Embedly",
       "required": false

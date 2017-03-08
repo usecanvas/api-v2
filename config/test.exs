@@ -26,6 +26,7 @@ else
   config :canvas_api, CanvasAPI.Repo,
     adapter: Ecto.Adapters.Postgres,
     database: "canvas_pro_api_test",
-    hostname: "localhost",
+    hostname: if(System.get_env("DOCKER"), do: "postgres", else: "localhost"),
+    username: if(System.get_env("DOCKER"), do: "postgres"),
     pool: Ecto.Adapters.SQL.Sandbox
 end
