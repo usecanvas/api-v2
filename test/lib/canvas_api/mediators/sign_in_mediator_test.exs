@@ -20,11 +20,6 @@ defmodule CanvasAPI.SignInMediatorTest do
     "image_88" => "https://example.com/user-image.png"
   }
 
-  setup do
-    insert(:whitelisted_domain, domain: @mock_team["domain"])
-    :ok
-  end
-
   test "creates a new account, personal team, team, and user" do
     with_mock Slack.OAuth, [access: mock_access] do
       account =
@@ -67,15 +62,6 @@ defmodule CanvasAPI.SignInMediatorTest do
       {:error, changeset} = Mediator.sign_in("ABCDEFG", account: account)
       assert(
         {:team_id, {"already exists for this account", []}} in changeset.errors)
-    end
-  end
-
-  test "allows only whitelisted teams" do
-    mock_team = @mock_team |> Map.merge(%{"domain" => "un-whitelist"})
-
-    with_mock Slack.OAuth, [access: mock_access(team: mock_team)] do
-      {:error, error} = Mediator.sign_in("ABCDEFG", account: nil)
-      assert error == {:domain_not_whitelisted, mock_team["domain"]}
     end
   end
 

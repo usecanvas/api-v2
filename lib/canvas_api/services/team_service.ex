@@ -26,7 +26,8 @@ defmodule CanvasAPI.TeamService do
   end
 
   def insert(params, type: :slack) do
-    if domain_whitelisted?(params["domain"]) do
+    if !System.get_env("DOMAIN_WHITELISTING") ||
+       domain_whitelisted?(params["domain"]) do
       %Team{}
       |> Team.create_changeset(params, type: :slack)
       |> Repo.insert
