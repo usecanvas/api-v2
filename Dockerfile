@@ -19,6 +19,6 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 # Compile app
-RUN mix compile
+RUN foreman run mix compile
 
 CMD foreman start -f Procfile.dev
