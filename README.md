@@ -1,59 +1,66 @@
-# CanvasAPI [![CircleCI](https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39)](https://circleci.com/gh/usecanvas/pro-api) [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/usecanvas/pro-api/tree/master)
+# Canvas API [![CircleCI][circle_ci_badge]][circle_ci_url] [![Deploy][heroku_button_svg]][heroku_deploy]
 
-To start your Phoenix app:
+This is the Canvas API, which provides an HTTP interface to Canvas resources,
+as well as event notifications over WebSockets.
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Start Phoenix endpoint with `foreman start -f Procfile.dev`
+## Dependencies
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  - **PostgreSQL**: The API stores data in PostgreSQL.
+  - **Redis**: Redis is used for API's worker queue and for event broadcasting.
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+### Slack OAuth
 
-## Learn more
+Canvas uses Slack for OAuth authentication. In order to run API, you will need
+to [create a new Slack API app][slack_api_apps]. The client ID and secret for
+this app should be set as `SLACK_CLIENT_ID` and `SLACK_CLIENT_SECRET` in the app
+environment.
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: https://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+Next, you'll want to set the redirect URLs for your Slack app, which should
+be the same as your `REDIRECT_URI` and `ADD_TO_SLACK_REDIRECT_URI` environment
+variables.
 
-## Documentation
+Also, you'll want to enable events for your Slack app (this should point to
+`protocol://host/webhooks/slack` with the `message.channels` subscription.
+Once this is enabled, get your verification token from the app credentials
+section of the Slack app admin interface and set it as
+`SLACK_VERIFICATION_TOKEN`.
 
-- [Internal documentation](https://usecanvas.github.io/pro-api)
-- [API documentation](https://github.com/usecanvas/pro-api/blob/master/api.md)
+Finally, enable a bot user for your Slack app.
 
-## Tasks
+### GitHub
 
-### Personal Access Tokens
+Canvas uses GitHub OAuth to unfurl GitHub links in Canvases, as well as to add
+events to canvas event pulses when canvases are mentioned in GitHub.
 
-To create a personal access token for an umbrella account, provide the domain
-and email address of a Slack user tied to that account, or the personal domain
-tied to the account:
+For the OAuth part, simply create a GitHub OAuth application and set the
+`GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` environment variables.
+The callback URL for the app should look like
+`protocol://host/oauth/github/callback`.
 
-```sh
-mix canvas_api.access_token usecanvas user@example.com
-```
+Webhooks currently have to be created manually on a per-org basis. Your
+webhook's URL should look like
+`protocol://host/webhooks/github?team.domain=teamdomain&team.id=teamid` with
+an `application/json` content type. The individual events to listen on would be
+"Commit comment", "Issue comment", "Issues, "Pull request", "Pull request
+review", "Pull request review comment", and "Push".
 
-Or:
+Make sure and set the webhook secret as `GITHUB_VERIFICATION_TOKEN`.
 
+### Embedly
 
-```sh
-mix canvas_api.access_token "~personal"
-```
+Canvas uses the Embedly API in order to unfurl links in canvases. Set an Embedly
+API key as `EMBEDLY_API_KEY`.
 
-Then, use token auth:
+## Running on Heroku
 
-```sh
-curl https://pro-api.usecanvas.com/v1/teams \
-  -H "Authorization: Bearer $token"
-```
+Canvas API should be the first Canvas app deployed. Use the Heroku button in
+this README and fill in environment variables appropriately.
 
-### Importing/Updating Templates
+## Importing/Updating Templates
 
-A template may be imported using the command line if it is in the ".canvas"
-format (meaning that it has a top-level "blocks" key, not "attributes.blocks"
-as in JSON API.
+A global template may be imported using the command line if it is in the
+".canvas" format (meaning that it has a top-level "blocks" key, not
+"attributes.blocks" as in JSON API.
 
 ```sh
 mix canvas_api.import_templates $URL1 $URL2 $URL3
@@ -70,3 +77,9 @@ Note that if the JSON from the URL contains an "ID" key, **the canvas or
 template with that ID will be replaced with the new contents**. This allows
 for the updating of templates. If you want to create a new template from an
 existing canvas, **make sure to strip the ID out of the JSON**.
+
+[circle_ci_badge]: https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39
+[circle_ci_url]: https://circleci.com/gh/usecanvas/pro-api
+[heroku_button_svg]: https://www.herokucdn.com/deploy/button.svg
+[heroku_deploy]: https://heroku.com/deploy?template=https://github.com/usecanvas/pro-api
+[slack_api_apps]: https://api.slack.com/apps

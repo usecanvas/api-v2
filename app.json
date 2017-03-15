@@ -1,12 +1,11 @@
 {
+  "name": "Canvas API",
+  "website": "https://github.com/usecanvas/pro-api",
   "addons": [
     "heroku-postgresql",
     "heroku-redis"
   ],
-  "scripts": {
-    "test-setup": "bin/addon-wait",
-    "test": "mix test"
-  },
+  "description": "The Canvas API",
   "buildpacks":[{
     "url": "https://github.com/heroku/heroku-buildpack-addon-wait.git"
   }, {
@@ -14,20 +13,17 @@
   }],
   "env": {
     "ADD_TO_SLACK_REDIRECT_URI": {
-      "description": "The redirect URI for Add-to-Slack",
-      "development_value": "http://localhost:4000/oauth/slack/add-to-slack/callback"
+      "description": "The redirect URI for Add-to-Slack. This should be in the format protocol://host/oauth/slack/add-to-slack"
     },
     "APPSIGNAL_PUSH_API_KEY": {
       "description": "An API key for pushing to Appsignal",
       "required": false
     },
     "BETA_REDIRECT_URI": {
-      "description": "The redirect URI for a non-whitelisted Slack domain",
-      "development_value": "http://localhost:4200/beta"
+      "description": "The redirect URI for a non-whitelisted Slack domain. This should be in the format protocol://web-app-host/beta"
     },
     "COOKIE_DOMAIN": {
       "description": "Domain for the cookie",
-      "development_value": "localhost",
       "value": "*.usecanvas.com"
     },
     "DATABASE_POOL_SIZE": {
@@ -60,42 +56,34 @@
       "description": "Client secret for a GitHub OAuth application"
     },
     "GITHUB_VERIFICATION_TOKEN": {
-      "description": "A verification token for GitHub Events API",
-      "development_required": false
+      "description": "A verification token for GitHub Events API"
     },
     "HOST": {
-      "description": "Hostname for this app",
-      "development_required": false
+      "description": "Hostname for this app"
     },
     "INTERCOM_SECURE_SECRET": {
       "description": "The secret key for Canvas Pro on Intercom for secure mode",
       "required": false
     },
     "REDIRECT_ON_AUTH_URL": {
-      "description": "The URL to redirect to on successful auth",
-      "development_value": "http://localhost:4200/post-auth"
+      "description": "The URL to redirect to on successful auth. This should be in the format protocol://web-app-host/post-auth"
     },
     "REDIRECT_ON_LOGIN_URL": {
-      "description": "The URL to redirect to on successful login",
-      "development_value": "http://localhost:4200"
+      "description": "The URL to redirect to on successful login. This should be in the format protocol://web-app-host"
     },
     "REDIRECT_URI": {
-      "description": "The redirect URI for Slack",
-      "development_value": "http://localhost:4000/oauth/slack/callback"
+      "description": "The redirect URI for Slack. This should be in the format protocol://host/oauth/slack/callback"
     },
     "REDIS_URL": {
       "description": "The URL to connect to Redis with",
-      "development_value": "redis://localhost:6379",
       "required": false
     },
     "PORT": {
       "description": "Port on which to run the app",
-      "required": false,
-      "development_value": "4000"
+      "required": false
     },
     "SECRET_KEY_BASE": {
-      "description": "A secret key for encrypting and signing data",
-      "development_value": "Bah0Bijei9epheeshuod4eBaB3aeThaeshet6vaevighieMai9maeti1aeb4Oa7ko9ohfoX2Quah0riec"
+      "description": "A secret key for encrypting and signing data"
     },
     "SENTRY_DSN": {
       "description": "A key for sending events to Sentry",
@@ -108,20 +96,35 @@
       "description": "A secret for a Slack app"
     },
     "SLACK_TOKEN_ENCRYPTION_KEY": {
-      "description": "A key used to encrypt and decrypt Slack tokens",
-      "development_value": "thaen6kiuNaoka4aengighoh5coo7soo"
+      "description": "A key used to encrypt and decrypt Slack tokens"
     },
     "SLACK_VERIFICATION_TOKEN": {
-      "description": "A verification token for Slack Events API",
-      "development_required": false
+      "description": "A verification token for Slack Events API"
     },
     "TEMPLATE_USER_ID": {
       "description": "ID of the user in the team containing templates",
       "required": false
     },
     "WEB_URL": {
-      "description": "URL on which the web app runs",
-      "development_value": "http://localhost:4200"
+      "description": "URL on which the web app runs. This should be in the format protocol://web-app-host"
+    }
+  },
+  "environments": {
+    "development": {
+      "ADD_TO_SLACK_REDIRECT_URI": "http://localhost:4000/oauth/slack/add-to-slack/callback",
+      "BETA_REDIRECT_URI": "http://localhost:4200/beta",
+      "COOKIE_DOMAIN": "localhost",
+      "GITHUB_VERIFICATION_TOKEN": "",
+      "HOST": "",
+      "PORT": "4000",
+      "REDIRECT_ON_AUTH_URL": "http://localhost:4200/post-auth",
+      "REDIRECT_ON_LOGIN_URL": "http://localhost:4200",
+      "REDIRECT_URI": "http://localhost:4000/oauth/slack/callback",
+      "REDIS_URL": "redis://localhost:6379",
+      "SECRET_KEY_BASE": "Bah0Bijei9epheeshuod4eBaB3aeThaeshet6vaevighieMai9maeti1aeb4Oa7ko9ohfoX2Quah0riec",
+      "SLACK_TOKEN_ENCRYPTION_KEY": "thaen6kiuNaoka4aengighoh5coo7soo",
+      "SLACK_VERIFICATION_TOKEN": "",
+      "WEB_URL": "http://localhost:4200"
     }
   }
 }
