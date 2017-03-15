@@ -31,5 +31,11 @@ config :canvas_api, CanvasAPI.Repo,
   hostname: "localhost",
   pool_size: 10
 
+if System.get_env("DOCKER") do
+  config :canvas_api, CanvasAPI.Repo,
+    hostname: "postgres",
+    username: "postgres"
+end
+
 config :mix_test_watch,
   tasks: ["test --stale", "credo --strict"]

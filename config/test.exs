@@ -28,4 +28,10 @@ else
     database: "canvas_pro_api_test",
     hostname: "localhost",
     pool: Ecto.Adapters.SQL.Sandbox
+
+  if System.get_env("DOCKER") do
+    config :canvas_api, CanvasAPI.Repo,
+      hostname: "postgres",
+      username: "postgres"
+  end
 end
