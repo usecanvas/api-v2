@@ -81,5 +81,5 @@ existing canvas, **make sure to strip the ID out of the JSON**.
 [circle_ci_badge]: https://circleci.com/gh/usecanvas/pro-api.svg?style=svg&circle-token=3bc227708e24ca576bd7b1db5f61a028e1441f39
 [circle_ci_url]: https://circleci.com/gh/usecanvas/pro-api
 [heroku_button_svg]: https://www.herokucdn.com/deploy/button.svg
-[heroku_deploy]: https://heroku.com/deploy?template=https://github.com/usecanvas/pro-api
+[heroku_deploy]: https://heroku.com/deploy?template=https://github.com/usecanvas/api-v2
 [slack_api_apps]: https://api.slack.com/apps
